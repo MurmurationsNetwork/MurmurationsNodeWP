@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "test_setting" : {
+      "type" :  "string",
+      "title" :  "Test setting",
+      "group" : "node_settings"
+    }
+  }
+}
