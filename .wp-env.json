@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    "."
+  ],
+  "config": {
+  },
+  "env": {
+    "development": {
+    },
+    "tests": {
+      "config": {
+      }
+    }
+  }
+}
