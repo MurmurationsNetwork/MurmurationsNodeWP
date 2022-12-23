@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.2.0
+ * Version:         0.2.2
  *
  * @package         Murmurations_Node
  */
@@ -254,11 +254,15 @@ function murmurations_profile_request(){
 
 	//load murmurations settings
 	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
-		$murmurations_data = get_option('murmurations-node_data', true);
+    $murmurations_data = get_option( 'murmurations-node_data', true );
+    $murmurations_data = array_filter( $murmurations_data, 'strlen' );//remove null data
+    $murmurations_data['tags'] = array_map( 'trim', explode( ',', $murmurations_data['tags'] ) );
+    if ( isset( $murmurations_data['urlSingleLabel'] ) && isset( $murmurations_data['urlSingleUrl'] ) ) {
+      $murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel'];
+      $murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl'];
+    }
 		$murmurations_data['geolocation']['lat'] = $murmurations_data['lat'];
 		$murmurations_data['geolocation']['lon'] = $murmurations_data['lon'];
-		$murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel']; //TODO repeater
-		$murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl']; //TODO repeater
 		
 		unset(
 			$murmurations_data['lat'],
