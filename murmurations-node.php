@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.2.2
+ * Version:         0.2.3
  *
  * @package         Murmurations_Node
  */
