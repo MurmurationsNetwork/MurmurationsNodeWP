@@ -1,6 +1,7 @@
 phpcs.xml
 phpunit.xml
 wp-cli.local.yml
+.wp-env.override.json
 node_modules/
 vendor/
 bin/
