@@ -65,10 +65,13 @@ const SettingsScreen = () => {
 										settingsFromState,
 								}, true )
 							  }).then((result) => {
-								apiFetch( { path: '/murmurations/v2/index/nodes' } ).then( ( posts ) => {
+								apiFetch( { path: '/murmurations/v2/index/nodes_sync' } ).then( ( posts ) => {
 									console.log( posts );
 								} )
-							  }).catch(alert); // ReferenceError: blabla is not defined
+							  }).catch((error) => {
+							  	console.error(error)
+							  });
+							  
 								// try {
 								// 	saveEntityRecord('root', 'site', {
 								// 		'murmurations-node_data':
@@ -84,11 +87,7 @@ const SettingsScreen = () => {
 								// 	} )
 								// }
 							
-							// Save settings to database
-							// const saveData = await saveEntityRecord('root', 'site', {
-							// 	'murmurations-node_data':
-							// 		settingsFromState,
-							// });
+							
 							// Validate
 							// apiFetch( { path: '/murmurations/v2/index/validate' } ).then( ( posts ) => {
 							// 	console.log( posts );
