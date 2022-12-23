@@ -257,6 +257,10 @@ function murmurations_profile_request(){
     $murmurations_data = get_option( 'murmurations-node_data', true );
     $murmurations_data = array_filter( $murmurations_data, 'strlen' );//remove null data
     $murmurations_data['tags'] = array_map( 'trim', explode( ',', $murmurations_data['tags'] ) );
+    if ( isset( $murmurations_data['urlSingleLabel'] ) && isset( $murmurations_data['urlSingleUrl'] ) ) {
+      $murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel'];
+      $murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl'];
+    }
 		$murmurations_data['geolocation']['lat'] = $murmurations_data['lat'];
 		$murmurations_data['geolocation']['lon'] = $murmurations_data['lon'];
 		
