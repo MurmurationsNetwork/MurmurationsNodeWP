@@ -261,8 +261,8 @@ function murmurations_profile_request(){
       $murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel'];
       $murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl'];
     }
-		$murmurations_data['geolocation']['lat'] = $murmurations_data['lat'];
-		$murmurations_data['geolocation']['lon'] = $murmurations_data['lon'];
+		$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['lat'] );
+		$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['lon'] );
 		
 		unset(
 			$murmurations_data['lat'],
