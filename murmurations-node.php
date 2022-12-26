@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.3.0
+ * Version:         0.3.1
  *
  * @package         Murmurations_Node
  */
@@ -272,8 +272,6 @@ function murmurations_profile_request(){
 			$murmurations_data['urlSingleUrl'],
 		);
 
-		$header['@id'] = site_url();
-		$header['@context'] = "https://library.murmurations.network/v2/schemas/organizations_schema-v1.0.0";
 		$header['linked_schemas'] = array('organizations_schema-v1.0.0');
 		$data = array_merge($header, $murmurations_data);
 		set_transient( "murmurations_profile", $data, HOUR_IN_SECONDS );
