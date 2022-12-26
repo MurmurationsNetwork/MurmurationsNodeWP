@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.3.1
+ * Version:         0.3.2
  *
  * @package         Murmurations_Node
  */
@@ -365,7 +365,7 @@ function murmurations_index_post_node(){
  *
  * @return WP_REST_Response
  */
-function murmurations_index_post_node_sync(){
+function murmurations_index_post_node_sync (){
 	delete_transient( 'murmurations_profile' );
 
 	$murmurations_data = get_option('murmurations-node_data', true);
@@ -392,7 +392,7 @@ function murmurations_index_post_node_sync(){
 	//TODO Error handling
 	if ( 200 === $response['response']['code'] ) {
 		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message->meta->message->data->node_id );
+		update_option('murmurations-node_id', $reponse_message->data->node_id );
 	} else {
     error_log( print_r( $request_args, true ) ); 
     error_log( print_r( $response, true ) );
