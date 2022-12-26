@@ -968,7 +968,7 @@ const SettingsScreen = () => {
       return posts;
     });
     if (!status.errors) {
-      let responseMessage = `status: ${status.status} \n node_id: ${status.node_id} \n profile_url: ${status.profile_url} \n last_updated: ${status.last_updated}`;
+      let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`;
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
@@ -992,8 +992,9 @@ const SettingsScreen = () => {
       console.log(posts);
       return posts;
     });
-    if (status.meta) {
-      createSuccessNotice(status, {
+    if (status.data) {
+      let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`;
+      createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
     } else {
