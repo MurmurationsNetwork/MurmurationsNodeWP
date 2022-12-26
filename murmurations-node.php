@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.2.4
+ * Version:         0.3.0
  *
  * @package         Murmurations_Node
  */
@@ -329,7 +329,7 @@ function murmurations_index_post_node(){
 		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
 		//'name' => $murmurations_data['name'],
 		//'primary_url' => site_url(),
-		'profile_url' => get_rest_url('murmurations/v2/profile'),
+		'profile_url' => rest_url( null, 'murmurations/v2/profile' ),
 		//'latitude' => $murmurations_data['lat'], 
 		//'longitude' => $murmurations_data['lon'],
 	));
@@ -375,7 +375,7 @@ function murmurations_index_post_node_sync(){
 		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
 		'name' => $murmurations_data['name'],
 		'primary_url' => site_url(),
-		'profile_url' => get_rest_url('murmurations/v2/profile'),
+		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
 		'latitude' => $murmurations_data['lat'], 
 		'longitude' => $murmurations_data['lon'],
 	));
@@ -399,9 +399,10 @@ function murmurations_index_post_node_sync(){
     error_log( print_r( $request_args, true ) ); 
     error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
+    update_option('murmurations-node_id', '' );
 	}
 
-	return rest_ensure_response( $reponse_message->meta->message );
+	return rest_ensure_response( $reponse_message );
 }
 
 /**
@@ -411,13 +412,13 @@ function murmurations_index_post_node_sync(){
  *
  * @return WP_REST_Response
  */
-function murmurations_index_validate(){
+function murmurations_index_validate () {
 	$murmurations_data = get_option('murmurations-node_data', true);
 	$json_data = json_encode( array(
 		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
 		'name' => $murmurations_data['name'],
 		'primary_url' => site_url(),
-		'profile_url' => get_rest_url('murmurations/v2/profile'),
+		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
 		'latitude' => $murmurations_data['lat'], 
 		'longitude' => $murmurations_data['lon'],
 	));
@@ -443,7 +444,7 @@ function murmurations_index_validate(){
 		$reponse_message = json_decode ( $response['body'] );
 	}
 
-	return rest_ensure_response( $reponse_message->meta->message );
+	return rest_ensure_response( $reponse_message );
 }
 
 /**
@@ -453,13 +454,13 @@ function murmurations_index_validate(){
  *
  * @return WP_REST_Response
  */
-function murmurations_index_node_status() {
-	$murmurations_data = get_option('murmurations-node_data', true);
+function murmurations_index_node_status () {
+	$murmurations_data = get_option( 'murmurations-node_data', true );
 	$json_data = json_encode( array(
 		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
 		'name' => $murmurations_data['name'],
 		'primary_url' => site_url(),
-		'profile_url' => get_rest_url('murmurations/v2/profile'),
+		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
 		'latitude' => $murmurations_data['lat'], 
 		'longitude' => $murmurations_data['lon'],
 	));
@@ -469,24 +470,27 @@ function murmurations_index_node_status() {
 			'Content-Type' => 'application/json',
 			'accept' => 'application/json',
 		),
-		'body'     	 => $json_data,
+		//'body'     	 => $json_data,
 	);
-	$query = MURMURATIONS_NODE_INDEX . '/validate';
+  $node_id = get_option( 'murmurations-node_id', false );
+  if ( $node_id ) {
+    $query = MURMURATIONS_NODE_INDEX . "/nodes/{$node_id}";
 	
-	$response = wp_safe_remote_get( $query, $request_args );
-
-	//TODO Error handling
-	if ( 200 === $response['response']['code'] ) {
-		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message );
-	} else {
-		$reponse_message = json_decode ( $response['body'] );
-	}
-	
-	error_log( print_r( $request_args, true ) );  
-	error_log( print_r( $response, true ) );
-
-	return rest_ensure_response( $reponse_message->meta->message );
+    $response = wp_safe_remote_get( $query, $request_args );
+  
+    //TODO Error handling
+    if ( 200 === $response['response']['code'] ) {
+      $reponse_message = json_decode ( $response['body'] );
+    } else {
+      $reponse_message = json_decode ( $response['body'] );
+    }
+    error_log( print_r( $request_args, true ) );  
+    error_log( print_r( $response, true ) );
+  } else {
+    $reponse_message = __( 'Profile not indexed', 'murmurations-node' );
+    error_log( print_r( $reponse_message, true ) );
+  }
+	return rest_ensure_response( $reponse_message );
 }
 
 /**
