@@ -969,7 +969,7 @@ const SettingsScreen = () => {
     });
     if (!status.errors) {
       let responseMessage = `status: ${status.status} \n node_id: ${status.node_id} \n profile_url: ${status.profile_url} \n last_updated: ${status.last_updated}`;
-      createSuccessNotice(status.meta.mode_id, {
+      createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
       setIsTesting(false);
