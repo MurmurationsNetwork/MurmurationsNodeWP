@@ -79,7 +79,7 @@ function enqueue_settings_script( $hook ) {
 	$asset_file_page = plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 	if ( file_exists( $asset_file_page ) && 'settings_page_murmurations-node' === $hook ) {
 		$assets = require $asset_file_page;
-		
+		wp_enqueue_media();
 		wp_register_script(
 			'murmurations-node',
 			plugin_dir_url( __FILE__ ) . 'build/index.js',
