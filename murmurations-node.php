@@ -19,10 +19,16 @@ include "includes/autoload.php";
 define( 'MURMNODE_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
-if ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) {
-	\defined( 'MURMURATIONS_NODE_INDEX' ) || \define( 'MURMURATIONS_NODE_INDEX', 'https://test-index.murmurations.network/v2' );
-} else {
-	\defined( 'MURMURATIONS_NODE_INDEX' ) || \define( 'MURMURATIONS_NODE_INDEX', 'https://index.murmurations.network/v2' );
+$murmurations_data = get_option( 'murmurations-node_data', true );
+if ( isset($murmurations_data['env']) ) {
+  error_log('dev_mode: ' . $murmurations_data['env'] );
+  if ( 'test' === $murmurations_data['env'] ) {
+    \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://test-index.murmurations.network/v2' );
+    \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://test-library.murmurations.network/v2/' );
+  } else {
+    \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://index.murmurations.network/v2' );
+    \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://library.murmurations.network/v2/' );
+  }
 }
 
 function llog( $content, $meta = null ){
@@ -183,6 +189,9 @@ function murmurations_plugin_settings() {
 						'rss' => array(
 						  'type' => 'string',
 						),
+						'env' => array(
+						  'type' => 'string',
+						),
 					),
 				),
 			),
@@ -340,7 +349,7 @@ function murmurations_index_post_node(){
 		'body'     	 => $json_data,
 	);
 	error_log( print_r( $request_args, true ) );  
-	$query = MURMURATIONS_NODE_INDEX . '/nodes';
+	$query = MURMURATIONS_INDEX . '/nodes';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
 	
@@ -385,7 +394,7 @@ function murmurations_index_post_node_sync (){
 		),
 		'body'     	 => $json_data,
 	);
-	$query = MURMURATIONS_NODE_INDEX . '/nodes-sync';
+	$query = MURMURATIONS_INDEX . '/nodes-sync';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
 	
@@ -428,7 +437,7 @@ function murmurations_index_validate () {
 		),
 		'body'     	 => $json_data,
 	);
-	$query = MURMURATIONS_NODE_INDEX . '/validate';
+	$query = MURMURATIONS_INDEX . '/validate';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
 
@@ -472,7 +481,7 @@ function murmurations_index_node_status () {
 	);
   $node_id = get_option( 'murmurations-node_id', false );
   if ( $node_id ) {
-    $query = MURMURATIONS_NODE_INDEX . "/nodes/{$node_id}";
+    $query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
 	
     $response = wp_safe_remote_get( $query, $request_args );
   
@@ -509,7 +518,7 @@ function murmurations_index_node_delete() {
 		),
 	);
   delete_option( 'murmurations-node_id' );
-	$query = MURMURATIONS_NODE_INDEX . "/nodes/{$node_id}";
+	$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
 	
 	$response = wp_remote_request( $query, $request_args );
 

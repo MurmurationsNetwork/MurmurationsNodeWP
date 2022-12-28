@@ -20,6 +20,7 @@ const Rss = () => {
             label={__('RSS', 'murmurations-node')}
             value={rss}
             onChange={(value) => setSetting('rss', value)}
+            help={__("The URL for the entity's RSS feed", 'murmurations-node')}
         />
 	);
 };

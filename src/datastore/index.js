@@ -30,6 +30,7 @@ import {
 	SET_IMAGE_ID,
 	SET_TAGS,
 	SET_RSS,
+	SET_ENV,
 	//
 } from './constants';
 
@@ -197,6 +198,14 @@ const actions = {
 			},
 		};
 	},
+	setEnv(env) {
+		return {
+			type: SET_ENV,
+			payload: {
+				env,
+			},
+		};
+	},
 
 	
 	setUserPreferences(userPreferences) {
@@ -353,6 +362,12 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				...state,
 				rss,
 			};
+		case SET_ENV:
+			const { env } = payload;
+			return {
+				...state,
+				env,
+			};
 		
 		case SET_USER_PREFERENCES:
 			const { userPreferences } = payload;
@@ -425,6 +440,9 @@ const selectors = {
 	},
 	getRSS(state) {
 		return state.rss;
+	},
+	getEnv(state) {
+		return state.env;
 	},
 	getSettings(state) {
 		const { ...settings } = state;

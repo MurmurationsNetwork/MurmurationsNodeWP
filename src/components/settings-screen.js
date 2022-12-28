@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Panel, PanelBody, PanelRow, SearchControl, Spinner } from '@wordpress/components';
+import { Button, Panel, PanelBody, PanelRow, FormToggle, Spinner } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect, coreDataStore } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data'; // do I need this?
@@ -27,6 +27,7 @@ import Image from './image';
 import Tags from './tags';
 import Rss from './rss';
 import Notifications, { createSuccessNotice, createErrorNotice } from './notifications';
+import Env from './env';
 
 {/* 
 	SET_RSS, */}
@@ -153,16 +154,22 @@ const SettingsScreen = () => {
 	return (
 		<div className="wrap">
 			<Panel header="Murmurations Node Settings">
+				<PanelBody title={ __( 'Environment', 'murmurations-node') } initialOpen={ false }>
+					<PanelRow>
+						<Env />
+					</PanelRow>
+				</PanelBody>
 				<PanelBody>
 					<Name />
 					<PrimaryUrl />
 					<Urls />
 					<Description />
 					<Mission />
-					<Location />
 					<Image />
 					<Tags />
 					<Rss />
+					<Location />
+					<hr />
 					<Button variant="primary" onClick={ handleSave } disabled={ isRequesting } >
 						{ isRequesting ? (
 							<>

@@ -20,6 +20,7 @@ export const SET_IMAGE = 'SET_IMAGE';
 export const SET_IMAGE_ID = 'SET_IMAGE_ID';
 export const SET_TAGS = 'SET_TAGS';
 export const SET_RSS = 'SET_RSS';
+export const SET_ENV = 'SET_ENV';
 //
 export const STATE_FROM_DATABASE = 'STATE_FROM_DATABASE';
 export const FETCH_SETTINGS = 'FETCH_SETTINGS';

@@ -20,6 +20,7 @@ const Tags = () => {
             label={__('Tags', 'murmurations-node')}
             value={tags}
             onChange={(value) => setSetting('tags', value)}
+			help={__('Keywords relevant to this entity and its activities or attributes.', 'murmurations-node')}
         />
 	);
 };

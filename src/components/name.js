@@ -20,7 +20,7 @@ const Name = () => {
 			label={__('Name', 'murmurations-node')}
 			value={name}
 			onChange={(value) => setSetting('name', value)}
-			//onChange={(value) => setName(value)}
+			help={__('The name of the entity, organization, project, item, etc.', 'murmurations-node' )}
 		/>
 	);
 };

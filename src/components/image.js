@@ -1,19 +1,44 @@
 /**
  * WordPress dependencies
  */
-//import { addFilter } from '@wordpress/hooks'
+import { addFilter } from '@wordpress/hooks'
 import { TextControl, Button, ResponsiveWrapper } from '@wordpress/components';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/media-utils'
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';
-// const replaceMediaUpload = () => MediaUpload;
 
-// addFilter(
-// 	'editor.MediaUpload',
-// 	'core/edit-post/components/media-upload/replace-media-upload',
-// 	replaceMediaUpload
-// );
+const replaceMediaUpload = () => MediaUpload;
+
+addFilter(
+	'editor.MediaUpload',
+	'core/edit-post/components/media-upload/replace-media-upload',
+	replaceMediaUpload
+);
+
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+function MyMediaUploader() {
+	const mediaId = useSelect((select) => select(STORE_NAME).getImage()) ? useSelect((select) => select(STORE_NAME).getImage()) : 'http://localhost:8888/wp-content/uploads/2022/12/pancho_papa_popper.jpg';
+	console.log( 'mediaId: ' + mediaId )
+	const { setImage, setSetting } =
+		useDispatch(STORE_NAME);
+	return (
+		<MediaUploadCheck>
+			<MediaUpload
+				onSelect={ ( media ) =>
+					console.log( 'selected ' + media.length )
+				}
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ mediaId }
+				render={ ( { open } ) => (
+					<Button onClick={ open }>Open Media Library</Button>
+				) }
+				help={__('An image that is generally used to refer to the entity, organization, project, etc.', 'murmurations-node')}
+			/>
+		</MediaUploadCheck>
+	);
+}
 
 const Image = () => {
 	// Get the name from the state.
@@ -27,7 +52,7 @@ const Image = () => {
 	// const media = useSelect(
 	// 	(select) => {
 	// 		//console.log( 'useSelect' )
-	// 		// let meida = select('core').getMedia(id);
+	// 		// let media = select('core').getMedia(id);
 	// 		// console.table( meida )
 	// 		console.table( id )
 	// 		return id;// ? select('core').getMedia(id) : 12;
@@ -86,4 +111,5 @@ const Image = () => {
 		//</MediaUploadCheck>
 	);
 };
+// export default MyMediaUploader;
 export default Image;

@@ -19,6 +19,7 @@ const GeoLocationLat = () => {
 			label={__('Latitude', 'murmurations-node')}
 			value={geoLocationLat}
 			onChange={(value) => setSetting('geoLocationLat', value)}
+			help={__('The geo-coordinates (latitude)', 'murmurations-node')}
 		/>
 	);
 };

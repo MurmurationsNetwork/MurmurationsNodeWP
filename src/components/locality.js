@@ -19,7 +19,8 @@ const Locality = () => {
             label={__('Locality', 'murmurations-node')}
             value={locality}
             onChange={(value) => setSetting('locality', value)}
-        />
+            help={__('The locality (city, town, village, etc.) where the entity is located', 'murmurations-node')}
+			/>
 	);
 };
 export default Locality;

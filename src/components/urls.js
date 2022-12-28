@@ -47,15 +47,17 @@ const Urls = () => {
 				<legend>URLS</legend>
 				<PanelRow>
 					<TextControl
-						label={__('Link Label', 'murmurations-node')}
+						label={__('URL Name', 'murmurations-node')}
 						value={urlSingleLabel}
 						onChange={(value) => setSetting('urlSingleLabel', value)}
+						help={__('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')}
 					/>
 					<TextControl
-						label={__('Link Url', 'murmurations-node')}
+						label={__('URL', 'murmurations-node')}
 						placeholder={'https://example.com'}
 						value={urlSingleUrl}
 						onChange={(value) => setSetting('urlSingleUrl', value)}
+						help={__('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')}
 					/>
 				</PanelRow>
 				{/* <Button

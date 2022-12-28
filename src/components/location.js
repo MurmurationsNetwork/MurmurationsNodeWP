@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { TextControl, PanelRow, Button, PanelBody, SelectControl, RadioControl } from '@wordpress/components';
+import { TextControl, PanelRow, Button, PanelBody, SelectControl, RadioControl, SearchControl, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';
@@ -11,7 +11,6 @@ import { useRef } from '@wordpress/element';
 import Locality from './locality';
 import Region from './region';
 import Country from './country';
-//import GeoLocation from './geolocation';
 import GeoLocationLat from './geolocation-lat';
 import GeoLocationLon from './geolocation-lon';
 
@@ -33,92 +32,89 @@ const Location = () => {
     const latInputRef = useRef(null);
     const lonInputRef = useRef(null);
 
+    // Search OpenMaps API
+    const handleSearch = () => {
+        apiFetch( { 
+            path: 'murmurations/v2/find/location',
+            method: 'POST',
+            data: { location }
+        } )
+            .then((response) => JSON.parse(response.body))
+            .then((body) => {
+                // TODO add some kind of select list
+                // Use first result
+                let first = body[0];
+                let locationArr = first.display_name.split(', ');
+
+                // Populate fields
+                locationInputRef.current = first.display_name; 
+                countryInputRef.current = locationArr.pop();
+                regionInputRef.current = locationArr.pop();
+                localityInputRef.current = locationArr.join(", ").toString();
+                latInputRef.current = first.lat;
+                lonInputRef.current = first.lon;
+                
+                setSetting('location', locationInputRef.current)
+                setSetting('locality', localityInputRef.current)
+                setSetting('region', regionInputRef.current)
+                setSetting('country_name', countryInputRef.current)
+                setSetting('lat', latInputRef.current)
+                setSetting('lon', lonInputRef.current)
+                
+                //locationInputRef.current.focus();
+            });
+    }
+
 	// Update the state.
 	const { setLocation, setLocality, setRegion, setCountry, setGeoLocationLat, setGeoLocationLon, setSetting } =
 		useDispatch(STORE_NAME);
 
 	return (
-        <PanelRow>
-            <fieldset>
-                <legend>Search</legend>
-                <TextControl
+        <div>
+            <PanelRow>
+                <SearchControl
                     label={__('Location', 'murmurations-node')}
+                    hideLabelFromVision={false}
                     ref={locationInputRef}
                     value={location}
                     onChange={(value) => setSetting('location', value)}
+                    onKeyPress={ (event) => { 
+                        if (event.key === 'Enter' ) {
+                            handleSearch()
+                        } }  
+                    }
+                    help={ __('Lookup your location to fill in the values below.', 'murmurations-node')}
+                    className={'murmurations-search-field'}
                 />
-                <Button
-                    variant='secondary'
-                    //isSmall={true}
-                    //style={{marginTop: '1rem'}}
-                    onClick={() => {
-                        // Search OpenMaps API
-                        apiFetch( { 
-                            path: 'murmurations/v2/find/location',
-                            method: 'POST',
-                            data: { location }
-                        } )
-                            .then((response) => JSON.parse(response.body))
-                            .then((body) => {
-                                // TODO add some kind of select list
-                                // Use first result
-                                let first = body[0];
-                                let locationArr = first.display_name.split(', ');
-
-                                // Populate fields
-                                locationInputRef.current = first.display_name; 
-                                countryInputRef.current = locationArr.pop();
-                                regionInputRef.current = locationArr.pop();
-                                localityInputRef.current = locationArr.join(", ").toString();
-                                latInputRef.current = first.lat;
-                                lonInputRef.current = first.lon;
-                                
-                                setSetting('location', locationInputRef.current)
-                                setSetting('locality', localityInputRef.current)
-                                setSetting('region', regionInputRef.current)
-                                setSetting('country_name', countryInputRef.current)
-                                //setSetting('geoLocationLat', geoLocationLatInputRef.current)
-                                setSetting('lat', latInputRef.current)
-                                setSetting('lon', lonInputRef.current)
-                                
-                                locationInputRef.current.focus();
-                            });
-                    }}
-                >
-                    {__('Search', 'murmurations-node')}
-                </Button>
-            </fieldset>
-            <fieldset>
-                <legend>(Hidden?)</legend>
-                <PanelRow>
-                    <Locality 
-                        ref={localityInputRef}
-                        value={locality}
-                        onChange={(value) => setSetting('locality', value)}
-                    />
-                    <Region 
-                        ref={regionInputRef}
-                        value={region}
-                        onChange={(value) => setSetting('region', value)}
-                    />
-                    <Country 
-                        ref={countryInputRef}
-                        value={country_name}
-                        onChange={(value) => setSetting('country_name', value)}
-                    />
-                    <GeoLocationLat
-                        ref={latInputRef}
-                        value={lat}
-                        onChange={(value) => setSetting('lat', value)}
-                    />
-                    <GeoLocationLon
-                        ref={lonInputRef}
-                        value={lon}
-                        onChange={(value) => setSetting('lon', value)}
-                    />
-                </PanelRow>
-            </fieldset>
-        </PanelRow>
+            </PanelRow>
+            <PanelRow>
+                <Locality 
+                    ref={localityInputRef}
+                    value={locality}
+                    onChange={(value) => setSetting('locality', value)}
+                />
+                <Region 
+                    ref={regionInputRef}
+                    value={region}
+                    onChange={(value) => setSetting('region', value)}
+                />
+                <Country 
+                    ref={countryInputRef}
+                    value={country_name}
+                    onChange={(value) => setSetting('country_name', value)}
+                />
+                <GeoLocationLat
+                    ref={latInputRef}
+                    value={lat}
+                    onChange={(value) => setSetting('lat', value)}
+                />
+                <GeoLocationLon
+                    ref={lonInputRef}
+                    value={lon}
+                    onChange={(value) => setSetting('lon', value)}
+                />
+            </PanelRow>
+        </div>
 	);
 };
 export default Location;

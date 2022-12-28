@@ -19,6 +19,7 @@ const Country = () => {
             label={__('Country', 'murmurations-node')}
             value={country_name}
             onChange={(value) => setSetting('country_name', value)}
+			help={__('The name of country where the entity is based', 'murmurations-node' )}
         />
 	);
 };

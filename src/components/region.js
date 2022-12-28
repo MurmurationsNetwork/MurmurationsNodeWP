@@ -19,6 +19,7 @@ const Region = () => {
             label={__('Region', 'murmurations-node')}
             value={region}
             onChange={(value) => setSetting('region', value)}
+            help={__('The region (state, county, province, etc.) where the entity is located', 'murmurations-node')}
         />
 	);
 };
