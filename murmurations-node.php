@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Murmurations Node
  * Plugin URI:      https://github.com/MurmurationsNetwork/MurmurationsNodeWP
- * Description:     Put your organisation on the map!
+ * Description:     Add your Profile to the Murmurations decentralised data sharing network.
  * Author:          Murmurations Network
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
@@ -53,8 +53,8 @@ function murmurations_settings_link( $links ) {
  */
 function register_plugin_settings_page() {
 	$page_hook_suffix = \add_options_page(
-		__( 'Murmurations Node', 'murmurations-node' ),
-		__( 'Murmurations Node', 'murmurations-node' ),
+		__( 'Murmurations', 'murmurations-node' ),
+		__( 'Murmurations', 'murmurations-node' ),
 		'manage_options',
 		'murmurations-node',
 		__NAMESPACE__ . '\render_settings_page',
