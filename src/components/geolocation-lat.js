@@ -5,10 +5,11 @@ import { TextControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';
+import { forwardRef } from '@wordpress/element';
 
-const GeoLocationLat = () => {
+const GeoLocationLat = forwardRef(function GeoLocationLat(props, ref) {
 	// Get the name from the state.
-	const geoLocationLat = useSelect((select) => select(STORE_NAME).getGeoLocationLat());
+	const latitude = useSelect((select) => select(STORE_NAME).getGeoLocationLat());
 
 	// Update the state.
 	const { setGeoLocationLat, setSetting } =
@@ -17,10 +18,11 @@ const GeoLocationLat = () => {
 	return (	
 		<TextControl
 			label={__('Latitude', 'murmurations-node')}
-			value={geoLocationLat}
-			onChange={(value) => setSetting('geoLocationLat', value)}
+			ref={ref}
+			value={latitude ?? ''}
+			onChange={(value) => setSetting('latitude', value)}
 			help={__('The geo-coordinates (latitude)', 'murmurations-node')}
 		/>
 	);
-};
+});
 export default GeoLocationLat;

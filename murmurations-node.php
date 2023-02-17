@@ -121,60 +121,60 @@ function murmurations_plugin_settings() {
 					'type'       => 'object',
 					'properties' => array(
 						'name' => array(
-						  'type' => 'string',
-						),
-						'primary_url' => array(
-						  'type' => 'string',
-						),
-            'urlSingleLabel' => array( //Temp
-              'type' => 'string',
-            ),
-            'urlSingleUrl' => array( //Temp
-              'type' => 'string',
-            ),
-						'urls' => array(
-						  'type' => 'array',
-						  'properties' => array(
-							  'type' => 'object',
-							  'properties' => array(
-                  'name' => 'string',
-                  'url' => 'string',
-							  )
-						  )
-						),
-						'description' => array(
-						  'type' => 'string',
-						),
-						'mission' => array(
-						  'type' => 'string',
-						),
-						'location' => array(
-						  'type' => 'string',
-						),
-						'locality' => array(
-						  'type' => 'string',
-						),
-						'region' => array(
-						  'type' => 'string',
-						),
-						'country_name' => array(
-						  'type' => 'string',
-						),
-						'geolocation' => array(
-						  'type' => 'object',
-						  'properties' => array(
-                'lat' => array(
-                  'type' => 'string',
-                ),
-                'lon' => array(
-                  'type' => 'string',
-                ),
-              ),
-						),
-						'lat' => array(
 							'type' => 'string',
 						),
-						'lon' => array(
+						'primary_url' => array(
+							'type' => 'string',
+						),
+						'urlSingleLabel' => array( //Temp
+							'type' => 'string',
+						),
+						'urlSingleUrl' => array( //Temp
+							'type' => 'string',
+						),
+						'urls' => array(
+							'type' => 'array',
+							'properties' => array(
+								'type' => 'object',
+								'properties' => array(
+									'name' => 'string',
+									'url' => 'string',
+								)
+							)
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'mission' => array(
+							'type' => 'string',
+						),
+						'location' => array(
+							'type' => 'string',
+						),
+						'locality' => array(
+							'type' => 'string',
+						),
+						'region' => array(
+							'type' => 'string',
+						),
+						'country_name' => array(
+							'type' => 'string',
+						),
+						'geolocation' => array(
+							'type' => 'object',
+							'properties' => array(
+								'lat' => array(
+									'type' => 'string',
+								),
+								'lon' => array(
+									'type' => 'string',
+								),
+							),
+						),
+						'latitude' => array(
+							'type' => 'string',
+						),
+						'longitude' => array(
 							'type' => 'string',
 						),
 						'image' => array(
@@ -257,9 +257,9 @@ add_action( 'rest_api_init', __NAMESPACE__ . '\murmurations_plugin_settings' );
  * @return WP_REST_Response
  */
 function murmurations_profile_request(){
-  if ( false === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
-    return new \WP_Error( 'murmurations_no_saved_profile', __( 'No profile found', 'murmurations-node' ), array( 'status' => 404 ) );
-  }
+	if ( false === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
+		return new \WP_Error( 'murmurations_no_saved_profile', __( 'No profile found', 'murmurations-node' ), array( 'status' => 404 ) );
+	}
 
 	//load murmurations settings
 	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
@@ -270,12 +270,13 @@ function murmurations_profile_request(){
       $murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel'];
       $murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl'];
     }
-		$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['lat'] );
-		$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['lon'] );
+		$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['latitude'] );
+		$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['longitude'] );
 		
 		unset(
-			$murmurations_data['lat'],
-			$murmurations_data['lon'],
+			$murmurations_data['env'],
+			$murmurations_data['latitude'],
+			$murmurations_data['longitude'],
 			$murmurations_data['location'],
 			$murmurations_data['urlSingleLabel'],
 			$murmurations_data['urlSingleUrl'],
@@ -383,8 +384,8 @@ function murmurations_index_post_node_sync (){
 		'name' => $murmurations_data['name'],
 		'primary_url' => site_url(),
 		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
-		'latitude' => $murmurations_data['lat'], 
-		'longitude' => $murmurations_data['lon'],
+		'latitude' => $murmurations_data['latitude'], 
+		'longitude' => $murmurations_data['longitude'],
 	));
 	$request_args = array(
 		'timeout'    => 15,

@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { TextControl, PanelRow, Button, PanelBody, SelectControl, RadioControl, SearchControl, Dashicon } from '@wordpress/components';
+import { TextControl, PanelRow, Button, PanelBody, SelectControl, RadioControl, SearchControl, Dashicon, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';
 import apiFetch from '@wordpress/api-fetch';
-import { useRef } from '@wordpress/element';
+import { useRef, forwardRef, useState } from '@wordpress/element';
 
 import Locality from './locality';
 import Region from './region';
@@ -20,20 +20,22 @@ const Location = () => {
 	const locality = useSelect((select) => select(STORE_NAME).getLocality());
 	const region = useSelect((select) => select(STORE_NAME).getRegion());
 	const country_name = useSelect((select) => select(STORE_NAME).getCountryName());
-    const lat = useSelect((select) => select(STORE_NAME).getGeoLocationLat());
-	const lon = useSelect((select) => select(STORE_NAME).getGeoLocationLon());
+    const latitude = useSelect((select) => select(STORE_NAME).getGeoLocationLat());
+	const longitude = useSelect((select) => select(STORE_NAME).getGeoLocationLon());
 	//const { lat, lon } = useSelect((select) => select(STORE_NAME).getGeoLocation());
+    const [ isSearching, setIsSearching ] = useState( false );
 
-    const locationInputRef = useRef(null);
-    const localityInputRef = useRef(null);
-    const regionInputRef = useRef(null);
-    const countryInputRef = useRef(null);
+    const locationInputRef = useRef('');
+    const localityInputRef = useRef('');
+    const regionInputRef = useRef('');
+    const countryInputRef = useRef('');
     // const geoLocationLatInputRef = useRef(null);
-    const latInputRef = useRef(null);
-    const lonInputRef = useRef(null);
+    const latInputRef = useRef('');
+    const lonInputRef = useRef('');
 
     // Search OpenMaps API
     const handleSearch = () => {
+        setIsSearching(true)
         apiFetch( { 
             path: 'murmurations/v2/find/location',
             method: 'POST',
@@ -41,8 +43,12 @@ const Location = () => {
         } )
             .then((response) => JSON.parse(response.body))
             .then((body) => {
+                setIsSearching(false)
                 // TODO add some kind of select list
                 // Use first result
+                if ( !body.length > 0 ) {
+                    console.log('no results found')
+                }
                 let first = body[0];
                 let locationArr = first.display_name.split(', ');
 
@@ -58,19 +64,25 @@ const Location = () => {
                 setSetting('locality', localityInputRef.current)
                 setSetting('region', regionInputRef.current)
                 setSetting('country_name', countryInputRef.current)
-                setSetting('lat', latInputRef.current)
-                setSetting('lon', lonInputRef.current)
+                setSetting('latitude', latInputRef.current)
+                setSetting('longitude', lonInputRef.current)
                 
                 //locationInputRef.current.focus();
             });
     }
 
 	// Update the state.
-	const { setLocation, setLocality, setRegion, setCountry, setGeoLocationLat, setGeoLocationLon, setSetting } =
-		useDispatch(STORE_NAME);
-
+	const { 
+        setLocation, 
+        setLocality, 
+        setRegion, 
+        setCountry, 
+        setGeoLocationLat, 
+        setGeoLocationLon, 
+        setSetting 
+    } = useDispatch(STORE_NAME);
 	return (
-        <div>
+        <PanelBody>
             <PanelRow>
                 <SearchControl
                     label={__('Location', 'murmurations-node')}
@@ -86,6 +98,19 @@ const Location = () => {
                     help={ __('Lookup your location to fill in the values below.', 'murmurations-node')}
                     className={'murmurations-search-field'}
                 />
+                <Button 
+                    variant="primary"
+                    icon={'search'}
+                    onClick={ handleSearch } 
+                    disabled={ isSearching }
+                    >
+                    { isSearching ? (
+                        <>
+                            { __( 'Searching...', 'murmurations-node') }
+                            <Spinner/>
+                        </>
+                    ) : __( 'Search', 'murmurations-node') }
+                </Button>
             </PanelRow>
             <PanelRow>
                 <Locality 
@@ -105,16 +130,16 @@ const Location = () => {
                 />
                 <GeoLocationLat
                     ref={latInputRef}
-                    value={lat}
-                    onChange={(value) => setSetting('lat', value)}
+                    value={latitude}
+                    onChange={(value) => setSetting('latitude', value)}
                 />
                 <GeoLocationLon
                     ref={lonInputRef}
-                    value={lon}
-                    onChange={(value) => setSetting('lon', value)}
+                    value={longitude}
+                    onChange={(value) => setSetting('longitude', value)}
                 />
             </PanelRow>
-        </div>
+        </PanelBody>
 	);
 };
 export default Location;

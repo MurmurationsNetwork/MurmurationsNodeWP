@@ -24,8 +24,8 @@ import {
 	SET_REGION,
 	SET_COUNTRY_NAME,
 	SET_GEOLOCATION,
-	SET_GEOLOCATIONLAT,
-	SET_GEOLOCATIONLON,
+	SET_GEOLOCATION_LAT,
+	SET_GEOLOCATION_LON,
 	SET_IMAGE,
 	SET_IMAGE_ID,
 	SET_TAGS,
@@ -150,19 +150,19 @@ const actions = {
 			},
 		};
 	},
-	setGeoLocationLat(lat) {
+	setGeoLocationLat(latitude) {
 		return {
-			type: SET_GEOLOCATIONLAT,
+			type: SET_GEOLOCATION_LAT,
 			payload: {
-				lat,
+				latitude,
 			},
 		};
 	},
-	setGeoLocationLon(lon) {
+	setGeoLocationLon(longitude) {
 		return {
-			type: SET_GEOLOCATIONLON,
+			type: SET_GEOLOCATION_LON,
 			payload: {
-				lon,
+				longitude,
 			},
 		};
 	},
@@ -318,25 +318,25 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				country_name,
 			};
 		// case SET_GEOLOCATION:
-		// 	const { lat, lon } = payload; // { geolocation }
+		// 	const { latitude, latitude } = payload; // { geolocation }
 		// 	return {
 		// 		...state,
 		// 		geolocation: {
-		// 			lat,
-		// 			lon
+		// 			latitude,
+		// 			longitude
 		// 		},
 		// 	};
-		case SET_GEOLOCATIONLAT:
-			const { lat } = payload;
+		case SET_GEOLOCATION_LAT:
+			const { latitude } = payload;
 			return {
 				...state,
-				lat,
+				latitude,
 			};
-		case SET_GEOLOCATIONLON:
-			const { lon } = payload;
+		case SET_GEOLOCATION_LON:
+			const { longitude } = payload;
 			return {
 				...state,
-				lon,
+				longitude,
 			};
 		case SET_IMAGE:
 			const { image } = payload;
@@ -424,10 +424,10 @@ const selectors = {
 		return state.geolocation;
 	},
 	getGeoLocationLat(state) {
-		return state.lat;
+		return state.latitude;
 	},
 	getGeoLocationLon(state) {
-		return state.lon;
+		return state.longitude;
 	},
 	getImage(state) {
 		return state.image;
