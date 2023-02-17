@@ -320,8 +320,8 @@ function location_lookup( $data ){
 		);
 
 		$query = add_query_arg( array(
-      'q' => $location,
-      'format' => 'json',
+			'q'			=> $location,
+			'format'	=> 'json',
 		), 'https://nominatim.openstreetmap.org/search' );
 
 		$response = wp_safe_remote_get( $query, $request_args );
@@ -340,24 +340,8 @@ function location_lookup( $data ){
  */
 function murmurations_index_post_node(){
 	delete_transient( 'murmurations_profile' );
-	$murmurations_data = get_option('murmurations-node_data', true);
-	$json_data = json_encode( array(
-		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
-		//'name' => $murmurations_data['name'],
-		//'primary_url' => site_url(),
-		'profile_url' => rest_url( null, 'murmurations/v2/profile' ),
-		//'latitude' => $murmurations_data['lat'], 
-		//'longitude' => $murmurations_data['lon'],
-	));
-	$request_args = array(
-		'timeout'    => 15,
-		'headers'    => array(
-			'Content-Type' => 'application/json',
-			'accept' => 'application/json',
-		),
-		'body'     	 => $json_data,
-	);
-	error_log( print_r( $request_args, true ) );  
+
+	$request_args = request_args();
 	$query = MURMURATIONS_INDEX . '/nodes';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
@@ -367,8 +351,8 @@ function murmurations_index_post_node(){
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message->meta->message->data->node_id );
 	} else {
-    error_log( print_r( $request_args, true ) ); 
-    error_log( print_r( $response, true ) );
+    	error_log( print_r( $request_args, true ) ); 
+    	error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
 	}
 	
@@ -386,23 +370,7 @@ function murmurations_index_post_node(){
 function murmurations_index_post_node_sync (){
 	delete_transient( 'murmurations_profile' );
 
-	$murmurations_data = get_option('murmurations-node_data', true);
-	$json_data = json_encode( array(
-		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
-		'name' => $murmurations_data['name'],
-		'primary_url' => site_url(),
-		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
-		'latitude' => $murmurations_data['latitude'], 
-		'longitude' => $murmurations_data['longitude'],
-	));
-	$request_args = array(
-		'timeout'    => 15,
-		'headers'    => array(
-			'Content-Type' => 'application/json',
-			'accept' => 'application/json',
-		),
-		'body'     	 => $json_data,
-	);
+	$request_args = request_args();
 	$query = MURMURATIONS_INDEX . '/nodes-sync';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
@@ -412,10 +380,10 @@ function murmurations_index_post_node_sync (){
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message->data->node_id );
 	} else {
-    error_log( print_r( $request_args, true ) ); 
-    error_log( print_r( $response, true ) );
+		error_log( print_r( $request_args, true ) ); 
+		error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
-    update_option('murmurations-node_id', '' );
+    	update_option('murmurations-node_id', '' );
 	}
 
 	return rest_ensure_response( $reponse_message );
@@ -429,23 +397,7 @@ function murmurations_index_post_node_sync (){
  * @return WP_REST_Response
  */
 function murmurations_index_validate () {
-	$murmurations_data = get_option('murmurations-node_data', true);
-	$json_data = json_encode( array(
-		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
-		'name' => $murmurations_data['name'],
-		'primary_url' => site_url(),
-		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
-		'latitude' => $murmurations_data['lat'], 
-		'longitude' => $murmurations_data['lon'],
-	));
-	$request_args = array(
-		'timeout'    => 15,
-		'headers'    => array(
-			'Content-Type' => 'application/json',
-			'accept' => 'application/json',
-		),
-		'body'     	 => $json_data,
-	);
+	$request_args = request_args();
 	$query = MURMURATIONS_INDEX . '/validate';
 	
 	$response = wp_safe_remote_post( $query, $request_args );
@@ -455,8 +407,8 @@ function murmurations_index_validate () {
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message );
 	} else {
-    error_log( print_r( $request_args, true ) );  
-    error_log( print_r( $response, true ) );
+		error_log( print_r( $request_args, true ) );  
+    	error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
 	}
 
@@ -471,42 +423,32 @@ function murmurations_index_validate () {
  * @return WP_REST_Response
  */
 function murmurations_index_node_status () {
-	$murmurations_data = get_option( 'murmurations-node_data', true );
-	$json_data = json_encode( array(
-		'linked_schemas' => array( 'organizations_schema-v1.0.0' ),
-		'name' => $murmurations_data['name'],
-		'primary_url' => site_url(),
-		'profile_url' => get_rest_url( null, 'murmurations/v2/profile' ),
-		'latitude' => $murmurations_data['lat'], 
-		'longitude' => $murmurations_data['lon'],
-	));
 	$request_args = array(
 		'timeout'    => 15,
 		'headers'    => array(
 			'Content-Type' => 'application/json',
 			'accept' => 'application/json',
 		),
-		//'body'     	 => $json_data,
 	);
-  $node_id = get_option( 'murmurations-node_id', false );
-  if ( $node_id ) {
-    $query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
+	$node_id = get_option( 'murmurations-node_id', false );
+	if ( $node_id ) {
+		$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
+		
+		$response = wp_safe_remote_get( $query, $request_args );
 	
-    $response = wp_safe_remote_get( $query, $request_args );
-  
-    //TODO Error handling
-    if ( 200 === $response['response']['code'] ) {
-      $reponse_message = json_decode ( $response['body'] );
-    } else {
-      $reponse_message = json_decode ( $response['body'] );
-    }
-    error_log( print_r( $request_args, true ) );  
-    error_log( print_r( $response, true ) );
-  } else {
-    $reponse_message = __( 'Profile not indexed', 'murmurations-node' );
-    error_log( print_r( $reponse_message, true ) );
-  }
-	return rest_ensure_response( $reponse_message );
+		//TODO Error handling
+		if ( 200 === $response['response']['code'] ) {
+			$reponse_message = json_decode ( $response['body'] );
+		} else {
+			$reponse_message = json_decode ( $response['body'] );
+		}
+		error_log( print_r( $request_args, true ) );  
+		error_log( print_r( $response, true ) );
+	} else {
+		$reponse_message = __( 'Profile not indexed', 'murmurations-node' );
+		error_log( print_r( $reponse_message, true ) );
+	}
+		return rest_ensure_response( $reponse_message );
 }
 
 /**
@@ -517,16 +459,16 @@ function murmurations_index_node_status () {
  * @return WP_REST_Response
  */
 function murmurations_index_node_delete() {
-  $node_id = get_option( 'murmurations-node_id' );
+	$node_id = get_option( 'murmurations-node_id' );
 
 	$request_args = array(
 		'timeout'    => 15,
-    'method' => 'DELETE',
+   		'method' => 'DELETE',
 		'headers'    => array(
 			'accept' => 'application/json',
 		),
 	);
-  delete_option( 'murmurations-node_id' );
+  	delete_option( 'murmurations-node_id' );
 	$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
 	
 	$response = wp_remote_request( $query, $request_args );
@@ -545,3 +487,23 @@ function murmurations_index_node_delete() {
 	return rest_ensure_response( $reponse_message->meta->message );
 }
 
+function request_args() {
+	$murmurations_data = get_option('murmurations-node_data', true);
+	$json_data = json_encode( array(
+		'linked_schemas'	=> array( 'organizations_schema-v1.0.0' ),
+		'profile_url' 		=> get_rest_url( null, 'murmurations/v2/profile' ),
+		'name'				=> $murmurations_data['name'],
+		'primary_url'		=> site_url(),
+		'latitude'			=> $murmurations_data['lat'], 
+		'longitude'			=> $murmurations_data['lon'],
+	));
+	$request_args = array(
+		'timeout'   		=> 15,
+		'headers'    		=> array(
+			'Content-Type'		=> 'application/json',
+			'accept' 			=> 'application/json',
+		),
+		'body'     	 		=> $json_data,
+	);
+	return $request_args;
+}

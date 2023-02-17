@@ -18,7 +18,7 @@ const Name = () => {
 	return (
 		<TextControl
 			label={__('Name', 'murmurations-node')}
-			value={name}
+			value={name ?? ''}
 			onChange={(value) => setSetting('name', value)}
 			help={__('The name of the entity, organization, project, item, etc.', 'murmurations-node' )}
 		/>

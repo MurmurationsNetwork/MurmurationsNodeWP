@@ -29,7 +29,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const Country = () => {
+
+const Country = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(function Country(props, ref) {
   // Get the name from the state.
   const country_name = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getCountryName());
 
@@ -40,11 +41,12 @@ const Country = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Country', 'murmurations-node'),
-    value: country_name,
+    ref: ref,
+    value: country_name !== null && country_name !== void 0 ? country_name : '',
     onChange: value => setSetting('country_name', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The name of country where the entity is based', 'murmurations-node')
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Country);
 
 /***/ }),
@@ -87,7 +89,7 @@ const Description = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Description', 'murmurations-node'),
-    value: description,
+    value: description !== null && description !== void 0 ? description : '',
     onChange: value => setSetting('description', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('A description of the item, entity, organization, project, etc.', 'murmurations-node')
   });
@@ -127,24 +129,19 @@ __webpack_require__.r(__webpack_exports__);
 const Env = () => {
   // Get the env from the state.
   const env = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getEnv());
-  //const [ env, setEnv ] = useState( false );
 
   // Update the state.
   const {
     setEnv,
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalToggleGroupControl, {
-    label: "API Version",
-    value: env,
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
+    checked: env,
+    className: "test-api",
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Use Test API", 'murmurations-node'),
+    help: "Please only publish genuine profiles to the Live API. For testing use the Test API.",
     onChange: value => setSetting('env', value)
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalToggleGroupControlOption, {
-    value: "test",
-    label: "Test"
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalToggleGroupControlOption, {
-    value: "live",
-    label: "Live"
-  })));
+  }));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Env);
 
@@ -177,9 +174,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const GeoLocationLat = () => {
+
+const GeoLocationLat = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(function GeoLocationLat(props, ref) {
   // Get the name from the state.
-  const geoLocationLat = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLat());
+  const latitude = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLat());
 
   // Update the state.
   const {
@@ -188,11 +186,12 @@ const GeoLocationLat = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Latitude', 'murmurations-node'),
-    value: geoLocationLat,
-    onChange: value => setSetting('geoLocationLat', value),
+    ref: ref,
+    value: latitude !== null && latitude !== void 0 ? latitude : '',
+    onChange: value => setSetting('latitude', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The geo-coordinates (latitude)', 'murmurations-node')
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (GeoLocationLat);
 
 /***/ }),
@@ -224,8 +223,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const GeoLocationLon = () => {
-  const geoLocationLon = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLon());
+
+const GeoLocationLon = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(function GeoLocationLon(props, ref) {
+  const longitude = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLon());
 
   // Update the state.
   const {
@@ -234,67 +234,13 @@ const GeoLocationLon = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Longitude', 'murmurations-node'),
-    value: geoLocationLon,
-    onChange: value => setSetting('geoLocationLon', value),
+    ref: ref,
+    value: longitude !== null && longitude !== void 0 ? longitude : '',
+    onChange: value => setSetting('longitude', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The geo-coordinates (longitude)', 'murmurations-node')
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (GeoLocationLon);
-
-/***/ }),
-
-/***/ "./src/components/geolocation.js":
-/*!***************************************!*\
-  !*** ./src/components/geolocation.js ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _datastore_constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../datastore/constants */ "./src/datastore/constants.js");
-
-/**
- * WordPress dependencies
- */
-
-
-
-
-const GeoLocation = () => {
-  // Get the name from the state.
-  //const { lat, lon } = useSelect((select) => select(STORE_NAME).getGeoLocation());
-  const geoLocationLat = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLat());
-  const geoLocationLon = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLon());
-  //let {lat, lon} = geoLocation
-
-  // Update the state.
-  //const { setGeoLocation, setSetting } =
-  const {
-    setGeoLocationLat,
-    setGeoLocationLon,
-    setSetting
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Latitude', 'murmurations-node'),
-    value: lat,
-    onChange: value => setSetting('geoLocation', value)
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Longitude', 'murmurations-node'),
-    value: lon,
-    onChange: value => setSetting('geoLocation', value)
-  }));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (GeoLocation);
 
 /***/ }),
 
@@ -344,7 +290,7 @@ function MyMediaUploader() {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUploadCheck, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUpload, {
     onSelect: media => console.log('selected ' + media.length),
     allowedTypes: ALLOWED_MEDIA_TYPES,
-    value: mediaId,
+    value: mediaId !== null && mediaId !== void 0 ? mediaId : '',
     render: _ref => {
       let {
         open
@@ -400,7 +346,7 @@ const Image = () => {
   //change component
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Image', 'murmurations-node'),
-    value: image,
+    value: image !== null && image !== void 0 ? image : '',
     onChange: value => setSetting('image', value)
   })
   //<MediaUploadCheck>
@@ -460,7 +406,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const Locality = () => {
+
+const Locality = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(function Locality(props, ref) {
   // Get the name from the state.
   const locality = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getLocality());
 
@@ -471,11 +418,12 @@ const Locality = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Locality', 'murmurations-node'),
-    value: locality,
+    ref: ref,
+    value: locality !== null && locality !== void 0 ? locality : '',
     onChange: value => setSetting('locality', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The locality (city, town, village, etc.) where the entity is located', 'murmurations-node')
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Locality);
 
 /***/ }),
@@ -527,20 +475,21 @@ const Location = () => {
   const locality = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getLocality());
   const region = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getRegion());
   const country_name = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getCountryName());
-  const lat = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLat());
-  const lon = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLon());
+  const latitude = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLat());
+  const longitude = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocationLon());
   //const { lat, lon } = useSelect((select) => select(STORE_NAME).getGeoLocation());
-
-  const locationInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const localityInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const regionInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const countryInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const [isSearching, setIsSearching] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const locationInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  const localityInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  const regionInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  const countryInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   // const geoLocationLatInputRef = useRef(null);
-  const latInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const lonInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const latInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  const lonInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
 
   // Search OpenMaps API
   const handleSearch = () => {
+    setIsSearching(true);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()({
       path: 'murmurations/v2/find/location',
       method: 'POST',
@@ -548,8 +497,12 @@ const Location = () => {
         location
       }
     }).then(response => JSON.parse(response.body)).then(body => {
+      setIsSearching(false);
       // TODO add some kind of select list
       // Use first result
+      if (!body.length > 0) {
+        console.log('no results found');
+      }
       let first = body[0];
       let locationArr = first.display_name.split(', ');
 
@@ -564,8 +517,8 @@ const Location = () => {
       setSetting('locality', localityInputRef.current);
       setSetting('region', regionInputRef.current);
       setSetting('country_name', countryInputRef.current);
-      setSetting('lat', latInputRef.current);
-      setSetting('lon', lonInputRef.current);
+      setSetting('latitude', latInputRef.current);
+      setSetting('longitude', lonInputRef.current);
 
       //locationInputRef.current.focus();
     });
@@ -581,7 +534,11 @@ const Location = () => {
     setGeoLocationLon,
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SearchControl, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
+    className: 'p-0'
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+    className: "justify-inherit mt-10"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SearchControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Location', 'murmurations-node'),
     hideLabelFromVision: false,
     ref: locationInputRef,
@@ -594,7 +551,15 @@ const Location = () => {
     },
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Lookup your location to fill in the values below.', 'murmurations-node'),
     className: 'murmurations-search-field'
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_locality__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "primary",
+    icon: 'search',
+    onClick: handleSearch,
+    className: 'location-search',
+    disabled: isSearching
+  }, isSearching ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Searching...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search', 'murmurations-node'))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+    className: "align-start gap-5"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_locality__WEBPACK_IMPORTED_MODULE_6__["default"], {
     ref: localityInputRef,
     value: locality,
     onChange: value => setSetting('locality', value)
@@ -608,12 +573,12 @@ const Location = () => {
     onChange: value => setSetting('country_name', value)
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_geolocation_lat__WEBPACK_IMPORTED_MODULE_9__["default"], {
     ref: latInputRef,
-    value: lat,
-    onChange: value => setSetting('lat', value)
+    value: latitude,
+    onChange: value => setSetting('latitude', value)
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_geolocation_lon__WEBPACK_IMPORTED_MODULE_10__["default"], {
     ref: lonInputRef,
-    value: lon,
-    onChange: value => setSetting('lon', value)
+    value: longitude,
+    onChange: value => setSetting('longitude', value)
   })));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Location);
@@ -658,7 +623,7 @@ const Mission = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Mission', 'murmurations-node'),
-    value: mission,
+    value: mission !== null && mission !== void 0 ? mission : '',
     onChange: value => setSetting('mission', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('A short statement of why the entity exists and its goals.', 'murmurations-node')
   });
@@ -706,7 +671,7 @@ const Name = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Name', 'murmurations-node'),
-    value: name,
+    value: name !== null && name !== void 0 ? name : '',
     onChange: value => setSetting('name', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The name of the entity, organization, project, item, etc.', 'murmurations-node')
   });
@@ -797,7 +762,7 @@ const PrimaryUrl = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Primary URL', 'murmurations-node'),
-    value: primaryUrl,
+    value: primaryUrl !== null && primaryUrl !== void 0 ? primaryUrl : '',
     onChange: value => setSetting('primary_url', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The primary URL of the entity or item (i.e., its unique website address)', 'murmurations-node')
   });
@@ -833,7 +798,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const Region = () => {
+
+const Region = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(function Region(props, ref) {
   // Get the name from the state.
   const region = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getRegion());
 
@@ -844,11 +810,12 @@ const Region = () => {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Region', 'murmurations-node'),
-    value: region,
+    ref: ref,
+    value: region !== null && region !== void 0 ? region : '',
     onChange: value => setSetting('region', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The region (state, county, province, etc.) where the entity is located', 'murmurations-node')
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Region);
 
 /***/ }),
@@ -893,7 +860,7 @@ const Rss = () => {
   //change component
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('RSS', 'murmurations-node'),
-    value: rss,
+    value: rss !== null && rss !== void 0 ? rss : '',
     onChange: value => setSetting('rss', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("The URL for the entity's RSS feed", 'murmurations-node')
   });
@@ -934,15 +901,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _description__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./description */ "./src/components/description.js");
 /* harmony import */ var _mission__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./mission */ "./src/components/mission.js");
 /* harmony import */ var _location__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./location */ "./src/components/location.js");
-/* harmony import */ var _locality__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./locality */ "./src/components/locality.js");
-/* harmony import */ var _region__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./region */ "./src/components/region.js");
-/* harmony import */ var _country__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./country */ "./src/components/country.js");
-/* harmony import */ var _geolocation__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./geolocation */ "./src/components/geolocation.js");
-/* harmony import */ var _image__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./image */ "./src/components/image.js");
-/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./tags */ "./src/components/tags.js");
-/* harmony import */ var _rss__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./rss */ "./src/components/rss.js");
-/* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./notifications */ "./src/components/notifications.js");
-/* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./env */ "./src/components/env.js");
+/* harmony import */ var _image__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./image */ "./src/components/image.js");
+/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./tags */ "./src/components/tags.js");
+/* harmony import */ var _rss__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./rss */ "./src/components/rss.js");
+/* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./notifications */ "./src/components/notifications.js");
+/* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./env */ "./src/components/env.js");
 
 /**
  * WordPress dependencies
@@ -970,12 +933,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-
-
-{/* 
- SET_RSS, */}
 const SettingsScreen = () => {
   const {
     saveEntityRecord,
@@ -984,8 +941,9 @@ const SettingsScreen = () => {
     isSavingEntityRecord
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)('core');
   const [isRequesting, setIsRequesting] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [isTesting, setIsTesting] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isPublishing, setIsPublishing] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [isValidating, setIsValidating] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isWorking, setIsWorking] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [isGettingStatus, setIsGettingStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     createSuccessNotice,
@@ -1046,7 +1004,7 @@ const SettingsScreen = () => {
     setIsValidating(false);
   };
   const handlePublish = async () => {
-    setIsTesting(true);
+    setIsPublishing(true);
     const status = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
       path: '/murmurations/v2/index/nodes_sync'
     }).then(posts => {
@@ -1058,16 +1016,17 @@ const SettingsScreen = () => {
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
-      setIsTesting(false);
+      setIsPublishing(false);
     } else {
       console.log(status.errors);
       status.errors.forEach(error => {
-        let errorMessage = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("code", null, error.status), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, error.status)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, error.detail));
-        createErrorNotice(error.detail, {
+        let prefix = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Server response: ', 'mumurations-node');
+        let errorMessage = `${prefix} ${error.detail}`;
+        createErrorNotice(errorMessage, {
           type: 'snackbar'
         });
       });
-      setIsTesting(false);
+      setIsPublishing(false);
     }
   };
   const handleStatus = async () => {
@@ -1091,52 +1050,27 @@ const SettingsScreen = () => {
     }
     setIsGettingStatus(false);
   };
+  const handleSaveAndPublish = async () => {
+    setIsWorking(true);
+    handleSave();
+    handleValidate();
+    handlePublish();
+    setIsWorking(false);
+  };
   if (!hasResolved) {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null);
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "wrap"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Panel, {
-    header: "Murmurations Node Settings"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Environment', 'murmurations-node'),
-    initialOpen: false
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_23__["default"], null))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_name__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_primary_url__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_description__WEBPACK_IMPORTED_MODULE_12__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_mission__WEBPACK_IMPORTED_MODULE_13__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_19__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_tags__WEBPACK_IMPORTED_MODULE_20__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_rss__WEBPACK_IMPORTED_MODULE_21__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_14__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    header: "Murmurations settings"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_name__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_primary_url__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_description__WEBPACK_IMPORTED_MODULE_12__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_mission__WEBPACK_IMPORTED_MODULE_13__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_15__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_tags__WEBPACK_IMPORTED_MODULE_16__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_rss__WEBPACK_IMPORTED_MODULE_17__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_14__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_19__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
     variant: "primary",
-    onClick: handleSave,
-    disabled: isRequesting
-  }, isRequesting ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
-    variant: "secondary",
-    onClick: handleValidate,
-    disabled: isValidating
-  }, isValidating ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Validating...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Validate', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
-    variant: "primary",
-    onClick: handlePublish,
-    disabled: isTesting
-  }, isTesting ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Publish', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
-    variant: "secondary",
-    onClick: handleStatus,
-    disabled: isGettingStatus
-  }, isGettingStatus ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Getting status...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Get status', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_22__["default"], null))));
+    onClick: handleSaveAndPublish,
+    disabled: isWorking
+  }, isWorking ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving & Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save & Publish', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_18__["default"], null)))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SettingsScreen);
-
-// Validate
-// apiFetch( { path: '/murmurations/v2/index/validate' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// Publish to index /nodes-sync
-// apiFetch( { path: '/murmurations/v2/index/nodes_sync' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// Publish to index /nodes
-// apiFetch( { path: '/murmurations/v2/index/nodes' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// On success, if node_id is returned, change button text from Publish to Update
 
 /***/ }),
 
@@ -1180,7 +1114,7 @@ const Tags = () => {
   //change component
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Tags', 'murmurations-node'),
-    value: tags,
+    value: tags !== null && tags !== void 0 ? tags : '',
     onChange: value => setSetting('tags', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Keywords relevant to this entity and its activities or attributes.', 'murmurations-node')
   });
@@ -1254,15 +1188,17 @@ const Urls = () => {
   // 		/>
   // 	</Fragment>;
   // } );
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "URLS"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "URLS"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+    className: "gap-5"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('URL Name', 'murmurations-node'),
-    value: urlSingleLabel,
+    value: urlSingleLabel !== null && urlSingleLabel !== void 0 ? urlSingleLabel : '',
     onChange: value => setSetting('urlSingleLabel', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('URL', 'murmurations-node'),
     placeholder: 'https://example.com',
-    value: urlSingleUrl,
+    value: urlSingleUrl !== null && urlSingleUrl !== void 0 ? urlSingleUrl : '',
     onChange: value => setSetting('urlSingleUrl', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')
   }))));
@@ -1321,8 +1257,8 @@ const SET_LOCALITY = 'SET_LOCALITY';
 const SET_REGION = 'SET_REGION';
 const SET_COUNTRY_NAME = 'SET_COUNTRY_NAME';
 const SET_GEOLOCATION = 'SET_GEOLOCATION';
-const SET_GEOLOCATIONLAT = 'SET_GEOLOCATIONLAT';
-const SET_GEOLOCATIONLON = 'SET_GEOLOCATIONLON';
+const SET_GEOLOCATIONLAT = 'SET_GEOLOCATION_LAT';
+const SET_GEOLOCATIONLON = 'SET_GEOLOCATION_LON';
 const SET_IMAGE = 'SET_IMAGE';
 const SET_IMAGE_ID = 'SET_IMAGE_ID';
 const SET_TAGS = 'SET_TAGS';
@@ -1471,19 +1407,19 @@ const actions = {
       }
     };
   },
-  setGeoLocationLat(lat) {
+  setGeoLocationLat(latitude) {
     return {
-      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATIONLAT,
+      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION_LAT,
       payload: {
-        lat
+        latitude
       }
     };
   },
-  setGeoLocationLon(lon) {
+  setGeoLocationLon(longitude) {
     return {
-      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATIONLON,
+      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION_LON,
       payload: {
-        lon
+        longitude
       }
     };
   },
@@ -1667,29 +1603,29 @@ function reducer() {
         country_name
       };
     // case SET_GEOLOCATION:
-    // 	const { lat, lon } = payload; // { geolocation }
+    // 	const { latitude, latitude } = payload; // { geolocation }
     // 	return {
     // 		...state,
     // 		geolocation: {
-    // 			lat,
-    // 			lon
+    // 			latitude,
+    // 			longitude
     // 		},
     // 	};
-    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATIONLAT:
+    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION_LAT:
       const {
-        lat
+        latitude
       } = payload;
       return {
         ...state,
-        lat
+        latitude
       };
-    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATIONLON:
+    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION_LON:
       const {
-        lon
+        longitude
       } = payload;
       return {
         ...state,
-        lon
+        longitude
       };
     case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_IMAGE:
       const {
@@ -1785,10 +1721,10 @@ const selectors = {
     return state.geolocation;
   },
   getGeoLocationLat(state) {
-    return state.lat;
+    return state.latitude;
   },
   getGeoLocationLon(state) {
-    return state.lon;
+    return state.longitude;
   },
   getImage(state) {
     return state.image;
@@ -1848,6 +1784,18 @@ const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.createReduxStore)(
 });
 
 (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.register)(store);
+
+/***/ }),
+
+/***/ "./src/admin.scss":
+/*!************************!*\
+  !*** ./src/admin.scss ***!
+  \************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
 
 /***/ }),
 
@@ -2019,6 +1967,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _components_settings_screen__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/settings-screen */ "./src/components/settings-screen.js");
+/* harmony import */ var _admin_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./admin.scss */ "./src/admin.scss");
 
 /**
  * WordPress dependencies
@@ -2028,6 +1977,7 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Internal dependencies
  */
+
 
 
 // Render the app to the screen.

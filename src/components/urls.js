@@ -45,17 +45,17 @@ const Urls = () => {
 		<PanelRow>
 			<fieldset>
 				<legend>URLS</legend>
-				<PanelRow>
+				<PanelRow className='gap-5'>
 					<TextControl
 						label={__('URL Name', 'murmurations-node')}
-						value={urlSingleLabel}
+						value={urlSingleLabel ?? ''}
 						onChange={(value) => setSetting('urlSingleLabel', value)}
 						help={__('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')}
 					/>
 					<TextControl
 						label={__('URL', 'murmurations-node')}
 						placeholder={'https://example.com'}
-						value={urlSingleUrl}
+						value={urlSingleUrl ?? ''}
 						onChange={(value) => setSetting('urlSingleUrl', value)}
 						help={__('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')}
 					/>

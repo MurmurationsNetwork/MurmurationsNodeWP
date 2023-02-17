@@ -18,7 +18,7 @@ const PrimaryUrl = () => {
 	return (
 		<TextControl
 			label={__('Primary URL', 'murmurations-node')}
-			value={primaryUrl}
+			value={primaryUrl ?? ''}
 			onChange={(value) => setSetting('primary_url', value)}
 			help={__('The primary URL of the entity or item (i.e., its unique website address)', 'murmurations-node')}
 		/>

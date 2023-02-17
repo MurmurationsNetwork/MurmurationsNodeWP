@@ -17,7 +17,7 @@ const Mission = () => {
 	return (
         <TextControl
             label={__('Mission', 'murmurations-node')}
-            value={mission}
+            value={mission ?? ''}
             onChange={(value) => setSetting('mission', value)}
 			help={__('A short statement of why the entity exists and its goals.', 'murmurations-node' )}
         />

@@ -30,7 +30,7 @@ function MyMediaUploader() {
 					console.log( 'selected ' + media.length )
 				}
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ mediaId }
+				value={ mediaId ?? ''}
 				render={ ( { open } ) => (
 					<Button onClick={ open }>Open Media Library</Button>
 				) }
@@ -83,7 +83,7 @@ const Image = () => {
 	return (
         <TextControl
             label={__('Image', 'murmurations-node')}
-            value={image}
+            value={image ?? ''}
             onChange={(value) => setSetting('image', value)}
         />
 		//<MediaUploadCheck>
