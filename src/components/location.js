@@ -82,8 +82,8 @@ const Location = () => {
         setSetting 
     } = useDispatch(STORE_NAME);
 	return (
-        <PanelBody>
-            <PanelRow>
+        <PanelBody className={'p-0'}>
+            <PanelRow className='justify-inherit mt-10'>
                 <SearchControl
                     label={__('Location', 'murmurations-node')}
                     hideLabelFromVision={false}
@@ -102,6 +102,7 @@ const Location = () => {
                     variant="primary"
                     icon={'search'}
                     onClick={ handleSearch } 
+                    className={'location-search'}
                     disabled={ isSearching }
                     >
                     { isSearching ? (
@@ -112,7 +113,7 @@ const Location = () => {
                     ) : __( 'Search', 'murmurations-node') }
                 </Button>
             </PanelRow>
-            <PanelRow>
+            <PanelRow className='align-start gap-5'>
                 <Locality 
                     ref={localityInputRef}
                     value={locality}

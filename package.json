@@ -2,7 +2,7 @@
   "name": "murmurations-node",
   "version": "0.2.0",
   "main": "build/index.js",
-  "description": "Put your organisation on the map!",
+  "description": "Add your Profile to the Murmurations decentralised data sharing network.",
   "author": "Murmurations.network",
   "devDependencies": {
     "@wordpress/env": "^4.9.0",

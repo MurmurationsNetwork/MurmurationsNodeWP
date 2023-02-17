@@ -5,8 +5,9 @@ import { TextControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';
+import { forwardRef } from '@wordpress/element';
 
-const Country = () => {
+const Country = forwardRef(function Country(props, ref) {
 	// Get the name from the state.
 	const country_name = useSelect((select) => select(STORE_NAME).getCountryName());
 
@@ -17,10 +18,11 @@ const Country = () => {
 	return (
         <TextControl
             label={__('Country', 'murmurations-node')}
-            value={country_name}
+			ref={ref}
+            value={country_name ?? ''}
             onChange={(value) => setSetting('country_name', value)}
 			help={__('The name of country where the entity is based', 'murmurations-node' )}
         />
 	);
-};
+});
 export default Country;
