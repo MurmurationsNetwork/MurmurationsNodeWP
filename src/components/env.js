@@ -12,8 +12,6 @@ import { useState } from '@wordpress/element';
 const Env = () => {
 	// Get the env from the state.
 	const env = useSelect((select) => select(STORE_NAME).getEnv());
-	//const [ env, setEnv ] = useState( false );
-
 
 	// Update the state.
 	const { setEnv, setSetting } =
@@ -21,19 +19,13 @@ const Env = () => {
 
 	return (
 		<div>
-			{/* <ToggleControl
-				label={'Live'}
-				checked={ env }
-				onChange={ () => setEnv( ( state ) => ! state ) }
-			/> */}
-			<ToggleGroupControl 
-				label="API Version" 
-				value={env}
+			<ToggleControl
+				checked={env}
+				className="test-api"
+				label={__("Use Test API", 'murmurations-node')}
+				help="Please only publish genuine profiles to the Live API. For testing use the Test API."
 				onChange={(value) => setSetting('env', value)}
-			>
-				<ToggleGroupControlOption value="test" label="Test" />
-				<ToggleGroupControlOption value="live" label="Live" />
-			</ToggleGroupControl>
+			/>
 		</div>
 	);
 };

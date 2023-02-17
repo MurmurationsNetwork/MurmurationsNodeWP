@@ -21,8 +21,7 @@ define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
 $murmurations_data = get_option( 'murmurations-node_data', true );
 if ( isset($murmurations_data['env']) ) {
-  error_log('dev_mode: ' . $murmurations_data['env'] );
-  if ( 'test' === $murmurations_data['env'] ) {
+  if ( $murmurations_data['env'] === true ) {
     \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://test-index.murmurations.network/v2' );
     \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://test-library.murmurations.network/v2/' );
   } else {
@@ -190,7 +189,7 @@ function murmurations_plugin_settings() {
 						  'type' => 'string',
 						),
 						'env' => array(
-						  'type' => 'string',
+						  'type' => 'boolean',
 						),
 					),
 				),

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Panel, PanelBody, PanelRow, FormToggle, Spinner } from '@wordpress/components';
+import { Button, ButtonGroup, ToggleControl, Panel, PanelBody, PanelRow, FormToggle, Spinner } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect, coreDataStore } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data'; // do I need this?
@@ -25,16 +25,12 @@ import Rss from './rss';
 import Notifications, { createSuccessNotice, createErrorNotice } from './notifications';
 import Env from './env';
 
-{/* 
-	SET_RSS, */}
-
-
-
 const SettingsScreen = () => {
 	const { saveEntityRecord, getLastEntitySaveError, hasFinishedResolution, isSavingEntityRecord } = useDispatch('core');
 	const [ isRequesting, setIsRequesting ] = useState( false );
-	const [ isTesting, setIsTesting ] = useState( false );
+	const [ isPublishing, setIsPublishing ] = useState( false );
 	const [ isValidating, setIsValidating ] = useState( false );
+	const [ isWorking, setIsWorking ] = useState( false );
 	const [ isGettingStatus, setIsGettingStatus ] = useState( false );
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
 
@@ -95,7 +91,7 @@ const SettingsScreen = () => {
 	};
 	
 	const handlePublish = async () => {
-		setIsTesting(true);
+		setIsPublishing(true);
 		const status = await apiFetch( { path: '/murmurations/v2/index/nodes_sync' } ).then( ( posts ) => {
 			console.log( posts );
 			return posts;
@@ -105,7 +101,7 @@ const SettingsScreen = () => {
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
-			setIsTesting(false);
+			setIsPublishing(false);
 		} else {
 			console.log( status.errors );
 			status.errors.forEach( error => {
@@ -115,11 +111,11 @@ const SettingsScreen = () => {
 					<p><strong>{error.status}</strong></p>
 					<p>{error.detail}</p>
 				</div>);
-				createErrorNotice( error.detail, {
+				createErrorNotice( __('Server response: ', 'mumurations-node') + error.detail, {
 					type: 'snackbar',
 				} );
 			});
-			setIsTesting(false);
+			setIsPublishing(false);
 		}
 	};
 
@@ -143,18 +139,21 @@ const SettingsScreen = () => {
 		setIsGettingStatus( false );
 	};
 
+	const handleSaveAndPublish = async () => {
+		setIsWorking(true);
+		handleSave()
+		handleValidate()
+		handlePublish()
+		setIsWorking(false);
+	};
+
 	if ( ! hasResolved ) {
 		return <Spinner />;
 	}
 
 	return (
 		<div className="wrap">
-			<Panel header="Murmurations Node Settings">
-				<PanelBody title={ __( 'Environment', 'murmurations-node') } initialOpen={ false }>
-					<PanelRow>
-						<Env />
-					</PanelRow>
-				</PanelBody>
+			<Panel header="Murmurations settings">
 				<PanelBody>
 					<Name />
 					<PrimaryUrl />
@@ -165,40 +164,18 @@ const SettingsScreen = () => {
 					<Tags />
 					<Rss />
 					<Location />
-					<hr />
-					<Button variant="primary" onClick={ handleSave } disabled={ isRequesting } >
-						{ isRequesting ? (
-							<>
-								{ __( 'Saving...', 'murmurations-node') }
-								<Spinner/>
-							</>
-						) : __( 'Save', 'murmurations-node') }
-					</Button>
-					<Button variant="secondary" onClick={ handleValidate } disabled={ isValidating } >
-						{ isValidating ? (
-							<>
-								{ __( 'Validating...', 'murmurations-node') }
-								<Spinner/>
-							</>
-						) : __( 'Validate', 'murmurations-node') }
-					</Button>
-					<Button variant="primary" onClick={ handlePublish } disabled={ isTesting } >
-						{ isTesting ? (
-							<>
-								{ __( 'Publishing...', 'murmurations-node') }
-								<Spinner/>
-							</>
-						) : __( 'Publish', 'murmurations-node') }
-					</Button>
-					<Button variant="secondary" onClick={ handleStatus } disabled={ isGettingStatus } >
-						{ isGettingStatus ? (
-							<>
-								{ __( 'Getting status...', 'murmurations-node') }
-								<Spinner/>
-							</>
-						) : __( 'Get status', 'murmurations-node') }
-					</Button>
-					<Notifications></Notifications>
+					<Env/>
+					<PanelRow>
+						<Button variant="primary" onClick={ handleSaveAndPublish } disabled={ isWorking } >
+							{ isWorking ? (
+								<>
+									{ __( 'Saving & Publishing...', 'murmurations-node') }
+									<Spinner/>
+								</>
+							) : __( 'Save & Publish', 'murmurations-node') }
+						</Button>
+						<Notifications></Notifications>
+					</PanelRow>
 				</PanelBody>
 			</Panel>
 		</div>
@@ -207,19 +184,3 @@ const SettingsScreen = () => {
 
 export default SettingsScreen;
 
-// Validate
-// apiFetch( { path: '/murmurations/v2/index/validate' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// Publish to index /nodes-sync
-// apiFetch( { path: '/murmurations/v2/index/nodes_sync' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// Publish to index /nodes
-// apiFetch( { path: '/murmurations/v2/index/nodes' } ).then( ( posts ) => {
-// 	console.log( posts );
-// } );
-
-// On success, if node_id is returned, change button text from Publish to Update 
