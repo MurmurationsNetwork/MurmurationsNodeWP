@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.3.4
+ * Version:         0.4.0-dev
  *
  * @package         Murmurations_Node
  */
@@ -97,6 +97,15 @@ function enqueue_settings_script( $hook ) {
 		foreach ( $assets['dependencies'] as $style ) {
 			wp_enqueue_style( $style );
 		}
+
+		$dir = __DIR__;
+		$admin_css = 'build/index.css';
+		wp_enqueue_style(
+			'murmurations-node',
+			plugins_url( $admin_css, __FILE__ ),
+			['wp-components'],
+			filemtime( "$dir/$admin_css" )
+		);
 	}
 };
 add_action( 'admin_enqueue_scripts',  __NAMESPACE__ . '\enqueue_settings_script' );

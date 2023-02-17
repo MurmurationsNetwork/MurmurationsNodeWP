@@ -105,13 +105,9 @@ const SettingsScreen = () => {
 		} else {
 			console.log( status.errors );
 			status.errors.forEach( error => {
-				let errorMessage = (
-				<div>
-					<code>{error.status}</code>
-					<p><strong>{error.status}</strong></p>
-					<p>{error.detail}</p>
-				</div>);
-				createErrorNotice( __('Server response: ', 'mumurations-node') + error.detail, {
+				let prefix = __('Server response: ', 'mumurations-node')
+				let errorMessage = `${prefix} ${error.detail}`
+				createErrorNotice( errorMessage, {
 					type: 'snackbar',
 				} );
 			});
@@ -183,4 +179,3 @@ const SettingsScreen = () => {
 };
 
 export default SettingsScreen;
-

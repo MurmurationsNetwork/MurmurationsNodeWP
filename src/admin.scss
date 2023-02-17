@@ -1,0 +1,37 @@
+/* Murmurations Node */
+
+#murmurations-node {
+    .components-base-control__label {
+        text-transform: initial;
+    }
+    
+    .align-start {
+        align-items: flex-start;
+    }
+    
+    .justify-inherit {
+        justify-content: inherit;
+    }
+
+    .gap-5 {
+        gap: 5px;
+    }
+
+    .p-0 {
+        padding: 0;
+    }
+
+    .mt-10 {
+        margin-top: 10px;
+    }
+    
+    .location-search {
+        padding: 1.5rem 1rem;
+        margin-left: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .test-api {
+        margin-top: 1rem;
+    }
+}

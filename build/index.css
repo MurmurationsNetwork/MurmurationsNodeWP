@@ -1,0 +1,32 @@
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/admin.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+/* Murmurations Node */
+#murmurations-node .components-base-control__label {
+  text-transform: initial;
+}
+#murmurations-node .align-start {
+  align-items: flex-start;
+}
+#murmurations-node .justify-inherit {
+  justify-content: inherit;
+}
+#murmurations-node .gap-5 {
+  gap: 5px;
+}
+#murmurations-node .p-0 {
+  padding: 0;
+}
+#murmurations-node .mt-10 {
+  margin-top: 10px;
+}
+#murmurations-node .location-search {
+  padding: 1.5rem 1rem;
+  margin-left: 10px;
+  margin-bottom: 15px;
+}
+#murmurations-node .test-api {
+  margin-top: 1rem;
+}
+
+/*# sourceMappingURL=index.css.map*/
