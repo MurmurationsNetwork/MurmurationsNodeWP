@@ -904,8 +904,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _image__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./image */ "./src/components/image.js");
 /* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./tags */ "./src/components/tags.js");
 /* harmony import */ var _rss__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./rss */ "./src/components/rss.js");
-/* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./notifications */ "./src/components/notifications.js");
-/* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./env */ "./src/components/env.js");
+/* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./env */ "./src/components/env.js");
+/* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./notifications */ "./src/components/notifications.js");
 
 /**
  * WordPress dependencies
@@ -949,6 +949,7 @@ const SettingsScreen = () => {
     createSuccessNotice,
     createErrorNotice
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_4__.store);
+  const env = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_7__.STORE_NAME).getEnv());
 
   // Gets all settings from the store.
   const {
@@ -966,7 +967,7 @@ const SettingsScreen = () => {
       'murmurations-node_data': settingsFromState
     });
     if (success) {
-      createSuccessNotice("The settings were saved!", {
+      createSuccessNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("The settings were saved!", 'murmurations-node'), {
         type: 'snackbar'
       });
       setIsRequesting(false);
@@ -974,7 +975,9 @@ const SettingsScreen = () => {
       const lastError = getLastEntitySaveError('root', 'site', {
         'murmurations-node_data': settingsFromState
       });
-      const message = (lastError?.message || 'There was an error.') + ' Please refresh the page and try again.';
+      const refresh = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Please refresh the page and try again.', 'murmurations-node');
+      const genericError = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('There was an error. ', 'murmurations-node');
+      const message = (lastError?.message || genericError) + refresh;
       createErrorNotice(message, {
         type: 'snackbar'
       });
@@ -1012,13 +1015,23 @@ const SettingsScreen = () => {
       return posts;
     });
     if (!status.errors) {
-      let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`;
+      if (env) {
+        let responseMessage = `
+					status: ${status.data.status} \n
+					node_id: ${status.data.node_id} \n
+					profile_url: ${status.data.profile_url} \n
+					last_updated: ${status.data.last_updated}`;
+      } else {
+        let responseMessage = `${status.data.status}`;
+      }
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
       setIsPublishing(false);
     } else {
-      console.log(status.errors);
+      if (env) {
+        console.log(status.errors);
+      }
       status.errors.forEach(error => {
         let prefix = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Server response: ', 'mumurations-node');
         let errorMessage = `${prefix} ${error.detail}`;
@@ -1038,12 +1051,16 @@ const SettingsScreen = () => {
       return posts;
     });
     if (status.data) {
-      let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`;
+      console.log(status);
+      let responseMessage = `
+				status: ${status.data.status} \n
+				node_id: ${status.data.node_id} \n
+				profile_url: ${status.data.profile_url} \n
+				last_updated: ${status.data.last_updated}`;
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
     } else {
-      console.log(status);
       createErrorNotice(status, {
         type: 'snackbar'
       });
@@ -1055,6 +1072,9 @@ const SettingsScreen = () => {
     handleSave();
     handleValidate();
     handlePublish();
+    if (env) {
+      handleStatus();
+    }
     setIsWorking(false);
   };
   if (!hasResolved) {
@@ -1064,11 +1084,11 @@ const SettingsScreen = () => {
     className: "wrap"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Panel, {
     header: "Murmurations settings"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_name__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_primary_url__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_description__WEBPACK_IMPORTED_MODULE_12__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_mission__WEBPACK_IMPORTED_MODULE_13__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_15__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_tags__WEBPACK_IMPORTED_MODULE_16__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_rss__WEBPACK_IMPORTED_MODULE_17__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_14__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_19__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_name__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_primary_url__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_description__WEBPACK_IMPORTED_MODULE_12__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_mission__WEBPACK_IMPORTED_MODULE_13__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_15__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_tags__WEBPACK_IMPORTED_MODULE_16__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_rss__WEBPACK_IMPORTED_MODULE_17__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_14__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_18__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
     variant: "primary",
     onClick: handleSaveAndPublish,
     disabled: isWorking
-  }, isWorking ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving & Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save & Publish', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_18__["default"], null)))));
+  }, isWorking ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving & Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save & Publish', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_19__["default"], null)))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SettingsScreen);
 

@@ -22,8 +22,8 @@ import Location from './location';
 import Image from './image';
 import Tags from './tags';
 import Rss from './rss';
-import Notifications, { createSuccessNotice, createErrorNotice } from './notifications';
 import Env from './env';
+import Notifications, { createSuccessNotice, createErrorNotice } from './notifications';
 
 const SettingsScreen = () => {
 	const { saveEntityRecord, getLastEntitySaveError, hasFinishedResolution, isSavingEntityRecord } = useDispatch('core');
@@ -33,6 +33,9 @@ const SettingsScreen = () => {
 	const [ isWorking, setIsWorking ] = useState( false );
 	const [ isGettingStatus, setIsGettingStatus ] = useState( false );
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	const env = useSelect((select) => select(STORE_NAME).getEnv());
+
+
 
 	// Gets all settings from the store.
 	const { settingsFromState, hasResolved } = useSelect(
@@ -52,7 +55,7 @@ const SettingsScreen = () => {
 								settingsFromState,
 						} )
 		if ( success ) {
-			createSuccessNotice( "The settings were saved!", {
+			createSuccessNotice( __("The settings were saved!", 'murmurations-node'), {
 				type: 'snackbar',
 			} );
 			setIsRequesting(false);
@@ -61,7 +64,9 @@ const SettingsScreen = () => {
 									'murmurations-node_data':
 										settingsFromState,
 								} );
-			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
+			const refresh = __('Please refresh the page and try again.', 'murmurations-node')
+			const genericError = __('There was an error. ', 'murmurations-node')
+			const message = ( lastError?.message || genericError ) + refresh
 			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
@@ -97,13 +102,23 @@ const SettingsScreen = () => {
 			return posts;
 			} )
 		if ( ! status.errors ) {
-			let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`
+			if ( env ) {
+				let responseMessage = `
+					status: ${status.data.status} \n
+					node_id: ${status.data.node_id} \n
+					profile_url: ${status.data.profile_url} \n
+					last_updated: ${status.data.last_updated}`
+			} else {
+				let responseMessage = `${status.data.status}`
+			}
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
 			setIsPublishing(false);
 		} else {
-			console.log( status.errors );
+			if ( env ) {
+				console.log( status.errors );
+			}
 			status.errors.forEach( error => {
 				let prefix = __('Server response: ', 'mumurations-node')
 				let errorMessage = `${prefix} ${error.detail}`
@@ -122,12 +137,16 @@ const SettingsScreen = () => {
 			return posts;
 			} )
 		if ( status.data ) {
-			let responseMessage = `status: ${status.data.status} \n node_id: ${status.data.node_id} \n profile_url: ${status.data.profile_url} \n last_updated: ${status.data.last_updated}`;
+			console.log( status );
+			let responseMessage = `
+				status: ${status.data.status} \n
+				node_id: ${status.data.node_id} \n
+				profile_url: ${status.data.profile_url} \n
+				last_updated: ${status.data.last_updated}`;
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
 		} else {
-			console.log( status );
 			createErrorNotice( status, {
 				type: 'snackbar',
 			} );
@@ -136,11 +155,14 @@ const SettingsScreen = () => {
 	};
 
 	const handleSaveAndPublish = async () => {
-		setIsWorking(true);
+		setIsWorking(true)
 		handleSave()
 		handleValidate()
 		handlePublish()
-		setIsWorking(false);
+		if ( env ) {
+			handleStatus()
+		}
+		setIsWorking(false)
 	};
 
 	if ( ! hasResolved ) {
