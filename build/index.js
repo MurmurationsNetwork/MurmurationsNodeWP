@@ -1020,7 +1020,8 @@ const SettingsScreen = () => {
 					status: ${status.data.status} \n
 					node_id: ${status.data.node_id} \n
 					profile_url: ${status.data.profile_url} \n
-					last_updated: ${status.data.last_updated}`;
+					last_updated: ${status.data.last_updated}
+					`;
       } else {
         let responseMessage = `${status.data.status}`;
       }
@@ -1172,55 +1173,62 @@ __webpack_require__.r(__webpack_exports__);
 
 const Urls = () => {
   // Get the name from the state.
-  //const urls = useSelect((select) => select(STORE_NAME).getUrls());
-
-  //TEMP
-  const urlSingleLabel = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getUrlSingleLabel());
-  const urlSingleUrl = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getUrlSingleURL());
-
-  // Update the state.
+  const urls = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getUrls());
   const {
     setUrlSingleLabel,
     setUrlSingleURL,
+    setUrl,
     setToggleState,
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
-
-  // urls.map( ( url, index ) => {
-  // 	return <Fragment key={ index }>
-  // 		<TextControl
-  // 			label={__('Name', 'murmurations-node')}
-  // 			value={ urls[ index ].name }
-  // 			onChange={ ( address ) => {} }
-  // 		/>
-  // 		<TextControl
-  // 			label={__('URL', 'murmurations-node')}
-  // 			className="grf__location-address"
-  // 			placeholder="350 Fifth Avenue New York NY"
-  // 			value={ urls[ index ].url }
-  // 			onChange={ ( address ) => {} }
-  // 		/>
-  // 		<IconButton
-  // 			className="grf__remove-location-address"
-  // 			icon="no-alt"
-  // 			label="Delete location"
-  // 			onClick={ () => {} }
-  // 		/>
-  // 	</Fragment>;
-  // } );
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "URLS"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
-    className: "gap-5"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('URL Name', 'murmurations-node'),
-    value: urlSingleLabel !== null && urlSingleLabel !== void 0 ? urlSingleLabel : '',
-    onChange: value => setSetting('urlSingleLabel', value),
-    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('URL', 'murmurations-node'),
-    placeholder: 'https://example.com',
-    value: urlSingleUrl !== null && urlSingleUrl !== void 0 ? urlSingleUrl : '',
-    onChange: value => setSetting('urlSingleUrl', value),
-    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')
+  const handleAddRow = function (index) {
+    let row = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+      name: '',
+      url: ''
+    };
+    const newUrls = [...urls];
+    newUrls.push(row);
+    setSetting('urls', newUrls);
+  };
+  const handleRemoveRow = index => {
+    const newUrls = [...urls];
+    newUrls.splice(index, 1);
+    setSetting('urls', newUrls);
+  };
+  const handleChange = (key, value, index) => {
+    const newUrls = [...urls];
+    newUrls[index][key] = value;
+    setSetting('urls', newUrls);
+  };
+  const RepeaterRow = urls.map((url, index) => {
+    var _url$name, _url$url;
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+      key: index,
+      className: "gap-5"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Name', 'murmurations-node'),
+      value: (_url$name = url.name) !== null && _url$name !== void 0 ? _url$name : '',
+      onChange: value => handleChange('name', value, index),
+      help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')
+    }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('URL', 'murmurations-node'),
+      value: (_url$url = url.url) !== null && _url$url !== void 0 ? _url$url : '',
+      onChange: value => handleChange('url', value, index),
+      help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')
+    }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      className: "url-remove mt-20 self-start",
+      icon: "no-alt",
+      label: "Remove url",
+      isDestructive: true,
+      onClick: () => handleRemoveRow(index)
+    }));
+  });
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "URLS"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, null, RepeaterRow, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    className: "url-add",
+    icon: "plus-alt2",
+    label: "Add url",
+    variant: "primary",
+    onClick: () => handleAddRow(urls.length)
   }))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Urls);
@@ -1241,8 +1249,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SET_DESCRIPTION": () => (/* binding */ SET_DESCRIPTION),
 /* harmony export */   "SET_ENV": () => (/* binding */ SET_ENV),
 /* harmony export */   "SET_GEOLOCATION": () => (/* binding */ SET_GEOLOCATION),
-/* harmony export */   "SET_GEOLOCATIONLAT": () => (/* binding */ SET_GEOLOCATIONLAT),
-/* harmony export */   "SET_GEOLOCATIONLON": () => (/* binding */ SET_GEOLOCATIONLON),
+/* harmony export */   "SET_GEOLOCATION_LAT": () => (/* binding */ SET_GEOLOCATION_LAT),
+/* harmony export */   "SET_GEOLOCATION_LON": () => (/* binding */ SET_GEOLOCATION_LON),
 /* harmony export */   "SET_IMAGE": () => (/* binding */ SET_IMAGE),
 /* harmony export */   "SET_IMAGE_ID": () => (/* binding */ SET_IMAGE_ID),
 /* harmony export */   "SET_LOCALITY": () => (/* binding */ SET_LOCALITY),
@@ -1277,8 +1285,8 @@ const SET_LOCALITY = 'SET_LOCALITY';
 const SET_REGION = 'SET_REGION';
 const SET_COUNTRY_NAME = 'SET_COUNTRY_NAME';
 const SET_GEOLOCATION = 'SET_GEOLOCATION';
-const SET_GEOLOCATIONLAT = 'SET_GEOLOCATION_LAT';
-const SET_GEOLOCATIONLON = 'SET_GEOLOCATION_LON';
+const SET_GEOLOCATION_LAT = 'SET_GEOLOCATION_LAT';
+const SET_GEOLOCATION_LON = 'SET_GEOLOCATION_LON';
 const SET_IMAGE = 'SET_IMAGE';
 const SET_IMAGE_ID = 'SET_IMAGE_ID';
 const SET_TAGS = 'SET_TAGS';
@@ -1552,11 +1560,15 @@ function reducer() {
       };
     case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_URLS:
       const {
-        urls
+        urls,
+        index
       } = payload;
       return {
         ...state,
-        urls
+        urls: [{
+          name: urls[index].name,
+          url: urls[index].url
+        }]
       };
     case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_URLSINGLE_LABEL:
       const {
@@ -1622,15 +1634,17 @@ function reducer() {
         ...state,
         country_name
       };
-    // case SET_GEOLOCATION:
-    // 	const { latitude, latitude } = payload; // { geolocation }
-    // 	return {
-    // 		...state,
-    // 		geolocation: {
-    // 			latitude,
-    // 			longitude
-    // 		},
-    // 	};
+    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION:
+      const {
+        geolocation
+      } = payload;
+      return {
+        ...state,
+        geolocation: {
+          latitude: geolocation.latitude,
+          longitude: geolocation.longitude
+        }
+      };
     case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_GEOLOCATION_LAT:
       const {
         latitude

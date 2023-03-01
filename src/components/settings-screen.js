@@ -35,8 +35,6 @@ const SettingsScreen = () => {
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
 	const env = useSelect((select) => select(STORE_NAME).getEnv());
 
-
-
 	// Gets all settings from the store.
 	const { settingsFromState, hasResolved } = useSelect(
 		( select ) => {
@@ -107,7 +105,8 @@ const SettingsScreen = () => {
 					status: ${status.data.status} \n
 					node_id: ${status.data.node_id} \n
 					profile_url: ${status.data.profile_url} \n
-					last_updated: ${status.data.last_updated}`
+					last_updated: ${status.data.last_updated}
+					`
 			} else {
 				let responseMessage = `${status.data.status}`
 			}

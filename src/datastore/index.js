@@ -206,7 +206,6 @@ const actions = {
 			},
 		};
 	},
-
 	
 	setUserPreferences(userPreferences) {
 		return {
@@ -264,10 +263,15 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				primary_url,
 			};
 		case SET_URLS:
-			const { urls } = payload;
+			const { urls, index } = payload;
 			return {
 				...state,
-				urls,
+				urls: [
+					{
+						name: urls[index].name,
+						url: urls[index].url,
+					}
+				],
 			};
 		case SET_URLSINGLE_LABEL:
 			const { urlSingleLabel } = payload;
@@ -317,15 +321,15 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				...state,
 				country_name,
 			};
-		// case SET_GEOLOCATION:
-		// 	const { latitude, latitude } = payload; // { geolocation }
-		// 	return {
-		// 		...state,
-		// 		geolocation: {
-		// 			latitude,
-		// 			longitude
-		// 		},
-		// 	};
+		case SET_GEOLOCATION:
+			const { geolocation } = payload;
+			return {
+				...state,
+				geolocation: {
+					latitude: geolocation.latitude,
+					longitude: geolocation.longitude
+				},
+			};
 		case SET_GEOLOCATION_LAT:
 			const { latitude } = payload;
 			return {

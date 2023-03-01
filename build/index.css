@@ -5,8 +5,14 @@
 #murmurations-node .components-base-control__label {
   text-transform: initial;
 }
+#murmurations-node .components-snackbar__content {
+  white-space: pre-line;
+}
 #murmurations-node .align-start {
   align-items: flex-start;
+}
+#murmurations-node .self-start {
+  align-self: flex-start;
 }
 #murmurations-node .justify-inherit {
   justify-content: inherit;
@@ -20,10 +26,13 @@
 #murmurations-node .mt-10 {
   margin-top: 10px;
 }
+#murmurations-node .mt-20 {
+  margin-top: 20px;
+}
 #murmurations-node .location-search {
   padding: 1.5rem 1rem;
   margin-left: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 13px;
 }
 #murmurations-node .test-api {
   margin-top: 1rem;

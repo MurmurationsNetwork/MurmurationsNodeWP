@@ -4,9 +4,17 @@
     .components-base-control__label {
         text-transform: initial;
     }
+
+    .components-snackbar__content {
+        white-space: pre-line;
+    }
     
     .align-start {
         align-items: flex-start;
+    }
+
+    .self-start {
+        align-self: flex-start;
     }
     
     .justify-inherit {
@@ -24,11 +32,15 @@
     .mt-10 {
         margin-top: 10px;
     }
+
+    .mt-20 {
+        margin-top: 20px;
+    }
     
     .location-search {
         padding: 1.5rem 1rem;
         margin-left: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 13px;
     }
     
     .test-api {

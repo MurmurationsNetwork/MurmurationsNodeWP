@@ -1,73 +1,78 @@
 /**
  * WordPress dependencies
  */
-import { TextControl, PanelRow, Button, IconButton } from '@wordpress/components';
+import { TextControl, PanelRow, Button, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-
 import { STORE_NAME } from '../datastore/constants';
 
 const Urls = () => {
 	// Get the name from the state.
-	//const urls = useSelect((select) => select(STORE_NAME).getUrls());
-	
-	//TEMP
-	const urlSingleLabel = useSelect((select) => select(STORE_NAME).getUrlSingleLabel());
-	const urlSingleUrl = useSelect((select) => select(STORE_NAME).getUrlSingleURL());
+	const urls = useSelect( ( select ) => select( STORE_NAME ).getUrls() );
 
-	// Update the state.
-	const { setUrlSingleLabel, setUrlSingleURL, setToggleState, setSetting } =
+	const { setUrlSingleLabel, setUrlSingleURL, setUrl, setToggleState, setSetting } =
 		useDispatch(STORE_NAME);
 
-		// urls.map( ( url, index ) => {
-		// 	return <Fragment key={ index }>
-		// 		<TextControl
-		// 			label={__('Name', 'murmurations-node')}
-		// 			value={ urls[ index ].name }
-		// 			onChange={ ( address ) => {} }
-		// 		/>
-		// 		<TextControl
-		// 			label={__('URL', 'murmurations-node')}
-		// 			className="grf__location-address"
-		// 			placeholder="350 Fifth Avenue New York NY"
-		// 			value={ urls[ index ].url }
-		// 			onChange={ ( address ) => {} }
-		// 		/>
-		// 		<IconButton
-		// 			className="grf__remove-location-address"
-		// 			icon="no-alt"
-		// 			label="Delete location"
-		// 			onClick={ () => {} }
-		// 		/>
-		// 	</Fragment>;
-		// } );
+	const handleAddRow = ( index, row = { name: '', url: '' } ) => {
+		const newUrls = [ ...urls ]
+		newUrls.push( row )
+		setSetting( 'urls', newUrls )
+	}
+
+	const handleRemoveRow = ( index ) => {
+		const newUrls = [ ...urls ]
+		newUrls.splice( index, 1 );
+		setSetting( 'urls', newUrls )
+	}
+
+	const handleChange = ( key, value, index ) => {
+		const newUrls = [ ...urls ]
+		newUrls[ index ][ key ] = value;
+		setSetting( 'urls', newUrls )
+	}
+
+	const RepeaterRow = urls.map( ( url, index ) => {
+		return(
+			<PanelRow key={ index } className='gap-5'>
+				<TextControl
+					label={ __( 'Name', 'murmurations-node' ) }
+					value={ url.name ?? '' }
+					onChange={ ( value ) => handleChange( 'name', value, index ) }
+					help={ __( 'The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node' ) }
+				/>
+				<TextControl
+					label={ __( 'URL', 'murmurations-node' ) }
+					value={ url.url ?? '' }
+					onChange={ ( value ) => handleChange( 'url', value, index ) }
+					help={ __( 'The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node' ) }
+				/>
+				<Button
+					className="url-remove mt-20 self-start"
+					icon="no-alt"
+					label="Remove url"
+					isDestructive
+					onClick={ () => handleRemoveRow( index ) }
+				/>
+			</PanelRow>
+		);
+	} );
+
 	return (
 		<PanelRow>
 			<fieldset>
 				<legend>URLS</legend>
-				<PanelRow className='gap-5'>
-					<TextControl
-						label={__('URL Name', 'murmurations-node')}
-						value={urlSingleLabel ?? ''}
-						onChange={(value) => setSetting('urlSingleLabel', value)}
-						help={__('The name of what this URL is for (e.g., the name of the social media provider, website, etc.)', 'murmurations-node')}
+				<PanelBody>
+					{ RepeaterRow }
+					<Button
+						className="url-add"
+						icon="plus-alt2"
+						label="Add url"
+						variant='primary'
+						onClick={ () => handleAddRow( urls.length ) }
 					/>
-					<TextControl
-						label={__('URL', 'murmurations-node')}
-						placeholder={'https://example.com'}
-						value={urlSingleUrl ?? ''}
-						onChange={(value) => setSetting('urlSingleUrl', value)}
-						help={__('The URL (starting with http:// or https://) that links to the entity or further describes the item', 'murmurations-node')}
-					/>
-				</PanelRow>
-				{/* <Button
-					isDefault
-					onClick={ () => {} }
-				>
-					{ __( 'Add URL' ) }
-				</Button> */}
+				</PanelBody>
 			</fieldset>
 		</PanelRow>
-	);
+	)
 };
 export default Urls;

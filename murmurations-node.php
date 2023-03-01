@@ -272,12 +272,8 @@ function murmurations_profile_request(){
 	//load murmurations settings
 	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
     $murmurations_data = get_option( 'murmurations-node_data', true );
-    $murmurations_data = array_filter( $murmurations_data, 'strlen' );//remove null data
+	$murmurations_data = array_filter( $murmurations_data ); // remove null data.
     $murmurations_data['tags'] = array_map( 'trim', explode( ',', $murmurations_data['tags'] ) );
-    if ( isset( $murmurations_data['urlSingleLabel'] ) && isset( $murmurations_data['urlSingleUrl'] ) ) {
-      $murmurations_data['urls'][0]['name'] = $murmurations_data['urlSingleLabel'];
-      $murmurations_data['urls'][0]['url'] = $murmurations_data['urlSingleUrl'];
-    }
 		$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['latitude'] );
 		$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['longitude'] );
 		
@@ -286,8 +282,6 @@ function murmurations_profile_request(){
 			$murmurations_data['latitude'],
 			$murmurations_data['longitude'],
 			$murmurations_data['location'],
-			$murmurations_data['urlSingleLabel'],
-			$murmurations_data['urlSingleUrl'],
 		);
 
 		$header['linked_schemas'] = array('organizations_schema-v1.0.0');
