@@ -8,9 +8,11 @@ import { STORE_NAME } from '../datastore/constants';
 
 const Urls = () => {
 	// Get the name from the state.
-	const urls = useSelect( ( select ) => select( STORE_NAME ).getUrls() );
+	let urls = useSelect( ( select ) => select( STORE_NAME ).getUrls() );
 
-	const { setUrlSingleLabel, setUrlSingleURL, setUrl, setToggleState, setSetting } =
+	urls = urls ? urls : []
+
+	const { setUrl, setToggleState, setSetting } =
 		useDispatch(STORE_NAME);
 
 	const handleAddRow = ( index, row = { name: '', url: '' } ) => {

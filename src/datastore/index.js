@@ -15,8 +15,6 @@ import {
 	SET_NAME,
 	SET_PRIMARY_URL,
 	SET_URLS,
-	SET_URLSINGLE_LABEL, //TEMP
-	SET_URLSINGLE_URL, //TEMP
 	SET_DESCRIPTION,
 	SET_MISSION,
 	SET_LOCATION, //User convenience
@@ -24,8 +22,6 @@ import {
 	SET_REGION,
 	SET_COUNTRY_NAME,
 	SET_GEOLOCATION,
-	SET_GEOLOCATION_LAT,
-	SET_GEOLOCATION_LON,
 	SET_IMAGE,
 	SET_IMAGE_ID,
 	SET_TAGS,
@@ -72,22 +68,6 @@ const actions = {
 			type: SET_URLS,
 			payload: {
 				urls,
-			},
-		};
-	},
-	setUrlSingleLabel(name) {
-		return {
-			type: SET_URLSINGLE_LABEL,
-			payload: {
-				name,
-			},
-		};
-	},
-	setUrlSingleURL(url) {
-		return {
-			type: SET_URLSINGLE_URL,
-			payload: {
-				url,
 			},
 		};
 	},
@@ -139,30 +119,11 @@ const actions = {
 			},
 		};
 	},
-	setGeoLocation(lat, lon) {//how to set object
+	setGeoLocation( geolocation ) {
 		return {
 			type: SET_GEOLOCATION,
 			payload: {
-				geolocation: {
-					lat,
-					lon
-				},
-			},
-		};
-	},
-	setGeoLocationLat(latitude) {
-		return {
-			type: SET_GEOLOCATION_LAT,
-			payload: {
-				latitude,
-			},
-		};
-	},
-	setGeoLocationLon(longitude) {
-		return {
-			type: SET_GEOLOCATION_LON,
-			payload: {
-				longitude,
+				geolocation,
 			},
 		};
 	},
@@ -273,18 +234,6 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 					}
 				],
 			};
-		case SET_URLSINGLE_LABEL:
-			const { urlSingleLabel } = payload;
-			return {
-				...state,
-				urlSingleLabel,
-			};
-		case SET_URLSINGLE_URL:
-			const { urlSingleURL } = payload;
-			return {
-				...state,
-				urlSingleURL,
-			};
 		case SET_DESCRIPTION:
 			const { description } = payload;
 			return {
@@ -326,21 +275,9 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 			return {
 				...state,
 				geolocation: {
-					latitude: geolocation.latitude,
-					longitude: geolocation.longitude
+					lat: geolocation.latitude,
+					lon: geolocation.longitude
 				},
-			};
-		case SET_GEOLOCATION_LAT:
-			const { latitude } = payload;
-			return {
-				...state,
-				latitude,
-			};
-		case SET_GEOLOCATION_LON:
-			const { longitude } = payload;
-			return {
-				...state,
-				longitude,
 			};
 		case SET_IMAGE:
 			const { image } = payload;
@@ -400,12 +337,6 @@ const selectors = {
 	getUrls(state) {
 		return state.urls;
 	},
-	getUrlSingleLabel(state) {
-		return state.urlSingleLabel;
-	},
-	getUrlSingleURL(state) {
-		return state.urlSingleUrl;
-	},
 	getDescription(state) {
 		return state.description;
 	},
@@ -426,12 +357,6 @@ const selectors = {
 	},
 	getGeoLocation(state) {
 		return state.geolocation;
-	},
-	getGeoLocationLat(state) {
-		return state.latitude;
-	},
-	getGeoLocationLon(state) {
-		return state.longitude;
 	},
 	getImage(state) {
 		return state.image;

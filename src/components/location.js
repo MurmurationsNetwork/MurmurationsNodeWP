@@ -8,28 +8,21 @@ import { STORE_NAME } from '../datastore/constants';
 import apiFetch from '@wordpress/api-fetch';
 import { useRef, forwardRef, useState } from '@wordpress/element';
 
-import Locality from './locality';
-import Region from './region';
-import Country from './country';
-import GeoLocationLat from './geolocation-lat';
-import GeoLocationLon from './geolocation-lon';
-
 const Location = () => {
 	// Get data from the db.
 	const location = useSelect((select) => select(STORE_NAME).getLocation());
 	const locality = useSelect((select) => select(STORE_NAME).getLocality());
 	const region = useSelect((select) => select(STORE_NAME).getRegion());
 	const country_name = useSelect((select) => select(STORE_NAME).getCountryName());
-    const latitude = useSelect((select) => select(STORE_NAME).getGeoLocationLat());
-	const longitude = useSelect((select) => select(STORE_NAME).getGeoLocationLon());
-	//const { lat, lon } = useSelect((select) => select(STORE_NAME).getGeoLocation());
+	let geolocation = useSelect((select) => select(STORE_NAME).getGeoLocation());
+    geolocation = geolocation ? geolocation : {};
+    
     const [ isSearching, setIsSearching ] = useState( false );
 
     const locationInputRef = useRef('');
     const localityInputRef = useRef('');
     const regionInputRef = useRef('');
     const countryInputRef = useRef('');
-    // const geoLocationLatInputRef = useRef(null);
     const latInputRef = useRef('');
     const lonInputRef = useRef('');
 
@@ -64,23 +57,28 @@ const Location = () => {
                 setSetting('locality', localityInputRef.current)
                 setSetting('region', regionInputRef.current)
                 setSetting('country_name', countryInputRef.current)
-                setSetting('latitude', latInputRef.current)
-                setSetting('longitude', lonInputRef.current)
+                handleChange( 'lat', latInputRef.current )
+                handleChange( 'lon', lonInputRef.current )
                 
-                //locationInputRef.current.focus();
+                locationInputRef.current.focus();
             });
     }
 
 	// Update the state.
 	const { 
-        setLocation, 
-        setLocality, 
-        setRegion, 
-        setCountry, 
-        setGeoLocationLat, 
-        setGeoLocationLon, 
+        // setLocation, 
+        // setLocality, 
+        // setRegion, 
+        // setCountry, 
         setSetting 
     } = useDispatch(STORE_NAME);
+
+    const handleChange = ( key, value ) => {
+		const newGeolocation = geolocation
+		newGeolocation[key] = value;
+		setSetting( 'geolocation', newGeolocation )
+	}
+
 	return (
         <PanelBody className={'p-0'}>
             <PanelRow className='justify-inherit mt-10'>
@@ -114,30 +112,40 @@ const Location = () => {
                 </Button>
             </PanelRow>
             <PanelRow className='align-start gap-5'>
-                <Locality 
+                <TextControl
+                    label={__('Locality', 'murmurations-node')}
                     ref={localityInputRef}
-                    value={locality}
+                    value={locality ?? ''}
                     onChange={(value) => setSetting('locality', value)}
+                    help={__('The locality (city, town, village, etc.) where the entity is located', 'murmurations-node')}
                 />
-                <Region 
+                <TextControl
+                    label={__('Region', 'murmurations-node')}
                     ref={regionInputRef}
-                    value={region}
+                    value={region ?? ''}
                     onChange={(value) => setSetting('region', value)}
+                    help={__('The region (state, county, province, etc.) where the entity is located', 'murmurations-node')}
                 />
-                <Country 
+                <TextControl
+                    label={__('Country', 'murmurations-node')}
                     ref={countryInputRef}
-                    value={country_name}
+                    value={country_name ?? ''}
                     onChange={(value) => setSetting('country_name', value)}
+                    help={__('The name of country where the entity is based', 'murmurations-node' )}
                 />
-                <GeoLocationLat
+                <TextControl
                     ref={latInputRef}
-                    value={latitude}
-                    onChange={(value) => setSetting('latitude', value)}
+                    label={ __( 'Latitude', 'murmurations-node' ) }
+                    value={ geolocation.lat ?? '' }
+                    onChange={ ( value ) => handleChange( 'lat', value ) }
+                    help={ __( 'The geo-coordinates (latitude)', 'murmurations-node' ) }
                 />
-                <GeoLocationLon
+                <TextControl
                     ref={lonInputRef}
-                    value={longitude}
-                    onChange={(value) => setSetting('longitude', value)}
+                    label={ __( 'Longitude', 'murmurations-node' ) }
+                    value={ geolocation.lon ?? '' }
+                    onChange={ ( value ) => handleChange( 'lon', value ) }
+                    help={ __( 'The geo-coordinates (longitude)', 'murmurations-node' ) }
                 />
             </PanelRow>
         </PanelBody>
