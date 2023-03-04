@@ -14,11 +14,9 @@ const Location = () => {
 	const locality = useSelect((select) => select(STORE_NAME).getLocality());
 	const region = useSelect((select) => select(STORE_NAME).getRegion());
 	const country_name = useSelect((select) => select(STORE_NAME).getCountryName());
-	let geolocation = useSelect((select) => select(STORE_NAME).getGeoLocation());
-    geolocation = geolocation ? geolocation : {};
+	const geolocation = useSelect((select) => select(STORE_NAME).getGeoLocation()) ?? {};
     
     const [ isSearching, setIsSearching ] = useState( false );
-
     const locationInputRef = useRef('');
     const localityInputRef = useRef('');
     const regionInputRef = useRef('');
@@ -66,10 +64,6 @@ const Location = () => {
 
 	// Update the state.
 	const { 
-        // setLocation, 
-        // setLocality, 
-        // setRegion, 
-        // setCountry, 
         setSetting 
     } = useDispatch(STORE_NAME);
 
