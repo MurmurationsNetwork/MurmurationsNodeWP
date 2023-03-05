@@ -131,104 +131,51 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const replaceMediaUpload = () => _wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUpload;
-(0,_wordpress_hooks__WEBPACK_IMPORTED_MODULE_1__.addFilter)('editor.MediaUpload', 'core/edit-post/components/media-upload/replace-media-upload', replaceMediaUpload);
 const ALLOWED_MEDIA_TYPES = ['image'];
-function MyMediaUploader() {
-  const mediaId = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME).getImage()) ? (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME).getImage()) : 'http://localhost:8888/wp-content/uploads/2022/12/pancho_papa_popper.jpg';
-  console.log('mediaId: ' + mediaId);
+function Image() {
+  var _useSelect;
+  const media = (_useSelect = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME).getImage())) !== null && _useSelect !== void 0 ? _useSelect : '';
   const {
-    setImage,
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUploadCheck, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUpload, {
-    onSelect: media => console.log('selected ' + media.length),
+  const handleMedia = function () {
+    let newMedia = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    if (newMedia === null) {
+      setSetting('image', '');
+    } else {
+      setSetting('image', newMedia.url);
+    }
+  };
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+    className: "label-fieldset"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Image', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelRow, null, !media ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_media_utils__WEBPACK_IMPORTED_MODULE_3__.MediaUpload, {
+    onSelect: newMedia => handleMedia(newMedia),
     allowedTypes: ALLOWED_MEDIA_TYPES,
-    value: mediaId !== null && mediaId !== void 0 ? mediaId : '',
+    value: media !== null && media !== void 0 ? media : '',
     render: _ref => {
       let {
         open
       } = _ref;
       return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        variant: "primary",
         onClick: open
-      }, "Open Media Library");
+      }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Open Media Library'));
     },
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('An image that is generally used to refer to the entity, organization, project, etc.', 'murmurations-node')
-  }));
+  }) : (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
+    src: media,
+    height: "250px",
+    width: "auto",
+    className: "image-preview"
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    className: "image-remove",
+    icon: "no-alt",
+    label: "Remove image",
+    isDestructive: true,
+    onClick: () => handleMedia(null)
+  }))));
 }
-const Image = () => {
-  // Get the name from the state.
-  const image = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME).getImage());
-  //const id = useSelect((select) => select(STORE_NAME).getImageID()) ? useSelect((select) => select(STORE_NAME).getImageID()) : 12;
-
-  // Update the state.
-  const {
-    setImage,
-    setImageID,
-    setSetting
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_6__.STORE_NAME);
-
-  // const media = useSelect(
-  // 	(select) => {
-  // 		//console.log( 'useSelect' )
-  // 		// let media = select('core').getMedia(id);
-  // 		// console.table( meida )
-  // 		console.table( id )
-  // 		return id;// ? select('core').getMedia(id) : 12;
-  // 	},
-  // 	//[id]
-  // );
-  // const onSelectMedia = (media) => {
-  // 	props.setAttributes({
-  // 		mediaId: media.id,
-  // 		mediaUrl: media.url
-  // 	});
-  // }
-
-  // const onSelectMedia = (selectedMedia) => {
-  // 	console.log('onSelectMedia: ' + selectedMedia)
-  // 	console.table( selectedMedia )
-  // 	//onSelect(selectedMedia.id);
-  // 	// setSetting('image', {
-  // 	// 			mediaId: selectedMedia.id,
-  // 	// 			mediaUrl: selectedMedia.url
-  // 	// 		});
-  // 	setSetting('image', selectedMedia.url)
-  // 	//setSetting('image_id', selectedMedia.id)
-  // };
-
-  //change component
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Image', 'murmurations-node'),
-    value: image !== null && image !== void 0 ? image : '',
-    onChange: value => setSetting('image', value)
-  })
-  //<MediaUploadCheck>
-  // <MediaUpload
-  // 	onSelect={onSelectMedia}
-  // 	// onSelect={ ( media ) =>
-  // 	// 	console.log( 'selected ' + media.length )
-  // 	// }
-  // 	allowedTypes={['image']}
-  // 	value={id}
-  // 	render={({ open }) => (
-  // 		<Button onClick={open} variant="secondary">
-  // 			{id == 0 && __('Choose an image', 'murmurations-node')}
-  // 			{media != undefined && (
-  // 				<ResponsiveWrapper 
-  // 					naturalWidth={media.media_details.width} 
-  // 					naturalHeight={media.media_details.height}
-  // 				>
-  // 					<img src={media.source_url} alt={media.alt} />
-  // 				</ResponsiveWrapper>
-  // 			)}
-  // 		</Button>
-  // 	)}
-  //>
-  //</MediaUploadCheck>
-  ;
-};
-// export default MyMediaUploader;
+;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Image);
 
 /***/ }),
@@ -265,14 +212,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Location = () => {
-  var _geolocation$lat, _geolocation$lon;
+  var _useSelect, _geolocation$lat, _geolocation$lon;
   // Get data from the db.
   const location = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getLocation());
   const locality = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getLocality());
   const region = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getRegion());
   const country_name = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getCountryName());
-  let geolocation = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocation());
-  geolocation = geolocation ? geolocation : {};
+  const geolocation = (_useSelect = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocation())) !== null && _useSelect !== void 0 ? _useSelect : {};
   const [isSearching, setIsSearching] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const locationInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const localityInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
@@ -319,10 +265,6 @@ const Location = () => {
 
   // Update the state.
   const {
-    // setLocation, 
-    // setLocality, 
-    // setRegion, 
-    // setCountry, 
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
   const handleChange = (key, value) => {
@@ -929,9 +871,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Urls = () => {
+  var _useSelect;
   // Get the name from the state.
-  let urls = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getUrls());
-  urls = urls ? urls : [];
+  const urls = (_useSelect = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getUrls())) !== null && _useSelect !== void 0 ? _useSelect : [];
   const {
     setUrl,
     setToggleState,

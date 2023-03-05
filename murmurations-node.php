@@ -262,7 +262,7 @@ function murmurations_profile_request(){
     $murmurations_data = get_option( 'murmurations-node_data', true );
 	$murmurations_data = array_filter( $murmurations_data ); // remove null data.
     $murmurations_data['tags'] = is_array( $murmurations_data['tags'] ) ? array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) : '';
-		
+
 		unset(
 			$murmurations_data['env'],
 			$murmurations_data['location'],

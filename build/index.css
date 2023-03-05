@@ -2,6 +2,10 @@
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/admin.scss ***!
   \***************************************************************************************************************************************************************************************************************************************/
 /* Murmurations Node */
+#murmurations-node fieldset {
+  width: 100%;
+  padding-bottom: 1rem;
+}
 #murmurations-node .components-base-control__label {
   text-transform: initial;
 }
@@ -28,6 +32,17 @@
 }
 #murmurations-node .mt-20 {
   margin-top: 20px;
+}
+#murmurations-node .image-remove {
+  align-self: center;
+  margin-left: 1rem;
+}
+#murmurations-node .label-fieldset {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 8px;
 }
 #murmurations-node .location-search {
   padding: 1.5rem 1rem;
