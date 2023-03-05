@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.4.0-dev
+ * Version:         0.4.0-alpha-1
  *
  * @package         Murmurations_Node
  */
@@ -261,7 +261,9 @@ function murmurations_profile_request(){
 	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
     $murmurations_data = get_option( 'murmurations-node_data', true );
 	$murmurations_data = array_filter( $murmurations_data ); // remove null data.
-    $murmurations_data['tags'] = ( isset( $murmurations_data['tags'] ) && is_array( $murmurations_data['tags'] ) ) ? array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) : '';
+    $murmurations_data['tags'] = array_filter( array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) ) ?? [];
+	$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['geolocation']['lat'] );
+	$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['geolocation']['lon'] );
 
 		unset(
 			$murmurations_data['env'],
@@ -361,7 +363,7 @@ function murmurations_index_post_node_sync (){
 		error_log( print_r( $request_args, true ) ); 
 		error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
-    	update_option('murmurations-node_id', '' );
+    	update_option('murmurations-node_id', '0' );
 	}
 
 	return rest_ensure_response( $reponse_message );
