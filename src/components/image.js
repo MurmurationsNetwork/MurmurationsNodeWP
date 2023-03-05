@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { addFilter } from '@wordpress/hooks'
-import { Button, ResponsiveWrapper, PanelRow } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/media-utils'
+import { Button, PanelRow } from '@wordpress/components';
+import { MediaUpload } from '@wordpress/media-utils'
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../datastore/constants';

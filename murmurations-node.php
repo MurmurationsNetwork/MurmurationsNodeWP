@@ -261,7 +261,7 @@ function murmurations_profile_request(){
 	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
     $murmurations_data = get_option( 'murmurations-node_data', true );
 	$murmurations_data = array_filter( $murmurations_data ); // remove null data.
-    $murmurations_data['tags'] = is_array( $murmurations_data['tags'] ) ? array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) : '';
+    $murmurations_data['tags'] = ( isset( $murmurations_data['tags'] ) && is_array( $murmurations_data['tags'] ) ) ? array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) : '';
 
 		unset(
 			$murmurations_data['env'],
