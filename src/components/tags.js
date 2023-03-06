@@ -8,20 +8,22 @@ import { STORE_NAME } from '../datastore/constants';
 
 const Tags = () => {
 	// Get the name from the state.
-	const tags = useSelect((select) => select(STORE_NAME).getTags());
+	const tags = useSelect( ( select ) => select( STORE_NAME ).getTags() );
 
 	// Update the state.
-	const { setTags, setSetting } =
-		useDispatch(STORE_NAME);
+	const { setTags, setSetting } = useDispatch( STORE_NAME );
 
-    //change component
+	//change component
 	return (
-        <TextControl
-            label={__('Tags', 'murmurations-node')}
-            value={tags ?? ''}
-            onChange={(value) => setSetting('tags', value)}
-			help={__('Keywords relevant to this entity and its activities or attributes.', 'murmurations-node')}
-        />
+		<TextControl
+			label={ __( 'Tags', 'murmurations-node' ) }
+			value={ tags ?? '' }
+			onChange={ ( value ) => setSetting( 'tags', value ) }
+			help={ __(
+				'Keywords relevant to this entity and its activities or attributes.',
+				'murmurations-node'
+			) }
+		/>
 	);
 };
 export default Tags;

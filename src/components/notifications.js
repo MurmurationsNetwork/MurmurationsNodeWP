@@ -1,5 +1,13 @@
 import { store as noticesStore } from '@wordpress/notices';
-import { Button, Panel, PanelBody, PanelRow, SearchControl, Spinner, SnackbarList } from '@wordpress/components';
+import {
+	Button,
+	Panel,
+	PanelBody,
+	PanelRow,
+	SearchControl,
+	Spinner,
+	SnackbarList,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 const Notifications = () => {
@@ -8,8 +16,10 @@ const Notifications = () => {
 		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices.filter( ({ type }) => type === 'snackbar' );
-	
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
+
 	return (
 		<SnackbarList
 			notices={ snackbarNotices }
@@ -17,6 +27,6 @@ const Notifications = () => {
 			onRemove={ removeNotice }
 		/>
 	);
-}
+};
 
 export default Notifications;

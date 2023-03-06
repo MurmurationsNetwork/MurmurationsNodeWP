@@ -32,7 +32,7 @@ import {
 
 // Define our actions
 const actions = {
-	initSettings(settings) {
+	initSettings( settings ) {
 		return {
 			type: STATE_FROM_DATABASE,
 			payload: {
@@ -47,7 +47,7 @@ const actions = {
 		};
 	},
 
-	setName(name) {
+	setName( name ) {
 		return {
 			type: SET_NAME,
 			payload: {
@@ -55,7 +55,7 @@ const actions = {
 			},
 		};
 	},
-	setPrimaryUrl(primary_url) {
+	setPrimaryUrl( primary_url ) {
 		return {
 			type: SET_PRIMARY_URL,
 			payload: {
@@ -63,7 +63,7 @@ const actions = {
 			},
 		};
 	},
-	setUrls(urls) {
+	setUrls( urls ) {
 		return {
 			type: SET_URLS,
 			payload: {
@@ -71,7 +71,7 @@ const actions = {
 			},
 		};
 	},
-	setDescription(description) {
+	setDescription( description ) {
 		return {
 			type: SET_DESCRIPTION,
 			payload: {
@@ -79,7 +79,7 @@ const actions = {
 			},
 		};
 	},
-	setMission(mission) {
+	setMission( mission ) {
 		return {
 			type: SET_MISSION,
 			payload: {
@@ -87,7 +87,7 @@ const actions = {
 			},
 		};
 	},
-	setLocation(location) {
+	setLocation( location ) {
 		return {
 			type: SET_LOCATION,
 			payload: {
@@ -95,7 +95,7 @@ const actions = {
 			},
 		};
 	},
-	setLocality(locality) {
+	setLocality( locality ) {
 		return {
 			type: SET_LOCALITY,
 			payload: {
@@ -103,7 +103,7 @@ const actions = {
 			},
 		};
 	},
-	setRegion(region) {
+	setRegion( region ) {
 		return {
 			type: SET_REGION,
 			payload: {
@@ -111,7 +111,7 @@ const actions = {
 			},
 		};
 	},
-	setCountryName(country_name) {
+	setCountryName( country_name ) {
 		return {
 			type: SET_COUNTRY_NAME,
 			payload: {
@@ -127,7 +127,7 @@ const actions = {
 			},
 		};
 	},
-	setImage(image) {
+	setImage( image ) {
 		return {
 			type: SET_IMAGE,
 			payload: {
@@ -135,7 +135,7 @@ const actions = {
 			},
 		};
 	},
-	setImageID(image_id) {
+	setImageID( image_id ) {
 		return {
 			type: SET_IMAGE,
 			payload: {
@@ -143,7 +143,7 @@ const actions = {
 			},
 		};
 	},
-	setTags(tags) {
+	setTags( tags ) {
 		return {
 			type: SET_TAGS,
 			payload: {
@@ -151,7 +151,7 @@ const actions = {
 			},
 		};
 	},
-	setRSS(rss) {
+	setRSS( rss ) {
 		return {
 			type: SET_RSS,
 			payload: {
@@ -159,7 +159,7 @@ const actions = {
 			},
 		};
 	},
-	setEnv(env) {
+	setEnv( env ) {
 		return {
 			type: SET_ENV,
 			payload: {
@@ -167,8 +167,8 @@ const actions = {
 			},
 		};
 	},
-	
-	setUserPreferences(userPreferences) {
+
+	setUserPreferences( userPreferences ) {
 		return {
 			type: SET_USER_PREFERENCES,
 			payload: {
@@ -176,7 +176,7 @@ const actions = {
 			},
 		};
 	},
-	setSetting(setting, value) {
+	setSetting( setting, value ) {
 		return {
 			type: SET_SETTING,
 			payload: {
@@ -198,8 +198,8 @@ const actions = {
 };
 
 // Define the reducer
-function reducer(state = DEFAULT_STATE, { type, payload }) {
-	switch (type) {
+function reducer( state = DEFAULT_STATE, { type, payload } ) {
+	switch ( type ) {
 		case STATE_FROM_DATABASE:
 			return {
 				...state,
@@ -209,7 +209,7 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 			const { setting, value } = payload;
 			return {
 				...state,
-				[setting]: value,
+				[ setting ]: value,
 			};
 		case SET_NAME:
 			const { name } = payload;
@@ -229,9 +229,9 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				...state,
 				urls: [
 					{
-						name: urls[index].name,
-						url: urls[index].url,
-					}
+						name: urls[ index ].name,
+						url: urls[ index ].url,
+					},
 				],
 			};
 		case SET_DESCRIPTION:
@@ -276,7 +276,7 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				...state,
 				geolocation: {
 					lat: geolocation.latitude,
-					lon: geolocation.longitude
+					lon: geolocation.longitude,
 				},
 			};
 		case SET_IMAGE:
@@ -309,13 +309,13 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 				...state,
 				env,
 			};
-		
+
 		case SET_USER_PREFERENCES:
 			const { userPreferences } = payload;
-			if (userPreferences) {
+			if ( userPreferences ) {
 				window.localStorage.setItem(
 					'murmurations-node-user-preferences',
-					JSON.stringify(userPreferences)
+					JSON.stringify( userPreferences )
 				);
 			}
 			return {
@@ -328,85 +328,85 @@ function reducer(state = DEFAULT_STATE, { type, payload }) {
 
 // Define some selectors
 const selectors = {
-	getName(state) {
+	getName( state ) {
 		return state.name;
 	},
-	getPrimaryUrl(state) {
+	getPrimaryUrl( state ) {
 		return state.primary_url;
 	},
-	getUrls(state) {
+	getUrls( state ) {
 		return state.urls;
 	},
-	getDescription(state) {
+	getDescription( state ) {
 		return state.description;
 	},
-	getMission(state) {
+	getMission( state ) {
 		return state.mission;
 	},
-	getLocation(state) {
+	getLocation( state ) {
 		return state.location;
 	},
-	getLocality(state) {
+	getLocality( state ) {
 		return state.locality;
 	},
-	getRegion(state) {
+	getRegion( state ) {
 		return state.region;
 	},
-	getCountryName(state) {
+	getCountryName( state ) {
 		return state.country_name;
 	},
-	getGeoLocation(state) {
+	getGeoLocation( state ) {
 		return state.geolocation;
 	},
-	getImage(state) {
+	getImage( state ) {
 		return state.image;
 	},
-	getImageID(state) {
+	getImageID( state ) {
 		return state.image_id;
 	},
-	getTags(state) {
+	getTags( state ) {
 		return state.tags;
 	},
-	getRSS(state) {
+	getRSS( state ) {
 		return state.rss;
 	},
-	getEnv(state) {
+	getEnv( state ) {
 		return state.env;
 	},
-	getSettings(state) {
+	getSettings( state ) {
 		const { ...settings } = state;
 		return settings;
 	},
-	getUserPreferences(state) {
+	getUserPreferences( state ) {
 		return state.userPreferences;
 	},
 };
 
 const resolvers = {
 	getSettings() {
-		return async ({ dispatch }) => {
-			const settings = await apiFetch({ path: '/wp/v2/settings' });
-			dispatch.initSettings(settings['murmurations-node_data']);
+		return async ( { dispatch } ) => {
+			const settings = await apiFetch( { path: '/wp/v2/settings' } );
+			dispatch.initSettings( settings[ 'murmurations-node_data' ] );
 		};
 	},
 	getUserPreferences() {
-		return ({ dispatch }) => {
+		return ( { dispatch } ) => {
 			const userPreferences =
 				window.localStorage.getItem(
 					'murmurations-node-user-preferences'
 				) || DEFAULT_STATE.userPreferences;
-			dispatch.setUserPreferences(JSON.parse(userPreferences));
+			dispatch.setUserPreferences( JSON.parse( userPreferences ) );
 		};
 	},
 };
 
 // Define and register the store.
-const store = createReduxStore(STORE_NAME, {
+const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
 	resolvers,
 	// __experimentalUseThunks: true,
-});
+} );
 
-register(store);
+register( store );
