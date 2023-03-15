@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "wp-scripts start",
+    "wp-env": "wp-env start",
     "build:settings": "wp-scripts start src/settings/index.js --output-path=build/settings",
     "grunt": "Grunt",
     "build": "wp-scripts start && grunt",
