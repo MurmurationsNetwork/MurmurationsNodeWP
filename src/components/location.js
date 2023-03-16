@@ -34,12 +34,34 @@ const Location = () => {
 		useSelect( ( select ) => select( STORE_NAME ).getGeoLocation() ) ?? {};
 
 	const [ isSearching, setIsSearching ] = useState( false );
+	const [ resultsArray, setResultsArray ] = useState( ); // results array
+	const [ resultsOptions, setResultsOptions ] = useState( false ); //search results
+	const [ selectedResults, setSelectedResults ] = useState( false ); //selected option
 	const locationInputRef = useRef( '' );
 	const localityInputRef = useRef( '' );
 	const regionInputRef = useRef( '' );
 	const countryInputRef = useRef( '' );
 	const latInputRef = useRef( '' );
 	const lonInputRef = useRef( '' );
+	const resultsInputRef = useRef( '' );
+
+	// Update the state.
+	const { setSetting } = useDispatch( STORE_NAME );
+
+	const handleChange = ( key, value ) => {
+		const newGeolocation = geolocation;
+		newGeolocation[ key ] = value;
+		setSetting( 'geolocation', newGeolocation );
+	};
+	
+	const isPostalCode = ( value ) => {
+		let hasNum = /\d/. test( value );
+		// let isNum = Number.isInteger( value );
+		
+		// console.log( 'hasNum:', hasNum )
+		// console.log( 'isNum:', isNum )
+		return hasNum;
+	}	
 
 	// Search OpenMaps API
 	const handleSearch = () => {
@@ -52,41 +74,47 @@ const Location = () => {
 			.then( ( response ) => JSON.parse( response.body ) )
 			.then( ( body ) => {
 				setIsSearching( false );
-				// TODO add some kind of select list
-				// Use first result
+
 				if ( ! body.length > 0 ) {
 					console.log( 'no results found' );
+					setResultsOptions( null )
+				} else {
+					setResultsArray( body ); 
+					let results = body.map(
+						( item, index ) => (
+							{
+								'label': item.display_name,
+								'value': index 
+							})
+					)
+					setResultsOptions( results.slice( 5 ) )
 				}
-				let first = body[ 0 ];
-				let locationArr = first.display_name.split( ', ' );
-
-				// Populate fields
-				locationInputRef.current = first.display_name;
-				countryInputRef.current = locationArr.pop();
-				regionInputRef.current = locationArr.pop();
-				localityInputRef.current = locationArr.join( ', ' ).toString();
-				latInputRef.current = first.lat;
-				lonInputRef.current = first.lon;
-
-				setSetting( 'location', locationInputRef.current );
-				setSetting( 'locality', localityInputRef.current );
-				setSetting( 'region', regionInputRef.current );
-				setSetting( 'country_name', countryInputRef.current );
-				handleChange( 'lat', latInputRef.current );
-				handleChange( 'lon', lonInputRef.current );
-
-				locationInputRef.current.focus();
 			} );
 	};
 
-	// Update the state.
-	const { setSetting } = useDispatch( STORE_NAME );
+	const handleSelect = ( value ) => {
 
-	const handleChange = ( key, value ) => {
-		const newGeolocation = geolocation;
-		newGeolocation[ key ] = value;
-		setSetting( 'geolocation', newGeolocation );
-	};
+		setSelectedResults( value )
+		let selection = resultsArray[value];		
+		let locationArr = selection.display_name.split( ', ' );
+
+		// Populate fields
+		locationInputRef.current = selection.display_name;
+		countryInputRef.current = locationArr.pop();
+		let regionOrPostCode = locationArr.pop();
+		
+		regionInputRef.current = !isPostalCode( regionOrPostCode ) ? regionOrPostCode : locationArr.pop();
+		localityInputRef.current = locationArr.join( ', ' ).toString();
+		latInputRef.current = selection.lat;
+		lonInputRef.current = selection.lon;
+
+		setSetting( 'location', locationInputRef.current );
+		setSetting( 'locality', localityInputRef.current );
+		setSetting( 'region', regionInputRef.current );
+		setSetting( 'country_name', countryInputRef.current );
+		handleChange( 'lat', latInputRef.current );
+		handleChange( 'lon', lonInputRef.current );
+	}
 
 	return (
 		<PanelBody className={ 'p-0' }>
@@ -125,6 +153,17 @@ const Location = () => {
 					) }
 				</Button>
 			</PanelRow>
+			{ resultsOptions ? 
+				<PanelRow>
+					<RadioControl
+						label={ __( 'Search results', 'murmurations-node' ) }
+						help={ __( 'Select a result to populate the location fields', 'murmurations-node' ) }
+						selected={ selectedResults }
+						options={ resultsOptions }
+						onChange={ ( value ) => handleSelect( value ) }
+					/>
+				</PanelRow> : ''
+			}
 			<PanelRow className="align-start gap-5">
 				<TextControl
 					label={ __( 'Locality', 'murmurations-node' ) }

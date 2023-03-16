@@ -215,12 +215,34 @@ const Location = () => {
   const country_name = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getCountryName());
   const geolocation = (_useSelect = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME).getGeoLocation())) !== null && _useSelect !== void 0 ? _useSelect : {};
   const [isSearching, setIsSearching] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [resultsArray, setResultsArray] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(); // results array
+  const [resultsOptions, setResultsOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false); //search results
+  const [selectedResults, setSelectedResults] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false); //selected option
   const locationInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const localityInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const regionInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const countryInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const latInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   const lonInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  const resultsInputRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+
+  // Update the state.
+  const {
+    setSetting
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
+  const handleChange = (key, value) => {
+    const newGeolocation = geolocation;
+    newGeolocation[key] = value;
+    setSetting('geolocation', newGeolocation);
+  };
+  const isPostalCode = value => {
+    let hasNum = /\d/.test(value);
+    // let isNum = Number.isInteger( value );
+
+    // console.log( 'hasNum:', hasNum )
+    // console.log( 'isNum:', isNum )
+    return hasNum;
+  };
 
   // Search OpenMaps API
   const handleSearch = () => {
@@ -233,39 +255,38 @@ const Location = () => {
       }
     }).then(response => JSON.parse(response.body)).then(body => {
       setIsSearching(false);
-      // TODO add some kind of select list
-      // Use first result
       if (!body.length > 0) {
         console.log('no results found');
+        setResultsOptions(null);
+      } else {
+        setResultsArray(body);
+        let results = body.map((item, index) => ({
+          'label': item.display_name,
+          'value': index
+        }));
+        setResultsOptions(results.slice(5));
       }
-      let first = body[0];
-      let locationArr = first.display_name.split(', ');
-
-      // Populate fields
-      locationInputRef.current = first.display_name;
-      countryInputRef.current = locationArr.pop();
-      regionInputRef.current = locationArr.pop();
-      localityInputRef.current = locationArr.join(', ').toString();
-      latInputRef.current = first.lat;
-      lonInputRef.current = first.lon;
-      setSetting('location', locationInputRef.current);
-      setSetting('locality', localityInputRef.current);
-      setSetting('region', regionInputRef.current);
-      setSetting('country_name', countryInputRef.current);
-      handleChange('lat', latInputRef.current);
-      handleChange('lon', lonInputRef.current);
-      locationInputRef.current.focus();
     });
   };
+  const handleSelect = value => {
+    setSelectedResults(value);
+    let selection = resultsArray[value];
+    let locationArr = selection.display_name.split(', ');
 
-  // Update the state.
-  const {
-    setSetting
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_4__.STORE_NAME);
-  const handleChange = (key, value) => {
-    const newGeolocation = geolocation;
-    newGeolocation[key] = value;
-    setSetting('geolocation', newGeolocation);
+    // Populate fields
+    locationInputRef.current = selection.display_name;
+    countryInputRef.current = locationArr.pop();
+    let regionOrPostCode = locationArr.pop();
+    regionInputRef.current = !isPostalCode(regionOrPostCode) ? regionOrPostCode : locationArr.pop();
+    localityInputRef.current = locationArr.join(', ').toString();
+    latInputRef.current = selection.lat;
+    lonInputRef.current = selection.lon;
+    setSetting('location', locationInputRef.current);
+    setSetting('locality', localityInputRef.current);
+    setSetting('region', regionInputRef.current);
+    setSetting('country_name', countryInputRef.current);
+    handleChange('lat', latInputRef.current);
+    handleChange('lon', lonInputRef.current);
   };
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
     className: 'p-0'
@@ -290,7 +311,13 @@ const Location = () => {
     onClick: handleSearch,
     className: 'location-search',
     disabled: isSearching
-  }, isSearching ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Searching...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search', 'murmurations-node'))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+  }, isSearching ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Searching...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search', 'murmurations-node'))), resultsOptions ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search results', 'murmurations-node'),
+    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Select a result to populate the location fields', 'murmurations-node'),
+    selected: selectedResults,
+    options: resultsOptions,
+    onChange: value => handleSelect(value)
+  })) : '', (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
     className: "align-start gap-5"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Locality', 'murmurations-node'),
