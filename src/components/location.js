@@ -56,10 +56,6 @@ const Location = () => {
 	
 	const isPostalCode = ( value ) => {
 		let hasNum = /\d/. test( value );
-		// let isNum = Number.isInteger( value );
-		
-		// console.log( 'hasNum:', hasNum )
-		// console.log( 'isNum:', isNum )
 		return hasNum;
 	}	
 

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, ButtonGroup, ToggleControl, Panel, PanelBody, PanelRow, FormToggle, Spinner } from '@wordpress/components';
+import { Button, TextControl, ButtonGroup, ToggleControl, Panel, PanelBody, PanelRow, FormToggle, Spinner, useBaseField } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect, coreDataStore } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data'; // do I need this?
@@ -13,26 +13,17 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import '../datastore/index';
-import Name from './name';
-import PrimaryUrl from './primary-url';
 import Urls from './urls';
-import Description from './description';
-import Mission from './mission';
-import Location from './location';
 import Image from './image';
-import Tags from './tags';
-import Rss from './rss';
+import Location from './location';
 import Env from './env';
 import Notifications, { createSuccessNotice, createErrorNotice } from './notifications';
 
 const SettingsScreen = () => {
 	const { saveEntityRecord, getLastEntitySaveError, hasFinishedResolution, isSavingEntityRecord } = useDispatch('core');
 	const [ isRequesting, setIsRequesting ] = useState( false );
-	const [ isPublishing, setIsPublishing ] = useState( false );
-	const [ isValidating, setIsValidating ] = useState( false );
-	const [ isWorking, setIsWorking ] = useState( false );
-	const [ isGettingStatus, setIsGettingStatus ] = useState( false );
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	const { setSetting } = useDispatch( STORE_NAME );
 	const env = useSelect((select) => select(STORE_NAME).getEnv());
 
 	// Gets all settings from the store.
@@ -45,14 +36,33 @@ const SettingsScreen = () => {
 				),
 			}
 	});
+	// console.log( 'settingsFromState: ', settingsFromState );
+	
+	const {
+		name,
+		primary_url,
+		description,
+		mission,
+		tags,
+		rss,
+		urls,
+	} = settingsFromState;
 
-	const handleSave = async () => {
+	// TODO handle DataSanitization
+	// URLS, input fields, etc 
+	const handleFormValidate = () => {
+		let sanitizedUrls = urls.filter( item => item.name !== "" && item.url !== "" )
+		setSetting( 'urls', sanitizedUrls )
+
+	}
+	
+	const handleFormSave = async () => {
 		setIsRequesting(true);
 		const success = await saveEntityRecord('root', 'site', {
 							'murmurations-node_data':
 								settingsFromState,
 						} )
-		if ( success ) {
+		if ( success && env ) {
 			createSuccessNotice( __("The settings were saved!", 'murmurations-node'), {
 				type: 'snackbar',
 			} );
@@ -72,13 +82,13 @@ const SettingsScreen = () => {
 		}
 	};
 	
-	const handleValidate = async () => {
-		setIsValidating(true);
+	const handleAPIValidate = async () => {
+		setIsRequesting(true);
 		const status = await apiFetch( { path: '/murmurations/v2/index/validate' } ).then( ( posts ) => {
 			console.log( posts );
 			return posts;
 			} )
-		if ( ! status.errors ) {
+		if ( ! status.errors && env ) {
 			createSuccessNotice( status.meta.message, {
 				type: 'snackbar',
 			} );
@@ -90,11 +100,11 @@ const SettingsScreen = () => {
 				} );
 			});
 		}
-		setIsValidating(false);
+		setIsRequesting(false);
 	};
 	
-	const handlePublish = async () => {
-		setIsPublishing(true);
+	const handleAPIPublish = async () => {
+		setIsRequesting(true);
 		const status = await apiFetch( { path: '/murmurations/v2/index/nodes_sync' } ).then( ( posts ) => {
 			console.log( posts );
 			return posts;
@@ -113,7 +123,7 @@ const SettingsScreen = () => {
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
-			setIsPublishing(false);
+			setIsRequesting(false);
 		} else {
 			if ( env ) {
 				console.log( status.errors );
@@ -125,12 +135,12 @@ const SettingsScreen = () => {
 					type: 'snackbar',
 				} );
 			});
-			setIsPublishing(false);
+			setIsRequesting(false);
 		}
 	};
 
-	const handleStatus = async () => {
-		setIsGettingStatus(true);
+	const handleAPIStatus = async () => {
+		setIsRequesting(true);
 		const status = await apiFetch( { path: '/murmurations/v2/index/node_status' } ).then( ( posts ) => {
 			console.log( posts );
 			return posts;
@@ -150,19 +160,25 @@ const SettingsScreen = () => {
 				type: 'snackbar',
 			} );
 		}
-		setIsGettingStatus( false );
+		setIsRequesting( false );
 	};
 
 	const handleSaveAndPublish = async () => {
-		setIsWorking(true)
-		handleSave()
-		handleValidate()
-		handlePublish()
+		setIsRequesting(true)
+		handleFormValidate()
+		handleFormSave()
+		handleAPIValidate()
+		handleAPIPublish()
 		if ( env ) {
-			handleStatus()
+			handleAPIStatus()
 		}
-		setIsWorking(false)
+		setIsRequesting(false)
 	};
+
+	const handleField = ( name, value ) => {
+
+		setSetting( name, value )
+	}
 
 	if ( ! hasResolved ) {
 		return <Spinner />;
@@ -172,19 +188,67 @@ const SettingsScreen = () => {
 		<div className="wrap">
 			<Panel header="Murmurations settings">
 				<PanelBody>
-					<Name />
-					<PrimaryUrl />
-					<Urls />
-					<Description />
-					<Mission />
+					<TextControl
+						label={ __( 'Name', 'murmurations-node' ) }
+						value={ name ?? '' }
+						onChange={ ( value ) => handleField( 'name', value ) }
+						help={ __(
+							'The name of the entity, organization, project, item, etc.',
+							'murmurations-node'
+						) }
+					/>
+					<TextControl
+						label={ __( 'Primary URL', 'murmurations-node' ) }
+						value={ primary_url ?? '' }
+						onChange={ ( value ) => handleField( 'primary_url', value ) }
+						help={ __(
+							'The primary URL of the entity or item (i.e., its unique website address)',
+							'murmurations-node'
+						) }
+					/>
+					<TextControl
+						label={ __( 'Description', 'murmurations-node' ) }
+						value={ description ?? '' }
+						onChange={ ( value ) => handleField( 'description', value ) }
+						help={ __(
+							'A description of the item, entity, organization, project, etc.',
+							'murmurations-node'
+						) }
+					/>
+					<TextControl
+						label={ __( 'Mission', 'murmurations-node' ) }
+						value={ mission ?? '' }
+						onChange={ ( value ) => handleField( 'mission', value ) }
+						help={ __(
+							'A short statement of why the entity exists and its goals.',
+							'murmurations-node'
+						) }
+					/>
+					<TextControl
+						label={ __( 'Tags', 'murmurations-node' ) }
+						value={ tags ?? '' }
+						onChange={ ( value ) => handleField( 'tags', value ) }
+						help={ __(
+							'Keywords relevant to this entity and its activities or attributes.',
+							'murmurations-node'
+						) }
+					/>
+					<TextControl
+						label={ __( 'RSS', 'murmurations-node' ) }
+						value={ rss ?? '' }
+						onChange={ ( value ) => handleField( 'rss', value ) }
+						help={ __(
+							"The URL for the entity's RSS feed",
+							'murmurations-node'
+						) }
+					/>
 					<Image />
-					<Tags />
-					<Rss />
+					<Urls />
 					<Location />
 					<Env />
 					<PanelRow>
-						<Button variant="primary" onClick={ handleSaveAndPublish } disabled={ isWorking } >
-							{ isWorking ? (
+						<Button variant="primary" onClick={ handleSaveAndPublish } disabled={ isRequesting } >
+							{ isRequesting ? (
 								<>
 									{ __( 'Saving & Publishing...', 'murmurations-node') }
 									<Spinner/>

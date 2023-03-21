@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { TextControl, PanelRow } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -12,7 +12,7 @@ const Name = () => {
 	const name = useSelect( ( select ) => select( STORE_NAME ).getName() );
 
 	// Update the state.
-	const { setName, setToggleState, setSetting } = useDispatch( STORE_NAME );
+	const { setSetting } = useDispatch( STORE_NAME );
 
 	return (
 		<TextControl
