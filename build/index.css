@@ -27,6 +27,9 @@
 #murmurations-node .p-0 {
   padding: 0;
 }
+#murmurations-node .border-b-0 {
+  border-bottom: 0;
+}
 #murmurations-node .mt-10 {
   margin-top: 10px;
 }
@@ -51,6 +54,10 @@
 }
 #murmurations-node .test-api {
   margin-top: 1rem;
+}
+#murmurations-node .align-left {
+  justify-content: start;
+  gap: 1rem;
 }
 
 /*# sourceMappingURL=index.css.map*/

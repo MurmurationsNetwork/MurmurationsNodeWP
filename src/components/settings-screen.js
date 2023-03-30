@@ -46,14 +46,28 @@ const SettingsScreen = () => {
 		tags,
 		rss,
 		urls,
+		indexed,
 	} = settingsFromState;
+
+	if ( ! hasResolved ) {
+		return <Spinner />;
+	}
+
+	const liveIndexExplorer = 'https://tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+	const testIndexExplorer = 'https://test-tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+	const index_url = primary_url.replace(/^http(s?):\/\//i, "");
+	const murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
+
+	const handleField = ( name, value ) => {
+		// validation?
+		setSetting( name, value )
+	}
 
 	// TODO handle DataSanitization
 	// URLS, input fields, etc 
 	const handleFormValidate = () => {
 		let sanitizedUrls = urls.filter( item => item.name !== "" && item.url !== "" )
 		setSetting( 'urls', sanitizedUrls )
-
 	}
 	
 	const handleFormSave = async () => {
@@ -120,6 +134,7 @@ const SettingsScreen = () => {
 			} else {
 				let responseMessage = `${status.data.status}`
 			}
+			handleField( 'indexed', status.data.node_id )
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
@@ -146,7 +161,6 @@ const SettingsScreen = () => {
 			return posts;
 			} )
 		if ( status.data ) {
-			console.log( status );
 			let responseMessage = `
 				status: ${status.data.status} \n
 				node_id: ${status.data.node_id} \n
@@ -155,7 +169,9 @@ const SettingsScreen = () => {
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
+			handleField( 'indexed', status.data.node_id )
 		} else {
+			console.log( status );
 			createErrorNotice( status, {
 				type: 'snackbar',
 			} );
@@ -174,15 +190,6 @@ const SettingsScreen = () => {
 		}
 		setIsRequesting(false)
 	};
-
-	const handleField = ( name, value ) => {
-
-		setSetting( name, value )
-	}
-
-	if ( ! hasResolved ) {
-		return <Spinner />;
-	}
 
 	return (
 		<div className="wrap">
@@ -246,7 +253,7 @@ const SettingsScreen = () => {
 					<Urls />
 					<Location />
 					<Env />
-					<PanelRow>
+					<PanelRow className='align-left'>
 						<Button variant="primary" onClick={ handleSaveAndPublish } disabled={ isRequesting } >
 							{ isRequesting ? (
 								<>
@@ -255,6 +262,16 @@ const SettingsScreen = () => {
 								</>
 							) : __( 'Save & Publish', 'murmurations-node') }
 						</Button>
+						{ indexed ? (
+							<Button 
+								variant="secondary" 
+								href={ murmurations_index } 
+								icon='location-alt'
+								target='_blank' 
+								rel='noopener' >
+									{ __( 'View site in index', 'murmurations-node') }
+							</Button> ) 
+							: '' }
 						<Notifications></Notifications>
 					</PanelRow>
 				</PanelBody>
