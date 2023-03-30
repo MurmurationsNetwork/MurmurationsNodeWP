@@ -76,7 +76,7 @@ const Urls = () => {
 		<PanelRow>
 			<fieldset>
 				<legend>URLS</legend>
-				<PanelBody>
+				<PanelBody className="border-b-0">
 					{ RepeaterRow }
 					<Button
 						className="url-add"
