@@ -20,7 +20,7 @@ define( 'MURMNODE_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
 $murmurations_data = get_option( 'murmurations-node_data', true );
-if ( isset($murmurations_data['env']) ) {
+if ( isset( $murmurations_data['env'] ) ) {
   if ( $murmurations_data['env'] === true ) {
     \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://test-index.murmurations.network/v2' );
     \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://test-library.murmurations.network/v2/' );
@@ -40,7 +40,7 @@ function llog( $content, $meta = null ){
  * @return array
  */
 function murmurations_settings_link( $links ) {
-  $links[] = '<a href="' . admin_url( 'options-general.php?page=murmurations-node' ) . '">' . __('Settings', 'murmurations-node') . '</a>';
+  $links[] = '<a href="' . admin_url( 'options-general.php?page=murmurations-node' ) . '">' . __( 'Settings', 'murmurations-node' ) . '</a>';
   return $links;
 }
 \add_filter( 'plugin_action_links_'.plugin_basename( __FILE__ ), __NAMESPACE__ . '\murmurations_settings_link' );
@@ -428,7 +428,7 @@ function murmurations_index_node_status () {
 		$reponse_message = __( 'Profile not indexed', 'murmurations-node' );
 		error_log( print_r( $reponse_message, true ) );
 	}
-		return rest_ensure_response( $reponse_message );
+	return rest_ensure_response( $reponse_message );
 }
 
 /**
