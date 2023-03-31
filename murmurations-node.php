@@ -16,6 +16,19 @@ namespace Murmurations\Node;
 
 include "includes/autoload.php";
 
+function activate_murmurations() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-activation.php';
+	__NAMESPACE__ . activate();
+}
+
+function deactivate_murmurations() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-deactivation.php';
+	__NAMESPACE__ . deactivate();
+}
+
+register_activation_hook( __FILE__, __NAMESPACE__ . '\activate_murmurations' );
+register_deactivation_hook( __FILE__, __NAMESPACE__ . '\deactivate_murmurations' );
+
 define( 'MURMNODE_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
@@ -253,6 +266,8 @@ add_action( 'rest_api_init', __NAMESPACE__ . '\murmurations_plugin_settings' );
  * @return WP_REST_Response
  */
 function murmurations_profile_request(){
+	error_log ( 'node_data: ' . print_r( get_option( 'murmurations-node_data' ), true ) );
+	error_log ( 'node_id: ' . print_r( get_option( 'murmurations-node_id' ), true ) );
 	if ( false === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
 		return new \WP_Error( 'murmurations_no_saved_profile', __( 'No profile found', 'murmurations-node' ), array( 'status' => 404 ) );
 	}
@@ -268,10 +283,11 @@ function murmurations_profile_request(){
 		unset(
 			$murmurations_data['env'],
 			$murmurations_data['location'],
+			$murmurations_data['indexed'],
 		);
 
 		$header['linked_schemas'] = array('organizations_schema-v1.0.0');
-		$data = array_merge($header, $murmurations_data);
+		$data = array_merge( $header, $murmurations_data );
 		set_transient( "murmurations_profile", $data, HOUR_IN_SECONDS );
 	}
 	return $data;
@@ -330,10 +346,15 @@ function murmurations_index_post_node(){
 	if ( 200 === $response['response']['code'] ) {
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message->meta->message->data->node_id );
+		$node_data = get_option( 'murmurations-node_data' );
+		$node_data['indexed'] = $reponse_message->meta->message->data->node_id;
+		update_option('murmurations-node_data', $node_data );
+		return rest_ensure_response( $reponse_message );
 	} else {
-    	error_log( print_r( $request_args, true ) ); 
-    	error_log( print_r( $response, true ) );
+    	// error_log( print_r( $request_args, true ) ); 
+    	// error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
+		update_option('murmurations-node_id', null );
 	}
 	
 	return rest_ensure_response( $reponse_message );
@@ -360,10 +381,10 @@ function murmurations_index_post_node_sync (){
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message->data->node_id );
 	} else {
-		error_log( print_r( $request_args, true ) ); 
-		error_log( print_r( $response, true ) );
+		// error_log( print_r( $request_args, true ) ); 
+		// error_log( print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
-    	update_option('murmurations-node_id', '0' );
+    	update_option('murmurations-node_id', null );
 	}
 
 	return rest_ensure_response( $reponse_message );
@@ -387,9 +408,9 @@ function murmurations_index_validate () {
 		$reponse_message = json_decode ( $response['body'] );
 		update_option('murmurations-node_id', $reponse_message );
 	} else {
-		error_log( print_r( $request_args, true ) );  
-    	error_log( print_r( $response, true ) );
-		$reponse_message = json_decode ( $response['body'] );
+		// error_log( print_r( $request_args, true ) );  
+    	// error_log( print_r( $response, true ) );
+		update_option('murmurations-node_id', null );
 	}
 
 	return rest_ensure_response( $reponse_message );
@@ -410,8 +431,9 @@ function murmurations_index_node_status () {
 			'accept' => 'application/json',
 		),
 	);
-	$node_id = get_option( 'murmurations-node_id', false );
+	$node_id = get_option( 'murmurations-node_id', true );
 	if ( $node_id ) {
+		error_log( 'node_id: ' . print_r( $node_id, true ) );
 		$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
 		
 		$response = wp_safe_remote_get( $query, $request_args );
@@ -422,8 +444,8 @@ function murmurations_index_node_status () {
 		} else {
 			$reponse_message = json_decode ( $response['body'] );
 		}
-		error_log( print_r( $request_args, true ) );  
-		error_log( print_r( $response, true ) );
+		// error_log( 'req_args: ' . print_r( $request_args, true ) );  
+		// error_log( 'response: ' . print_r( $response, true ) );
 	} else {
 		$reponse_message = __( 'Profile not indexed', 'murmurations-node' );
 		error_log( print_r( $reponse_message, true ) );
@@ -438,7 +460,7 @@ function murmurations_index_node_status () {
  *
  * @return WP_REST_Response
  */
-function murmurations_index_node_delete() {
+function murmurations_index_node_delete( $rest = true ) {
 	$node_id = get_option( 'murmurations-node_id' );
 
 	$request_args = array(
@@ -454,17 +476,24 @@ function murmurations_index_node_delete() {
 	$response = wp_remote_request( $query, $request_args );
 
 	//TODO Error handling
-	if ( 200 === $response['response']['code'] ) {
-		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message );
-	} else {
-		$reponse_message = json_decode ( $response['body'] );
-	}
-	
-	error_log( print_r( $request_args, true ) );  
-	error_log( print_r( $response, true ) );
+	// error_log( print_r( $request_args, true ) );  
+	// error_log( print_r( $response, true ) );
+	$reponse_message = json_decode ( $response['body'] );
 
-	return rest_ensure_response( $reponse_message->meta->message );
+	if ( 200 === $response['response']['code'] ) {
+		update_option('murmurations-node_id', $reponse_message );
+		if ( $rest ) {
+			return rest_ensure_response( $reponse_message->meta->message );
+		} else {
+			return true;
+		}
+	} else {
+		if ( $rest ) {
+			return rest_ensure_response( $reponse_message->meta->message );
+		} else {
+			return false;
+		}
+	}
 }
 
 function request_args() {
