@@ -274,7 +274,7 @@ add_action( 'rest_api_init', __NAMESPACE__ . '\murmurations_plugin_settings' );
 function murmurations_profile_request(){
 	error_log ( 'node_data: ' . print_r( get_option( 'murmurations-node_data' ), true ) );
 	error_log ( 'node_id: ' . print_r( get_option( 'murmurations-node_id' ), true ) );
-	if ( false === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
+	if ( null === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
 		return new \WP_Error( 'murmurations_no_saved_profile', __( 'No profile found', 'murmurations-node' ), array( 'status' => 404 ) );
 	}
 
