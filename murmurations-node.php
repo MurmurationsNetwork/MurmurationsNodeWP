@@ -33,14 +33,12 @@ define( 'MURMNODE_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
 $murmurations_data = get_option( 'murmurations-node_data', true );
-if ( isset( $murmurations_data['env'] ) ) {
-  if ( $murmurations_data['env'] === true ) {
+if ( isset( $murmurations_data['env'] ) && true === $murmurations_data['env'] ) {
     \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://test-index.murmurations.network/v2' );
     \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://test-library.murmurations.network/v2/' );
-  } else {
-    \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://index.murmurations.network/v2' );
-    \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://library.murmurations.network/v2/' );
-  }
+} else {
+  \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://index.murmurations.network/v2' );
+  \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://library.murmurations.network/v2/' );
 }
 
 function llog( $content, $meta = null ){
