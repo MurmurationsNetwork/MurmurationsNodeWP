@@ -250,6 +250,14 @@ function murmurations_plugin_settings() {
 			return current_user_can( 'manage_options' );
 		}
 	) );
+	
+	register_rest_route( 'murmurations/v2', '/index/node_delete', array(
+		'methods' => 'POST',
+		'callback' => __NAMESPACE__ . '\\murmurations_index_node_delete',
+		'permission_callback' => function () {
+			return current_user_can( 'manage_options' );
+		}
+	) );
 }
 add_action( 'rest_api_init', __NAMESPACE__ . '\murmurations_plugin_settings' );
 
