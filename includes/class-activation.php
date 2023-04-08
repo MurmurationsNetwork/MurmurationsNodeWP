@@ -15,7 +15,7 @@ function activate() {
     $wp_data['description'] = get_bloginfo('description');
     $wp_data['rss'] = get_bloginfo('rss2_url');
 
-    $wp_data['image'] = false !== get_theme_mod( 'custom_logo' ) ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' )[0] : '';
+    $wp_data['image'] = get_site_logo();
     $wp_data['tags'] = get_site_tags();
 
     error_log( 'activation: $wp_data: ' . print_r( $wp_data, true ) );
@@ -42,3 +42,11 @@ function get_site_tags() {
     }
     return join( ', ', $tags_a );
 }
+
+function get_site_logo() {
+    return get_site_icon_url() ?  get_site_icon_url() : 
+        ( get_theme_mod( 'custom_logo' ) ? 
+            wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' )[0]
+            : '' );
+}
+
