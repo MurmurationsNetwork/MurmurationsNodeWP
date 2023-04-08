@@ -7,6 +7,7 @@ import {
 	Button,
 	PanelBody,
 	SelectControl,
+	Notice,
 	RadioControl,
 	SearchControl,
 	Dashicon,
@@ -57,11 +58,19 @@ const Location = () => {
 	const isPostalCode = ( value ) => {
 		let hasNum = /\d/. test( value );
 		return hasNum;
-	}	
+	}
+
+	const clearSearch = () => {
+		setResultsOptions( null )
+		console.log( 'clearSearch: ', locationInputRef.current )
+		locationInputRef.current.value = ''
+		locationInputRef.current.focus()
+	}
 
 	// Search OpenMaps API
 	const handleSearch = () => {
 		setIsSearching( true );
+		setResultsOptions( null )
 		apiFetch( {
 			path: 'murmurations/v2/find/location',
 			method: 'POST',
@@ -73,8 +82,9 @@ const Location = () => {
 
 				if ( ! body.length > 0 ) {
 					console.log( 'no results found' );
-					setResultsOptions( null )
+					setResultsOptions( __( 'No results found', 'murmurations-node' ) )
 				} else {
+					console.log( body );
 					setResultsArray( body ); 
 					let results = body.map(
 						( item, index ) => (
@@ -83,7 +93,7 @@ const Location = () => {
 								'value': index 
 							})
 					)
-					setResultsOptions( results.slice( 5 ) )
+					setResultsOptions( results.slice( 0, 5 ) )
 				}
 			} );
 	};
@@ -126,6 +136,7 @@ const Location = () => {
 							handleSearch();
 						}
 					} }
+					// onClose={ () => clearSearch() }
 					help={ __(
 						'Lookup your location to fill in the values below.',
 						'murmurations-node'
@@ -149,7 +160,8 @@ const Location = () => {
 					) }
 				</Button>
 			</PanelRow>
-			{ resultsOptions ? 
+			{ resultsOptions ? (
+				typeof resultsOptions === 'object' ?
 				<PanelRow>
 					<RadioControl
 						label={ __( 'Search results', 'murmurations-node' ) }
@@ -158,7 +170,15 @@ const Location = () => {
 						options={ resultsOptions }
 						onChange={ ( value ) => handleSelect( value ) }
 					/>
-				</PanelRow> : ''
+				</PanelRow>  
+				: ( typeof resultsOptions === 'string' ) ? 
+					<Notice 
+						status='warning'
+						isDismissible={ false }
+					>
+						{ resultsOptions }
+					</Notice>
+					: '' ) : ''
 			}
 			<PanelRow className="align-start gap-5">
 				<TextControl
