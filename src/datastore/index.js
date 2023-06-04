@@ -10,23 +10,23 @@ import {
 	FETCH_SETTINGS,
 	SET_SETTING,
 	STORE_NAME,
-	SET_USER_PREFERENCES,
 	// Murmurations
 	SET_NAME,
 	SET_PRIMARY_URL,
 	SET_URLS,
 	SET_DESCRIPTION,
 	SET_MISSION,
-	SET_LOCATION, //User convenience
+	SET_LOCATION,
 	SET_LOCALITY,
 	SET_REGION,
 	SET_COUNTRY_NAME,
 	SET_GEOLOCATION,
 	SET_IMAGE,
-	SET_IMAGE_ID,
 	SET_TAGS,
 	SET_RSS,
 	SET_ENV,
+	SET_TEST_LAST_UPDATED,
+	SET_PROD_LAST_UPDATED,
 	//
 } from './constants';
 
@@ -167,6 +167,22 @@ const actions = {
 			},
 		};
 	},
+	setProdLastUpdated( prod_last_updated ) {
+		return {
+			type: SET_PROD_LAST_UPDATED,
+			payload: {
+				prod_last_updated,
+			},
+		};
+	},
+	setTestLastUpdated( test_last_updated ) {
+		return {
+			type: SET_TEST_LAST_UPDATED,
+			payload: {
+				test_last_updated,
+			},
+		};
+	},
 
 	setUserPreferences( userPreferences ) {
 		return {
@@ -185,16 +201,6 @@ const actions = {
 			},
 		};
 	},
-	// setToggleState(section) {
-	// 	return function ({ select, dispatch }) {
-	// 		const currentValues = select.getUserPreferences();
-	// 		const sectionValue = currentValues[section];
-	// 		dispatch.setUserPreferences({
-	// 			...currentValues,
-	// 			[section]: !sectionValue,
-	// 		});
-	// 	};
-	// },
 };
 
 // Define the reducer
@@ -285,12 +291,6 @@ function reducer( state = DEFAULT_STATE, { type, payload } ) {
 				...state,
 				image,
 			};
-		case SET_IMAGE_ID:
-			const { image_id } = payload;
-			return {
-				...state,
-				image_id,
-			};
 		case SET_TAGS:
 			const { tags } = payload;
 			return {
@@ -309,18 +309,17 @@ function reducer( state = DEFAULT_STATE, { type, payload } ) {
 				...state,
 				env,
 			};
-
-		case SET_USER_PREFERENCES:
-			const { userPreferences } = payload;
-			if ( userPreferences ) {
-				window.localStorage.setItem(
-					'murmurations-node-user-preferences',
-					JSON.stringify( userPreferences )
-				);
-			}
+		case SET_TEST_LAST_UPDATED:
+			const { test_last_updated } = payload;
 			return {
 				...state,
-				userPreferences,
+				test_last_updated,
+			};
+		case SET_PROD_LAST_UPDATED:
+			const { prod_last_updated } = payload;
+			return {
+				...state,
+				prod_last_updated,
 			};
 	}
 	return state;
@@ -361,9 +360,6 @@ const selectors = {
 	getImage( state ) {
 		return state.image;
 	},
-	getImageID( state ) {
-		return state.image_id;
-	},
 	getTags( state ) {
 		return state.tags;
 	},
@@ -373,12 +369,15 @@ const selectors = {
 	getEnv( state ) {
 		return state.env;
 	},
+	getTestLastUpdated( state ) {
+		return state.test_last_updated;
+	},
+	getProdLastUpdated( state ) {
+		return state.prod_last_updated;
+	},
 	getSettings( state ) {
 		const { ...settings } = state;
 		return settings;
-	},
-	getUserPreferences( state ) {
-		return state.userPreferences;
 	},
 };
 
@@ -389,15 +388,6 @@ const resolvers = {
 			dispatch.initSettings( settings[ 'murmurations-node_data' ] );
 		};
 	},
-	getUserPreferences() {
-		return ( { dispatch } ) => {
-			const userPreferences =
-				window.localStorage.getItem(
-					'murmurations-node-user-preferences'
-				) || DEFAULT_STATE.userPreferences;
-			dispatch.setUserPreferences( JSON.parse( userPreferences ) );
-		};
-	},
 };
 
 // Define and register the store.
@@ -406,7 +396,6 @@ const store = createReduxStore( STORE_NAME, {
 	actions,
 	selectors,
 	resolvers,
-	// __experimentalUseThunks: true,
 } );
 
 register( store );

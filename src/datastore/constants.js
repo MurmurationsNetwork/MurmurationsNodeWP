@@ -13,12 +13,12 @@ export const SET_REGION = 'SET_REGION';
 export const SET_COUNTRY_NAME = 'SET_COUNTRY_NAME';
 export const SET_GEOLOCATION = 'SET_GEOLOCATION';
 export const SET_IMAGE = 'SET_IMAGE';
-export const SET_IMAGE_ID = 'SET_IMAGE_ID';
 export const SET_TAGS = 'SET_TAGS';
 export const SET_RSS = 'SET_RSS';
 export const SET_ENV = 'SET_ENV';
+export const SET_TEST_LAST_UPDATED = 'SET_TEST_LAST_UPDATED';
+export const SET_PROD_LAST_UPDATED = 'SET_PROD_LAST_UPDATED';
 //
 export const STATE_FROM_DATABASE = 'STATE_FROM_DATABASE';
 export const FETCH_SETTINGS = 'FETCH_SETTINGS';
 export const SET_SETTING = 'SET_SETTING';
-export const SET_USER_PREFERENCES = 'SET_USER_PREFERENCES';

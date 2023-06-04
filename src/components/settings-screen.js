@@ -22,9 +22,11 @@ import Notifications, { createSuccessNotice, createErrorNotice } from './notific
 const SettingsScreen = () => {
 	const { saveEntityRecord, getLastEntitySaveError, hasFinishedResolution, isSavingEntityRecord } = useDispatch('core');
 	const [ isRequesting, setIsRequesting ] = useState( false );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isDeleting, setIsDeleting ] = useState( false );
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
 	const { setSetting } = useDispatch( STORE_NAME );
-	const env = useSelect((select) => select(STORE_NAME).getEnv());
+	// const env = useSelect((select) => select(STORE_NAME).getEnv());
 
 	// Gets all settings from the store.
 	const { settingsFromState, hasResolved } = useSelect(
@@ -34,9 +36,12 @@ const SettingsScreen = () => {
 				hasResolved: select(STORE_NAME).hasFinishedResolution(
 					'getSettings'
 				),
+				// lastError: select(STORE_NAME).getLastEntitySaveError(
+				// 	'getSettings'
+				// ),
 			}
 	});
-	// console.log( 'settingsFromState: ', settingsFromState );
+	console.log( 'settingsFromState: ', settingsFromState );
 	
 	const {
 		name,
@@ -46,46 +51,66 @@ const SettingsScreen = () => {
 		tags,
 		rss,
 		urls,
-		indexed,
+		test_last_updated,
+		prod_last_updated,
+		env,
 	} = settingsFromState;
 
 	if ( ! hasResolved ) {
 		return <Spinner />;
 	}
-
+	
 	const liveIndexExplorer = 'https://tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
 	const testIndexExplorer = 'https://test-tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
-	const index_url = primary_url.replace(/^http(s?):\/\//i, "");
-	const murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
+	let indexable_url = primary_url;
+	let index_url = indexable_url.replace(/^http(s?):\/\//i, "");
+	let murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
 
-	const handleField = ( name, value ) => {
-		// validation?
+	// if ( last_updated ) {
+	// 	const liveIndexExplorer = 'https://tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+	// 	const testIndexExplorer = 'https://test-tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+	// 	const index_url = primary_url.replace(/^http(s?):\/\//i, "");
+	// 	let murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
+	// }
+
+	let envi = env ? 'test' : 'prod';
+	let last_updated = env ? test_last_updated : prod_last_updated;
+
+	const handleField = async ( name, value ) => {
 		setSetting( name, value )
+		if ( 'env' === name ) {
+			handleFormSave()
+		}
 	}
 
 	// TODO handle DataSanitization
 	// URLS, input fields, etc 
 	const handleFormValidate = () => {
-		let sanitizedUrls = urls.filter( item => item.name !== "" && item.url !== "" )
-		setSetting( 'urls', sanitizedUrls )
+		if ( urls ) {
+			let sanitizedUrls = urls.filter( item => item.name !== "" && item.url !== "" )
+			setSetting( 'urls', sanitizedUrls )
+		}
 	}
 	
-	const handleFormSave = async () => {
+	const handleFormSave = async ( quiet = false ) => {
 		setIsRequesting(true);
 		const success = await saveEntityRecord('root', 'site', {
 							'murmurations-node_data':
 								settingsFromState,
 						} )
-		if ( success && env ) {
-			createSuccessNotice( __("The settings were saved!", 'murmurations-node'), {
-				type: 'snackbar',
-			} );
+		if ( success ) {
+			if ( ! quiet ) {
+				createSuccessNotice( __("The settings were saved!", 'murmurations-node'), {
+					type: 'snackbar',
+				} );
+			}
+			console.log( success );
 			setIsRequesting(false);
 		} else {
-			const lastError = getLastEntitySaveError( 'root', 'site', {
-									'murmurations-node_data':
-										settingsFromState,
-								} );
+			// const lastError = await getLastEntitySaveError( 'root', 'site', {
+			// 						'murmurations-node_data':
+			// 							settingsFromState,
+			// 					} );
 			const refresh = __('Please refresh the page and try again.', 'murmurations-node')
 			const genericError = __('There was an error. ', 'murmurations-node')
 			const message = ( lastError?.message || genericError ) + refresh
@@ -124,17 +149,26 @@ const SettingsScreen = () => {
 			return posts;
 			} )
 		if ( ! status.errors ) {
+			// console.log( status.data );
+			let responseMessage;// = `${status.data.status}`
+			console.log( 'env: ', env );
 			if ( env ) {
-				let responseMessage = `
+				responseMessage = `
 					status: ${status.data.status} \n
 					node_id: ${status.data.node_id} \n
 					profile_url: ${status.data.profile_url} \n
+					profile_hash: ${status.data.profile_hash} \n
 					last_updated: ${status.data.last_updated}
 					`
+				// let responseMessage = `${status.data.status}`
 			} else {
-				let responseMessage = `${status.data.status}`
+				console.log( 'else: ', status.data );
+				responseMessage = `${status.data.status}`
 			}
-			handleField( 'indexed', status.data.node_id )
+			await handleField( `${envi}_last_updated`, status.data.last_updated )
+			// handleField( `${envi}_node_id`, status.data.node_id )
+			handleFormSave()
+			// handleFormSave( true )
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
@@ -169,7 +203,7 @@ const SettingsScreen = () => {
 			createSuccessNotice( responseMessage, {
 				type: 'snackbar',
 			} );
-			handleField( 'indexed', status.data.node_id )
+			// handleField( 'index_dates', status.data )
 		} else {
 			console.log( status );
 			createErrorNotice( status, {
@@ -181,14 +215,47 @@ const SettingsScreen = () => {
 
 	const handleSaveAndPublish = async () => {
 		setIsRequesting(true)
-		handleFormValidate()
-		handleFormSave()
+		await handleFormValidate()
+		await handleFormSave()
 		handleAPIValidate()
 		handleAPIPublish()
 		if ( env ) {
-			handleAPIStatus()
+			// handleAPIStatus()
 		}
 		setIsRequesting(false)
+	};
+	
+	const handleDelete = async () => {
+		setIsDeleting(true)
+		const status = await apiFetch( { path: '/murmurations/v2/index/node_delete' } ).then( ( posts ) => {
+			return posts;
+			} )
+		if ( ! status.errors && status instanceof Object ) {
+			let responseMessage = `${status.meta.message}`
+			createSuccessNotice( responseMessage, {
+				type: 'snackbar',
+			} )
+			if ( env ) {
+				console.log( status.meta.message );
+			};
+			await setSetting( `${envi}_last_updated`, 0 )
+			handleFormSave()
+		} else {
+			if ( status instanceof Object ) {
+				status.errors.forEach( error => {
+					console.log( error );
+					let prefix = __('Server response: ', 'mumurations-node')
+					let errorMessage = `${prefix} ${error.detail}`
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
+				});
+			}
+			console.log( status );
+			setSetting( `${envi}_last_updated`, 0 )
+			handleFormSave()
+		}
+		setIsDeleting(false)
 	};
 
 	return (
@@ -252,7 +319,9 @@ const SettingsScreen = () => {
 					<Image />
 					<Urls />
 					<Location />
-					<Env />
+					<Env 
+						onChange={ ( value ) => handleField( 'env', value ) }
+					/>
 					<PanelRow className='align-left'>
 						<Button variant="primary" onClick={ handleSaveAndPublish } disabled={ isRequesting } >
 							{ isRequesting ? (
@@ -262,15 +331,38 @@ const SettingsScreen = () => {
 								</>
 							) : __( 'Save & Publish', 'murmurations-node') }
 						</Button>
-						{ indexed ? (
-							<Button 
-								variant="secondary" 
-								href={ murmurations_index } 
-								icon='location-alt'
-								target='_blank' 
-								rel='noopener' >
-									{ __( 'View site in index', 'murmurations-node') }
-							</Button> ) 
+						{/* <Button variant="primary" onClick={ handleFormSave } disabled={ isSaving } >
+							{ isSaving ? (
+								<>
+									{ __( 'Saving...', 'murmurations-node') }
+									<Spinner/>
+								</>
+							) : __( 'Save', 'murmurations-node') }
+						</Button> */}
+						{ last_updated ? 
+							<>
+								<Button 
+									variant="secondary" 
+									href={ murmurations_index } 
+									icon='location-alt'
+									target='_blank' 
+									rel='noopener' >
+										{ __( 'View site in index', 'murmurations-node') }
+								</Button>
+								<Button 
+									isDestructive
+									disabled={ isDeleting }
+									icon='no'
+									onClick={ handleDelete } 
+									>
+										{ isDeleting ? (
+											<>
+												{ __( 'Deleting...', 'murmurations-node') }
+												<Spinner/>
+											</>
+										) : __( 'Remove from Index ', 'murmurations-node') }
+								</Button>
+							</>
 							: '' }
 						<Notifications></Notifications>
 					</PanelRow>

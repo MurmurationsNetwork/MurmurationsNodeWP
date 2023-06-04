@@ -7,7 +7,7 @@
  * Author URI:      https://murmurations.network
  * Text Domain:     murmurations-node
  * Domain Path:     /languages
- * Version:         0.4.0-alpha-1
+ * Version:         0.4.0-beta-1
  *
  * @package         Murmurations_Node
  */
@@ -33,12 +33,14 @@ define( 'MURMNODE_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MURMNODE_ROOT_URL', plugin_dir_url( __FILE__ ) );
 
 $murmurations_data = get_option( 'murmurations-node_data', true );
-if ( isset( $murmurations_data['env'] ) && true === $murmurations_data['env'] ) {
+if ( isset( $murmurations_data['env'] ) && true === (bool) $murmurations_data['env'] ) {
+    \defined( 'MURMURATIONS_ENV' ) || \define( 'MURMURATIONS_ENV', 'test' );
     \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://test-index.murmurations.network/v2' );
     \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://test-library.murmurations.network/v2/' );
 } else {
-  \defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://index.murmurations.network/v2' );
-  \defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://library.murmurations.network/v2/' );
+	\defined( 'MURMURATIONS_ENV' ) || \define( 'MURMURATIONS_ENV', 'prod' );
+	\defined( 'MURMURATIONS_INDEX' ) || \define( 'MURMURATIONS_INDEX', 'https://index.murmurations.network/v2' );
+	\defined( 'MURMURATIONS_LIBRARY' ) || \define( 'MURMURATIONS_LIBRARY', 'https://library.murmurations.network/v2/' );
 }
 
 function llog( $content, $meta = null ){
@@ -54,7 +56,7 @@ function murmurations_settings_link( $links ) {
   $links[] = '<a href="' . admin_url( 'options-general.php?page=murmurations-node' ) . '">' . __( 'Settings', 'murmurations-node' ) . '</a>';
   return $links;
 }
-\add_filter( 'plugin_action_links_'.plugin_basename( __FILE__ ), __NAMESPACE__ . '\murmurations_settings_link' );
+\add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __NAMESPACE__ . '\murmurations_settings_link' );
 
 /**
  * register_plugin_settings_page
@@ -177,27 +179,33 @@ function murmurations_plugin_settings() {
 							'type' => 'object',
 							'properties' => array(
 								'lat' => array(
-									'type' => 'string',
+									'type' => 'number',
 								),
 								'lon' => array(
-									'type' => 'string',
+									'type' => 'number',
 								),
 							),
 						),
 						'image' => array(
-						  'type' => 'string',
+							'type' => 'string',
 						),
 						'image_id' => array(
-						  'type' => 'string',
+							'type' => 'string',
 						),
 						'tags' => array(
-						  'type' => 'string',
+							'type' => 'string',
 						),
 						'rss' => array(
-						  'type' => 'string',
+							'type' => 'string',
 						),
 						'env' => array(
-						  'type' => 'boolean',
+							'type' => 'boolean',
+						),
+						'prod_last_updated' => array(
+							'type' => 'number',
+						),
+						'test_last_updated' => array(
+							'type' => 'number',
 						),
 					),
 				),
@@ -206,6 +214,12 @@ function murmurations_plugin_settings() {
 	);
 
 	register_rest_route( 'murmurations/v2', '/profile', array(
+		'methods' => 'GET',
+		'callback' => __NAMESPACE__ . '\\murmurations_profile_request',
+		'permission_callback' => '__return_true'
+	) );
+
+	register_rest_route( 'murmurations/v2', '/profile/test', array(
 		'methods' => 'GET',
 		'callback' => __NAMESPACE__ . '\\murmurations_profile_request',
 		'permission_callback' => '__return_true'
@@ -252,7 +266,7 @@ function murmurations_plugin_settings() {
 	) );
 	
 	register_rest_route( 'murmurations/v2', '/index/node_delete', array(
-		'methods' => 'POST',
+		'methods' => 'GET',
 		'callback' => __NAMESPACE__ . '\\murmurations_index_node_delete',
 		'permission_callback' => function () {
 			return current_user_can( 'manage_options' );
@@ -272,30 +286,35 @@ add_action( 'rest_api_init', __NAMESPACE__ . '\murmurations_plugin_settings' );
  * @return WP_REST_Response
  */
 function murmurations_profile_request(){
-	error_log ( 'node_data: ' . print_r( get_option( 'murmurations-node_data' ), true ) );
-	error_log ( 'node_id: ' . print_r( get_option( 'murmurations-node_id' ), true ) );
-	if ( null === ( $node_id = get_option( 'murmurations-node_id' ) ) ) {
+	$env  = MURMURATIONS_ENV;
+	$node_id = get_option( "murmurations-node_id-$env" );
+	$node_data = get_option( 'murmurations-node_data' );
+	$data = get_transient( "murmurations-node_profile_$env" );
+	
+	if ( ! $node_id && ! $data ) {
 		return new \WP_Error( 'murmurations_no_saved_profile', __( 'No profile found', 'murmurations-node' ), array( 'status' => 404 ) );
 	}
 
 	//load murmurations settings
-	if ( false === ( $data = get_transient( "murmurations_profile" ) ) ) {
-    $murmurations_data = get_option( 'murmurations-node_data', true );
-	$murmurations_data = array_filter( $murmurations_data ); // remove null data.
-    $murmurations_data['tags'] = array_filter( array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) ) ?? [];
-	$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['geolocation']['lat'] );
-	$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['geolocation']['lon'] );
+	if ( false !== ( $data ) ) {
+		$murmurations_data = get_option( 'murmurations-node_data', true );
+		$murmurations_data = array_filter( $murmurations_data ); // remove null data.
+		$murmurations_data['tags'] = array_filter( array_map( 'trim', explode( ',', $murmurations_data['tags'] ) ) ) ?? [];
+		$murmurations_data['geolocation']['lat'] = floatval( $murmurations_data['geolocation']['lat'] );
+		$murmurations_data['geolocation']['lon'] = floatval( $murmurations_data['geolocation']['lon'] );
 
-		unset(
-			$murmurations_data['env'],
-			$murmurations_data['location'],
-			$murmurations_data['indexed'],
-		);
+			unset(
+				$murmurations_data['env'],
+				$murmurations_data['location'],
+				$murmurations_data['prod_last_updated'],
+				$murmurations_data['test_last_updated'],
+			);
 
-		$header['linked_schemas'] = array('organizations_schema-v1.0.0');
-		$data = array_merge( $header, $murmurations_data );
-		set_transient( "murmurations_profile", $data, HOUR_IN_SECONDS );
+			$header['linked_schemas'] = array( 'organizations_schema-v1.0.0' );
+			$data = array_merge( $header, $murmurations_data );
+			set_transient( "murmurations-node_profile_$env", $data, HOUR_IN_SECONDS );
 	}
+	// error_log ( "profile_request: $env _data: " . print_r( $data, true ) );
 	return $data;
 }
 
@@ -327,43 +346,14 @@ function location_lookup( $data ){
 		), 'https://nominatim.openstreetmap.org/search' );
 
 		$response = wp_safe_remote_get( $query, $request_args );
-		//TODO Error handling
-		set_transient( "murmurations_location_request_$location", $response, HOUR_IN_SECONDS );
+
+		if ( 200 === $response['response']['code'] ) {
+			set_transient( "murmurations_location_request_$location", $response, HOUR_IN_SECONDS );
+		} else {
+			error_log( 'location_lookup: $response: ' . print_r( $response, true ) );
+		}
 	}
 	return rest_ensure_response( $response );
-}
-
-/**
- * murmurations_index_post_node
- * 
- * @link https://app.swaggerhub.com/apis-docs/MurmurationsNetwork/IndexAPI/2.0.0#/Node%20Endpoints/post_nodes
- *
- * @return WP_REST_Response
- */
-function murmurations_index_post_node(){
-	delete_transient( 'murmurations_profile' );
-
-	$request_args = request_args();
-	$query = MURMURATIONS_INDEX . '/nodes';
-	
-	$response = wp_safe_remote_post( $query, $request_args );
-	
-	//TODO Error handling
-	if ( 200 === $response['response']['code'] ) {
-		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message->meta->message->data->node_id );
-		$node_data = get_option( 'murmurations-node_data' );
-		$node_data['indexed'] = $reponse_message->meta->message->data->node_id;
-		update_option('murmurations-node_data', $node_data );
-		return rest_ensure_response( $reponse_message );
-	} else {
-    	// error_log( print_r( $request_args, true ) ); 
-    	// error_log( print_r( $response, true ) );
-		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', null );
-	}
-	
-	return rest_ensure_response( $reponse_message );
 }
 
 /**
@@ -374,23 +364,24 @@ function murmurations_index_post_node(){
  *
  * @return WP_REST_Response
  */
-function murmurations_index_post_node_sync (){
-	delete_transient( 'murmurations_profile' );
+function murmurations_index_post_node_sync () {
+
+	$env  = MURMURATIONS_ENV;
+	set_transient( "murmurations-node_profile_$env", 'murmur', 5 * MINUTE_IN_SECONDS );
 
 	$request_args = request_args();
 	$query = MURMURATIONS_INDEX . '/nodes-sync';
-	
 	$response = wp_safe_remote_post( $query, $request_args );
 	
-	//TODO Error handling
+	if ( is_wp_error( $response ) ) {
+		return rest_ensure_response( $response );
+	}
 	if ( 200 === $response['response']['code'] ) {
 		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message->data->node_id );
+		update_option("murmurations-node_id-$env", $reponse_message->data->node_id );
 	} else {
-		// error_log( print_r( $request_args, true ) ); 
-		// error_log( print_r( $response, true ) );
+		error_log( 'index_post_node_sync: ' . print_r( $response, true ) );
 		$reponse_message = json_decode ( $response['body'] );
-    	update_option('murmurations-node_id', null );
 	}
 
 	return rest_ensure_response( $reponse_message );
@@ -404,19 +395,18 @@ function murmurations_index_post_node_sync (){
  * @return WP_REST_Response
  */
 function murmurations_index_validate () {
+	$env  = MURMURATIONS_ENV;
+
+	set_transient( "murmurations-node_profile_$env", 'murmur', 5 * MINUTE_IN_SECONDS );
 	$request_args = request_args();
 	$query = MURMURATIONS_INDEX . '/validate';
-	
 	$response = wp_safe_remote_post( $query, $request_args );
 
-	//TODO Error handling
+	// Purely informational no need to save reponse
 	if ( 200 === $response['response']['code'] ) {
 		$reponse_message = json_decode ( $response['body'] );
-		update_option('murmurations-node_id', $reponse_message );
 	} else {
-		// error_log( print_r( $request_args, true ) );  
-    	// error_log( print_r( $response, true ) );
-		update_option('murmurations-node_id', null );
+    	error_log( 'index_validate: ' . print_r( $response, true ) );
 	}
 
 	return rest_ensure_response( $reponse_message );
@@ -437,24 +427,23 @@ function murmurations_index_node_status () {
 			'accept' => 'application/json',
 		),
 	);
-	$node_id = get_option( 'murmurations-node_id', true );
+	$env  = MURMURATIONS_ENV;
+	$node_id = get_option( "murmurations-node_id-$env" );
+
 	if ( $node_id ) {
-		error_log( 'node_id: ' . print_r( $node_id, true ) );
+
 		$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
-		
 		$response = wp_safe_remote_get( $query, $request_args );
 	
-		//TODO Error handling
 		if ( 200 === $response['response']['code'] ) {
 			$reponse_message = json_decode ( $response['body'] );
 		} else {
 			$reponse_message = json_decode ( $response['body'] );
+			error_log( 'murmurations_index_node_status: response: ' . print_r( $response, true ) );
 		}
-		// error_log( 'req_args: ' . print_r( $request_args, true ) );  
-		// error_log( 'response: ' . print_r( $response, true ) );
 	} else {
 		$reponse_message = __( 'Profile not indexed', 'murmurations-node' );
-		error_log( print_r( $reponse_message, true ) );
+		error_log( 'murmurations_index_node_status: ' . print_r( $reponse_message, true ) );
 	}
 	return rest_ensure_response( $reponse_message );
 }
@@ -467,46 +456,55 @@ function murmurations_index_node_status () {
  * @return WP_REST_Response
  */
 function murmurations_index_node_delete( $rest = true ) {
-	$node_id = get_option( 'murmurations-node_id' );
+	$env  = MURMURATIONS_ENV;
+	$node_id = get_option( "murmurations-node_id-$env" );	
 
 	$request_args = array(
 		'timeout'    => 15,
-   		'method' => 'DELETE',
+		'method' => 'DELETE',
 		'headers'    => array(
 			'accept' => 'application/json',
 		),
 	);
-  	delete_option( 'murmurations-node_id' );
-	$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
-	
-	$response = wp_remote_request( $query, $request_args );
 
-	//TODO Error handling
-	// error_log( print_r( $request_args, true ) );  
-	// error_log( print_r( $response, true ) );
-	$reponse_message = json_decode ( $response['body'] );
-
-	if ( 200 === $response['response']['code'] ) {
-		update_option('murmurations-node_id', $reponse_message );
-		if ( $rest ) {
-			return rest_ensure_response( $reponse_message->meta->message );
+	if ( $node_id ) {
+		$query = MURMURATIONS_INDEX . "/nodes/{$node_id}";
+		delete_option( "murmurations-node_id-$env" );
+		delete_transient( "murmurations-node_profile_$env" );
+		
+		$response = wp_remote_request( $query, $request_args );
+		$reponse_message = json_decode ( $response['body'] );
+		
+		if ( 200 === $response['response']['code'] ) {
+			update_option('murmurations-node_data', $node_data );
+			delete_option( "murmurations-node_id-$env" );
+			if ( $rest ) {
+				return rest_ensure_response( $reponse_message );
+			} else {
+				return true;
+			}
 		} else {
-			return true;
-		}
-	} else {
-		if ( $rest ) {
-			return rest_ensure_response( $reponse_message->meta->message );
-		} else {
-			return false;
+			error_log( 'node_delete: error: ' . print_r( $reponse, true ) );
+			if ( $rest ) {
+				return rest_ensure_response( $reponse_message );
+			} else {
+				return false;
+			}
 		}
 	}
+	$response = array( 'meta' => array( 'message' => 'node_already_deleted' ) );
+	return rest_ensure_response( true );
 }
 
 function request_args() {
-	$murmurations_data = get_option('murmurations-node_data', true);
+	$murmurations_data = get_option( 'murmurations-node_data', true );
+	$env  = MURMURATIONS_ENV;
+
+	$murmurations_profile = 'test' === $env ? get_rest_url( null, 'murmurations/v2/profile/test' ) : get_rest_url( null, 'murmurations/v2/profile' );
+
 	$json_data = json_encode( array(
 		'linked_schemas'	=> array( 'organizations_schema-v1.0.0' ),
-		'profile_url' 		=> get_rest_url( null, 'murmurations/v2/profile' ),
+		'profile_url' 		=> $murmurations_profile,
 		'name'				=> $murmurations_data['name'],
 		'primary_url'		=> site_url(),
 		'latitude'			=> $murmurations_data['geolocation']['lat'], 

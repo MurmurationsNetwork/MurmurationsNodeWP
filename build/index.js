@@ -192,10 +192,17 @@ const Location = () => {
     let hasNum = /\d/.test(value);
     return hasNum;
   };
+  const clearSearch = () => {
+    setResultsOptions(null);
+    console.log('clearSearch: ', locationInputRef.current);
+    locationInputRef.current.value = '';
+    locationInputRef.current.focus();
+  };
 
   // Search OpenMaps API
   const handleSearch = () => {
     setIsSearching(true);
+    setResultsOptions(null);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()({
       path: 'murmurations/v2/find/location',
       method: 'POST',
@@ -206,14 +213,15 @@ const Location = () => {
       setIsSearching(false);
       if (!body.length > 0) {
         console.log('no results found');
-        setResultsOptions(null);
+        setResultsOptions((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('No results found', 'murmurations-node'));
       } else {
+        console.log(body);
         setResultsArray(body);
         let results = body.map((item, index) => ({
           'label': item.display_name,
           'value': index
         }));
-        setResultsOptions(results.slice(5));
+        setResultsOptions(results.slice(0, 5));
       }
     });
   };
@@ -251,7 +259,9 @@ const Location = () => {
       if (event.key === 'Enter') {
         handleSearch();
       }
-    },
+    }
+    // onClose={ () => clearSearch() }
+    ,
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Lookup your location to fill in the values below.', 'murmurations-node'),
     className: 'murmurations-search-field'
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
@@ -260,13 +270,16 @@ const Location = () => {
     onClick: handleSearch,
     className: 'location-search',
     disabled: isSearching
-  }, isSearching ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Searching...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search', 'murmurations-node'))), resultsOptions ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
+  }, isSearching ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Searching...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search', 'murmurations-node'))), resultsOptions ? typeof resultsOptions === 'object' ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search results', 'murmurations-node'),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Select a result to populate the location fields', 'murmurations-node'),
     selected: selectedResults,
     options: resultsOptions,
     onChange: value => handleSelect(value)
-  })) : '', (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+  })) : typeof resultsOptions === 'string' ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
+    status: "warning",
+    isDismissible: false
+  }, resultsOptions) : '' : '', (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
     className: "align-start gap-5"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Locality', 'murmurations-node'),
@@ -407,6 +420,8 @@ const SettingsScreen = () => {
     isSavingEntityRecord
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)('core');
   const [isRequesting, setIsRequesting] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isSaving, setIsSaving] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isDeleting, setIsDeleting] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     createSuccessNotice,
     createErrorNotice
@@ -414,7 +429,7 @@ const SettingsScreen = () => {
   const {
     setSetting
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_datastore_constants__WEBPACK_IMPORTED_MODULE_7__.STORE_NAME);
-  const env = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => select(_datastore_constants__WEBPACK_IMPORTED_MODULE_7__.STORE_NAME).getEnv());
+  // const env = useSelect((select) => select(STORE_NAME).getEnv());
 
   // Gets all settings from the store.
   const {
@@ -424,10 +439,13 @@ const SettingsScreen = () => {
     return {
       settingsFromState: select(_datastore_constants__WEBPACK_IMPORTED_MODULE_7__.STORE_NAME).getSettings(),
       hasResolved: select(_datastore_constants__WEBPACK_IMPORTED_MODULE_7__.STORE_NAME).hasFinishedResolution('getSettings')
+      // lastError: select(STORE_NAME).getLastEntitySaveError(
+      // 	'getSettings'
+      // ),
     };
   });
-  // console.log( 'settingsFromState: ', settingsFromState );
 
+  console.log('settingsFromState: ', settingsFromState);
   const {
     name,
     primary_url,
@@ -436,40 +454,62 @@ const SettingsScreen = () => {
     tags,
     rss,
     urls,
-    indexed
+    test_last_updated,
+    prod_last_updated,
+    env
   } = settingsFromState;
   if (!hasResolved) {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null);
   }
   const liveIndexExplorer = 'https://tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url=';
   const testIndexExplorer = 'https://test-tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url=';
-  const index_url = primary_url.replace(/^http(s?):\/\//i, "");
-  const murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
-  const handleField = (name, value) => {
-    // validation?
+  let indexable_url = primary_url;
+  let index_url = indexable_url.replace(/^http(s?):\/\//i, "");
+  let murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
+
+  // if ( last_updated ) {
+  // 	const liveIndexExplorer = 'https://tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+  // 	const testIndexExplorer = 'https://test-tools.murmurations.network/index-explorer?schema=organizations_schema-v1.0.0&primary_url='
+  // 	const index_url = primary_url.replace(/^http(s?):\/\//i, "");
+  // 	let murmurations_index = env ? testIndexExplorer + index_url : liveIndexExplorer + index_url;
+  // }
+
+  let envi = env ? 'test' : 'prod';
+  let last_updated = env ? test_last_updated : prod_last_updated;
+  const handleField = async (name, value) => {
     setSetting(name, value);
+    if ('env' === name) {
+      handleFormSave();
+    }
   };
 
   // TODO handle DataSanitization
   // URLS, input fields, etc 
   const handleFormValidate = () => {
-    let sanitizedUrls = urls.filter(item => item.name !== "" && item.url !== "");
-    setSetting('urls', sanitizedUrls);
+    if (urls) {
+      let sanitizedUrls = urls.filter(item => item.name !== "" && item.url !== "");
+      setSetting('urls', sanitizedUrls);
+    }
   };
-  const handleFormSave = async () => {
+  const handleFormSave = async function () {
+    let quiet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
     setIsRequesting(true);
     const success = await saveEntityRecord('root', 'site', {
       'murmurations-node_data': settingsFromState
     });
-    if (success && env) {
-      createSuccessNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("The settings were saved!", 'murmurations-node'), {
-        type: 'snackbar'
-      });
+    if (success) {
+      if (!quiet) {
+        createSuccessNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("The settings were saved!", 'murmurations-node'), {
+          type: 'snackbar'
+        });
+      }
+      console.log(success);
       setIsRequesting(false);
     } else {
-      const lastError = getLastEntitySaveError('root', 'site', {
-        'murmurations-node_data': settingsFromState
-      });
+      // const lastError = await getLastEntitySaveError( 'root', 'site', {
+      // 						'murmurations-node_data':
+      // 							settingsFromState,
+      // 					} );
       const refresh = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Please refresh the page and try again.', 'murmurations-node');
       const genericError = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('There was an error. ', 'murmurations-node');
       const message = (lastError?.message || genericError) + refresh;
@@ -510,17 +550,26 @@ const SettingsScreen = () => {
       return posts;
     });
     if (!status.errors) {
+      // console.log( status.data );
+      let responseMessage; // = `${status.data.status}`
+      console.log('env: ', env);
       if (env) {
-        let responseMessage = `
+        responseMessage = `
 					status: ${status.data.status} \n
 					node_id: ${status.data.node_id} \n
 					profile_url: ${status.data.profile_url} \n
+					profile_hash: ${status.data.profile_hash} \n
 					last_updated: ${status.data.last_updated}
 					`;
+        // let responseMessage = `${status.data.status}`
       } else {
-        let responseMessage = `${status.data.status}`;
+        console.log('else: ', status.data);
+        responseMessage = `${status.data.status}`;
       }
-      handleField('indexed', status.data.node_id);
+      await handleField(`${envi}_last_updated`, status.data.last_updated);
+      // handleField( `${envi}_node_id`, status.data.node_id )
+      handleFormSave();
+      // handleFormSave( true )
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
@@ -556,7 +605,7 @@ const SettingsScreen = () => {
       createSuccessNotice(responseMessage, {
         type: 'snackbar'
       });
-      handleField('indexed', status.data.node_id);
+      // handleField( 'index_dates', status.data )
     } else {
       console.log(status);
       createErrorNotice(status, {
@@ -567,14 +616,49 @@ const SettingsScreen = () => {
   };
   const handleSaveAndPublish = async () => {
     setIsRequesting(true);
-    handleFormValidate();
-    handleFormSave();
+    await handleFormValidate();
+    await handleFormSave();
     handleAPIValidate();
     handleAPIPublish();
     if (env) {
-      handleAPIStatus();
+      // handleAPIStatus()
     }
     setIsRequesting(false);
+  };
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const status = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
+      path: '/murmurations/v2/index/node_delete'
+    }).then(posts => {
+      return posts;
+    });
+    if (!status.errors && status instanceof Object) {
+      let responseMessage = `${status.meta.message}`;
+      createSuccessNotice(responseMessage, {
+        type: 'snackbar'
+      });
+      if (env) {
+        console.log(status.meta.message);
+      }
+      ;
+      await setSetting(`${envi}_last_updated`, 0);
+      handleFormSave();
+    } else {
+      if (status instanceof Object) {
+        status.errors.forEach(error => {
+          console.log(error);
+          let prefix = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Server response: ', 'mumurations-node');
+          let errorMessage = `${prefix} ${error.detail}`;
+          createErrorNotice(errorMessage, {
+            type: 'snackbar'
+          });
+        });
+      }
+      console.log(status);
+      setSetting(`${envi}_last_updated`, 0);
+      handleFormSave();
+    }
+    setIsDeleting(false);
   };
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "wrap"
@@ -610,19 +694,26 @@ const SettingsScreen = () => {
     value: rss !== null && rss !== void 0 ? rss : '',
     onChange: value => handleField('rss', value),
     help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("The URL for the entity's RSS feed", 'murmurations-node')
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_12__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, {
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_image__WEBPACK_IMPORTED_MODULE_10__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_urls__WEBPACK_IMPORTED_MODULE_9__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_location__WEBPACK_IMPORTED_MODULE_11__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_env__WEBPACK_IMPORTED_MODULE_12__["default"], {
+    onChange: value => handleField('env', value)
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, {
     className: "align-left"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
     variant: "primary",
     onClick: handleSaveAndPublish,
     disabled: isRequesting
-  }, isRequesting ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving & Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save & Publish', 'murmurations-node')), indexed ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+  }, isRequesting ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Saving & Publishing...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Save & Publish', 'murmurations-node')), last_updated ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
     variant: "secondary",
     href: murmurations_index,
     icon: "location-alt",
     target: "_blank",
     rel: "noopener"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('View site in index', 'murmurations-node')) : '', (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_13__["default"], null)))));
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('View site in index', 'murmurations-node')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    isDestructive: true,
+    disabled: isDeleting,
+    icon: "no",
+    onClick: handleDelete
+  }, isDeleting ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Deleting...', 'murmurations-node'), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Spinner, null)) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Remove from Index ', 'murmurations-node'))) : '', (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_notifications__WEBPACK_IMPORTED_MODULE_13__["default"], null)))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SettingsScreen);
 
@@ -735,18 +826,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SET_ENV": () => (/* binding */ SET_ENV),
 /* harmony export */   "SET_GEOLOCATION": () => (/* binding */ SET_GEOLOCATION),
 /* harmony export */   "SET_IMAGE": () => (/* binding */ SET_IMAGE),
-/* harmony export */   "SET_IMAGE_ID": () => (/* binding */ SET_IMAGE_ID),
 /* harmony export */   "SET_LOCALITY": () => (/* binding */ SET_LOCALITY),
 /* harmony export */   "SET_LOCATION": () => (/* binding */ SET_LOCATION),
 /* harmony export */   "SET_MISSION": () => (/* binding */ SET_MISSION),
 /* harmony export */   "SET_NAME": () => (/* binding */ SET_NAME),
 /* harmony export */   "SET_PRIMARY_URL": () => (/* binding */ SET_PRIMARY_URL),
+/* harmony export */   "SET_PROD_LAST_UPDATED": () => (/* binding */ SET_PROD_LAST_UPDATED),
 /* harmony export */   "SET_REGION": () => (/* binding */ SET_REGION),
 /* harmony export */   "SET_RSS": () => (/* binding */ SET_RSS),
 /* harmony export */   "SET_SETTING": () => (/* binding */ SET_SETTING),
 /* harmony export */   "SET_TAGS": () => (/* binding */ SET_TAGS),
+/* harmony export */   "SET_TEST_LAST_UPDATED": () => (/* binding */ SET_TEST_LAST_UPDATED),
 /* harmony export */   "SET_URLS": () => (/* binding */ SET_URLS),
-/* harmony export */   "SET_USER_PREFERENCES": () => (/* binding */ SET_USER_PREFERENCES),
 /* harmony export */   "STATE_FROM_DATABASE": () => (/* binding */ STATE_FROM_DATABASE),
 /* harmony export */   "STORE_NAME": () => (/* binding */ STORE_NAME)
 /* harmony export */ });
@@ -765,15 +856,15 @@ const SET_REGION = 'SET_REGION';
 const SET_COUNTRY_NAME = 'SET_COUNTRY_NAME';
 const SET_GEOLOCATION = 'SET_GEOLOCATION';
 const SET_IMAGE = 'SET_IMAGE';
-const SET_IMAGE_ID = 'SET_IMAGE_ID';
 const SET_TAGS = 'SET_TAGS';
 const SET_RSS = 'SET_RSS';
 const SET_ENV = 'SET_ENV';
+const SET_TEST_LAST_UPDATED = 'SET_TEST_LAST_UPDATED';
+const SET_PROD_LAST_UPDATED = 'SET_PROD_LAST_UPDATED';
 //
 const STATE_FROM_DATABASE = 'STATE_FROM_DATABASE';
 const FETCH_SETTINGS = 'FETCH_SETTINGS';
 const SET_SETTING = 'SET_SETTING';
-const SET_USER_PREFERENCES = 'SET_USER_PREFERENCES';
 
 /***/ }),
 
@@ -932,9 +1023,25 @@ const actions = {
       }
     };
   },
+  setProdLastUpdated(prod_last_updated) {
+    return {
+      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_PROD_LAST_UPDATED,
+      payload: {
+        prod_last_updated
+      }
+    };
+  },
+  setTestLastUpdated(test_last_updated) {
+    return {
+      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_TEST_LAST_UPDATED,
+      payload: {
+        test_last_updated
+      }
+    };
+  },
   setUserPreferences(userPreferences) {
     return {
-      type: _constants__WEBPACK_IMPORTED_MODULE_2__.SET_USER_PREFERENCES,
+      type: SET_USER_PREFERENCES,
       payload: {
         userPreferences
       }
@@ -949,16 +1056,6 @@ const actions = {
       }
     };
   }
-  // setToggleState(section) {
-  // 	return function ({ select, dispatch }) {
-  // 		const currentValues = select.getUserPreferences();
-  // 		const sectionValue = currentValues[section];
-  // 		dispatch.setUserPreferences({
-  // 			...currentValues,
-  // 			[section]: !sectionValue,
-  // 		});
-  // 	};
-  // },
 };
 
 // Define the reducer
@@ -1078,14 +1175,6 @@ function reducer() {
         ...state,
         image
       };
-    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_IMAGE_ID:
-      const {
-        image_id
-      } = payload;
-      return {
-        ...state,
-        image_id
-      };
     case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_TAGS:
       const {
         tags
@@ -1110,16 +1199,21 @@ function reducer() {
         ...state,
         env
       };
-    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_USER_PREFERENCES:
+    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_TEST_LAST_UPDATED:
       const {
-        userPreferences
+        test_last_updated
       } = payload;
-      if (userPreferences) {
-        window.localStorage.setItem('murmurations-node-user-preferences', JSON.stringify(userPreferences));
-      }
       return {
         ...state,
-        userPreferences
+        test_last_updated
+      };
+    case _constants__WEBPACK_IMPORTED_MODULE_2__.SET_PROD_LAST_UPDATED:
+      const {
+        prod_last_updated
+      } = payload;
+      return {
+        ...state,
+        prod_last_updated
       };
   }
   return state;
@@ -1160,9 +1254,6 @@ const selectors = {
   getImage(state) {
     return state.image;
   },
-  getImageID(state) {
-    return state.image_id;
-  },
   getTags(state) {
     return state.tags;
   },
@@ -1172,14 +1263,17 @@ const selectors = {
   getEnv(state) {
     return state.env;
   },
+  getTestLastUpdated(state) {
+    return state.test_last_updated;
+  },
+  getProdLastUpdated(state) {
+    return state.prod_last_updated;
+  },
   getSettings(state) {
     const {
       ...settings
     } = state;
     return settings;
-  },
-  getUserPreferences(state) {
-    return state.userPreferences;
   }
 };
 const resolvers = {
@@ -1193,15 +1287,6 @@ const resolvers = {
       });
       dispatch.initSettings(settings['murmurations-node_data']);
     };
-  },
-  getUserPreferences() {
-    return _ref2 => {
-      let {
-        dispatch
-      } = _ref2;
-      const userPreferences = window.localStorage.getItem('murmurations-node-user-preferences') || _constants__WEBPACK_IMPORTED_MODULE_2__.DEFAULT_STATE.userPreferences;
-      dispatch.setUserPreferences(JSON.parse(userPreferences));
-    };
   }
 };
 
@@ -1211,9 +1296,7 @@ const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.createReduxStore)(
   actions,
   selectors,
   resolvers
-  // __experimentalUseThunks: true,
 });
-
 (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.register)(store);
 
 /***/ }),
