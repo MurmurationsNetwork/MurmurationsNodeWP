@@ -819,27 +819,27 @@ const Urls = () => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DEFAULT_STATE": () => (/* binding */ DEFAULT_STATE),
-/* harmony export */   "FETCH_SETTINGS": () => (/* binding */ FETCH_SETTINGS),
-/* harmony export */   "SET_COUNTRY_NAME": () => (/* binding */ SET_COUNTRY_NAME),
-/* harmony export */   "SET_DESCRIPTION": () => (/* binding */ SET_DESCRIPTION),
-/* harmony export */   "SET_ENV": () => (/* binding */ SET_ENV),
-/* harmony export */   "SET_GEOLOCATION": () => (/* binding */ SET_GEOLOCATION),
-/* harmony export */   "SET_IMAGE": () => (/* binding */ SET_IMAGE),
-/* harmony export */   "SET_LOCALITY": () => (/* binding */ SET_LOCALITY),
-/* harmony export */   "SET_LOCATION": () => (/* binding */ SET_LOCATION),
-/* harmony export */   "SET_MISSION": () => (/* binding */ SET_MISSION),
-/* harmony export */   "SET_NAME": () => (/* binding */ SET_NAME),
-/* harmony export */   "SET_PRIMARY_URL": () => (/* binding */ SET_PRIMARY_URL),
-/* harmony export */   "SET_PROD_LAST_UPDATED": () => (/* binding */ SET_PROD_LAST_UPDATED),
-/* harmony export */   "SET_REGION": () => (/* binding */ SET_REGION),
-/* harmony export */   "SET_RSS": () => (/* binding */ SET_RSS),
-/* harmony export */   "SET_SETTING": () => (/* binding */ SET_SETTING),
-/* harmony export */   "SET_TAGS": () => (/* binding */ SET_TAGS),
-/* harmony export */   "SET_TEST_LAST_UPDATED": () => (/* binding */ SET_TEST_LAST_UPDATED),
-/* harmony export */   "SET_URLS": () => (/* binding */ SET_URLS),
-/* harmony export */   "STATE_FROM_DATABASE": () => (/* binding */ STATE_FROM_DATABASE),
-/* harmony export */   "STORE_NAME": () => (/* binding */ STORE_NAME)
+/* harmony export */   DEFAULT_STATE: () => (/* binding */ DEFAULT_STATE),
+/* harmony export */   FETCH_SETTINGS: () => (/* binding */ FETCH_SETTINGS),
+/* harmony export */   SET_COUNTRY_NAME: () => (/* binding */ SET_COUNTRY_NAME),
+/* harmony export */   SET_DESCRIPTION: () => (/* binding */ SET_DESCRIPTION),
+/* harmony export */   SET_ENV: () => (/* binding */ SET_ENV),
+/* harmony export */   SET_GEOLOCATION: () => (/* binding */ SET_GEOLOCATION),
+/* harmony export */   SET_IMAGE: () => (/* binding */ SET_IMAGE),
+/* harmony export */   SET_LOCALITY: () => (/* binding */ SET_LOCALITY),
+/* harmony export */   SET_LOCATION: () => (/* binding */ SET_LOCATION),
+/* harmony export */   SET_MISSION: () => (/* binding */ SET_MISSION),
+/* harmony export */   SET_NAME: () => (/* binding */ SET_NAME),
+/* harmony export */   SET_PRIMARY_URL: () => (/* binding */ SET_PRIMARY_URL),
+/* harmony export */   SET_PROD_LAST_UPDATED: () => (/* binding */ SET_PROD_LAST_UPDATED),
+/* harmony export */   SET_REGION: () => (/* binding */ SET_REGION),
+/* harmony export */   SET_RSS: () => (/* binding */ SET_RSS),
+/* harmony export */   SET_SETTING: () => (/* binding */ SET_SETTING),
+/* harmony export */   SET_TAGS: () => (/* binding */ SET_TAGS),
+/* harmony export */   SET_TEST_LAST_UPDATED: () => (/* binding */ SET_TEST_LAST_UPDATED),
+/* harmony export */   SET_URLS: () => (/* binding */ SET_URLS),
+/* harmony export */   STATE_FROM_DATABASE: () => (/* binding */ STATE_FROM_DATABASE),
+/* harmony export */   STORE_NAME: () => (/* binding */ STORE_NAME)
 /* harmony export */ });
 // Constants
 const STORE_NAME = 'murmurations-node';
