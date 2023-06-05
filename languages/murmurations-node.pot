@@ -1,15 +1,15 @@
-# Copyright (C) 2022 Murmurations Network
+# Copyright (C) 2023 Murmurations Network
 # This file is distributed under the same license as the Murmurations Node package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Murmurations Node 0.2.0\n"
+"Project-Id-Version: Murmurations Node 0.5.0-beta-1\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/MurmurationsNodeWP\n"
-"POT-Creation-Date: 2022-12-23 07:46:10+00:00\n"
+"POT-Creation-Date: 2023-06-05 04:21:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2022-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: en\n"
@@ -25,20 +25,28 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
 
-#: murmurations-node.php:38
+#: murmurations-node.php:56
 msgid "Settings"
+msgstr ""
+
+#: murmurations-node.php:68 murmurations-node.php:69
+msgid "Murmurations"
+msgstr ""
+
+#: murmurations-node.php:83
+msgid "Requires JavaScript"
+msgstr ""
+
+#: murmurations-node.php:295
+msgid "No profile found"
+msgstr ""
+
+#: murmurations-node.php:445
+msgid "Profile not indexed"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
 msgid "Murmurations Node"
-msgstr ""
-
-#: murmurations-node.php:65
-msgid "Requires JavaScript"
-msgstr ""
-
-#: murmurations-node.php:252
-msgid "No profile found"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
@@ -46,7 +54,7 @@ msgid "https://github.com/MurmurationsNetwork/MurmurationsNodeWP"
 msgstr ""
 
 #. Description of the plugin/theme
-msgid "Put your organisation on the map!"
+msgid "Add your Profile to the Murmurations decentralised data sharing network."
 msgstr ""
 
 #. Author of the plugin/theme
