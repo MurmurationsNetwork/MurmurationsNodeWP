@@ -2,7 +2,7 @@
 **Contributors:** [mediaformat](https://profiles.wordpress.org/mediaformat/)  
 **Donate link:** https://opencollective.com/murmurations  
 **Tags:** murmurations, network, regenerative economy, map  
-**Requires at least:** 5.0  
+**Requires at least:** 5.0.19  
 **Tested up to:** 6.2.2  
 **Stable tag:** trunk  
 **Requires PHP:** 5.6  
