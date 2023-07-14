@@ -1,0 +1,24 @@
+{
+  "name": "murmurations-node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "GPLv3",
+  "scripts": {
+    "build": "node ./scripts/build-prod.js",
+    "build:dev": "node ./scripts/build-dev.js",
+    "watch": "nodemon --watch src --ext '*' --exec 'npm run build:dev'"
+  },
+  "dependencies": {
+    "@murmurations/jsig": "^1.0.0",
+    "@murmurations/jsrfg": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "redaxios": "^0.5.1"
+  },
+  "devDependencies": {
+    "esbuild-plugin-eslint": "^0.1.1",
+    "eslint": "^8.34.0",
+    "eslint-plugin-react": "^7.32.2",
+    "nodemon": "^2.0.21"
+  }
+}
