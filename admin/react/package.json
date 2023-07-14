@@ -6,7 +6,9 @@
   "scripts": {
     "build": "node ./scripts/build-prod.js",
     "build:dev": "node ./scripts/build-dev.js",
-    "watch": "nodemon --watch src --ext '*' --exec 'npm run build:dev'"
+    "watch": "nodemon --watch src --ext '*' --exec 'npm run build:dev'",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|jsx|json)\"",
+    "format": "npm run prettier -- --write"
   },
   "dependencies": {
     "@murmurations/jsig": "^1.0.0",
@@ -19,6 +21,7 @@
     "esbuild-plugin-eslint": "^0.1.1",
     "eslint": "^8.34.0",
     "eslint-plugin-react": "^7.32.2",
-    "nodemon": "^2.0.21"
+    "nodemon": "^2.0.21",
+    "prettier": "^3.0.0"
   }
 }

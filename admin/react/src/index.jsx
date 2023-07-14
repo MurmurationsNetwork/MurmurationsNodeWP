@@ -1,8 +1,8 @@
-import ReactDOM from "react-dom"
-import App from "./app"
+import ReactDOM from 'react-dom'
+import App from './app'
 
-import "./styles/styles.css"
+import './styles/styles.css'
 
 ReactDOM.createRoot(
-  document.querySelector("#wp-admin-plugin-page-root")
+  document.querySelector('#wp-admin-plugin-page-root')
 ).render(<App />)
