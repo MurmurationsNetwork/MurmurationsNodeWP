@@ -7,8 +7,22 @@
     "build": "node ./scripts/build-prod.js",
     "build:dev": "node ./scripts/build-dev.js",
     "watch": "nodemon --watch src --ext '*' --exec 'npm run build:dev'",
+    "lint": "eslint --ignore-path .gitignore --ext .js --ext .jsx .",
+    "lint-fix": "eslint --ignore-path .gitignore --ext .js --ext .jsx . --fix",
     "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|jsx|json)\"",
-    "format": "npm run prettier -- --write"
+    "format": "npm run prettier -- --write",
+    "prepare": "cd ../.. && husky install admin/react/.husky"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint-config-prettier"
+    ]
+  },
+  "lint-staged": {
+    "**/*.{js,jsx}": [
+      "npm run lint-fix",
+      "npm run format"
+    ]
   },
   "dependencies": {
     "@murmurations/jsig": "^1.0.0",
@@ -20,8 +34,15 @@
   "devDependencies": {
     "esbuild-plugin-eslint": "^0.1.1",
     "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.32.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "nodemon": "^2.0.21",
     "prettier": "^3.0.0"
-  }
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "sideEffects": false
 }

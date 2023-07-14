@@ -1,4 +1,4 @@
-import axios from 'redaxios';
+import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
 import { useState } from 'react'
 
