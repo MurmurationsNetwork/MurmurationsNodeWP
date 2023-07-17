@@ -26,8 +26,8 @@ export default function App() {
 
   return (
     <div>
-      <h3>Murmurations Profile Generator</h3>
-      <button onClick={fetchSchema}>
+      <h1 className="text-2xl">Murmurations Profile Generator</h1>
+      <button className="border border-black p-1" onClick={fetchSchema}>
         {loading ? 'Loading ..' : 'Load Org Schema'}
       </button>
       {schema && (
