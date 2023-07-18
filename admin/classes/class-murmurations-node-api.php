@@ -1,9 +1,7 @@
 <?php
 
-if ( ! class_exists( 'React_WP_API' ) ) {
-    
-    class React_WP_API {
-
+if ( ! class_exists( 'Murmurations_Node_API' ) ) {
+    class Murmurations_Node_API {
         public function __construct() {
             add_action( 'wp_ajax_react-wp-admin-ajax', array( $this, 'handle_ajax' ) );
         }
@@ -15,12 +13,10 @@ if ( ! class_exists( 'React_WP_API' ) ) {
 
             echo json_encode( array(
                 'name'    => $user ? $user->data->display_name : 'there',
-                'message' => 'API call works!',  
+                'message' => 'API call works!',
             ) );
 
             exit;
         }
-        
     }
-
 }
