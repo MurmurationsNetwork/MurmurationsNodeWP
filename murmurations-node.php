@@ -17,9 +17,6 @@ if ( ! class_exists( 'MurmurationsNodeAdmin' ) ) {
     class MurmurationsNodeAdmin {
         public function __construct() {
             $this->register_autoloads();
-			$this->register_activation();
-			$this->register_deactivation();
-			$this->register_uninstall();
             $this->register_admin_page();
             $this->register_api();
         }
@@ -44,19 +41,41 @@ if ( ! class_exists( 'MurmurationsNodeAdmin' ) ) {
         public function register_api() {
             new Murmurations_Node_API();
         }
-
-		public function register_activation() {
-			new Murmurations_Node_Activation();
-		}
-
-		public function register_deactivation() {
-			new Murmurations_Node_Deactivation();
-		}
-
-		public function register_uninstall() {
-			new Murmurations_Node_Uninstall();
-		}
     }
 
     new MurmurationsNodeAdmin();
 }
+
+function murmurations_node_admin_activation(): void {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'murmurations_profiles';
+
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE $table_name (
+        id INT NOT NULL AUTO_INCREMENT,
+        cuid VARCHAR(100) NOT NULL,
+        node_id VARCHAR(100),
+        linked_schemas JSON NOT NULL,
+		profile JSON NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	dbDelta( $sql );
+}
+
+register_activation_hook( __FILE__, 'murmurations_node_admin_activation' );
+
+function murmurations_node_admin_uninstall(): void {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'murmurations_profiles';
+
+	if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name) {
+		$wpdb->query("DROP TABLE IF EXISTS $table_name");
+	}
+}
+
+register_uninstall_hook(__FILE__, 'murmurations_node_admin_uninstall');
