@@ -16,8 +16,18 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile',
 					array(
-						'methods'  => 'GET',
-						'callback' => array( $this, 'get_profiles' ),
+						array(
+							'methods'  => 'GET',
+							'callback' => array( $this, 'get_profiles' ),
+						),
+						array(
+							'methods'  => 'POST',
+							'callback' => array( $this, 'post_profile' ),
+						),
+						array(
+							'methods'  => 'PUT',
+							'callback' => array( $this, 'edit_profile' ),
+						),
 					)
 				);
 
@@ -25,41 +35,17 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				register_rest_route(
 					'murmurations-node/v1',
 					'/profile/(?P<cuid>[\w]+)',
-	                array(
-						'method'    => 'GET',
-                        'callback'  => array( $this, 'get_profile' ),
-	                )
-				);
-
-	            // post a profile
-	            register_rest_route(
-					'murmurations-node/v1',
-					'/profile',
-                    array(
-						'methods'  => 'POST',
-						'callback' => array( $this, 'post_profile' ),
-                    )
-	            );
-
-	            // edit a profile
-	            register_rest_route(
-					'murmurations-node/v1',
-		            '/profile',
-		            array(
-						'methods'  => 'PUT',
-                        'callback' => array( $this, 'edit_profile' ),
+					array(
+						array(
+							'method'    => 'GET',
+							'callback'  => array( $this, 'get_profile' ),
+						),
+						array(
+							'methods'  => 'DELETE',
+							'callback' => array( $this, 'delete_profile' ),
+						)
 					)
-	            );
-
-	            // delete a profile
-	            register_rest_route(
-					'murmurations-node/v1',
-		            '/profile/(?P<cuid>[\w]+)',
-		            array(
-						'methods'  => 'DELETE',
-						'callback' => array( $this, 'delete_profile' ),
-                    )
-	            );
+				);
             });
         }
 
