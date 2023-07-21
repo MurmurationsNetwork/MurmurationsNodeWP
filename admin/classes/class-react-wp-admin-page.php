@@ -23,6 +23,7 @@ if ( ! class_exists( 'React_WP_Admin_Page' ) ) {
 
         public function admin_page() {
             echo '<div id="wp-admin-plugin-page-root"></div>';
+            echo '<style>#wpcontent {padding-left: 0;}</style>';
         }
 
         public function enqueue_assets($hook) {
