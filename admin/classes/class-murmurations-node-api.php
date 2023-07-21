@@ -11,7 +11,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	            $this->wpdb = $wpdb;
 	            $this->table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
 
-				// get all profiles
+				// routes without cuid
 				register_rest_route(
 					'murmurations-node/v1',
 					'/profile',
@@ -31,7 +31,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					)
 				);
 
-				// get a profile
+				// routes with cuid
 				register_rest_route(
 					'murmurations-node/v1',
 					'/profile/(?P<cuid>[\w]+)',
