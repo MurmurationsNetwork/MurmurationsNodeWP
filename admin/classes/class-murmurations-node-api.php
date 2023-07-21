@@ -35,6 +35,14 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	            );
 
 	            // edit a profile
+	            register_rest_route(
+					'murmurations-node/v1',
+		            '/profile',
+		            array(
+						'methods'  => 'PUT',
+                        'callback' => array( $this, 'edit_profile' ),
+					)
+	            );
 
 	            // delete a profile
             });
@@ -140,6 +148,47 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$response = array(
 				'message' => esc_html__('Profile inserted successfully.', 'text-domain'),
+			);
+
+			return rest_ensure_response($response);
+		}
+
+		public function edit_profile( $request ) {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'murmurations_profiles';
+
+			$data = $request->get_json_params();
+
+			if (!isset($data['cuid'])) {
+				return new WP_Error('invalid_cuid', esc_html__('Invalid cuid in the request.', 'text-domain'), array('status' => 400));
+			}
+
+			$existing_profile = $wpdb->get_row(
+				$wpdb->prepare("SELECT * FROM $table_name WHERE cuid = %s", $data['cuid']),
+				ARRAY_A
+			);
+
+			if (empty($existing_profile)) {
+				return new WP_Error('profile_not_found', esc_html__('Profile not found.', 'text-domain'), array('status' => 404));
+			}
+
+			$update_data = array(
+				'profile' => wp_json_encode($data['profile']),
+				'updated_at' => current_time('mysql'),
+			);
+
+			$update_result = $wpdb->update(
+				$table_name,
+				$update_data,
+				array('cuid' => $data['cuid'])
+			);
+
+			if ($update_result === false) {
+				return new WP_Error('update_failed', esc_html__('Failed to update the profile.', 'text-domain'), array('status' => 500));
+			}
+
+			$response = array(
+				'message' => esc_html__('Profile updated successfully.', 'text-domain'),
 			);
 
 			return rest_ensure_response($response);
