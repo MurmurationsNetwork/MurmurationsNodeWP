@@ -10,6 +10,10 @@
  * License: GPLv3 or later
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! class_exists( 'MurmurationsNode' ) ) {
     define( 'MURMURATIONS_NODE_URL', plugin_dir_url( __FILE__ ) );
     define( 'MURMURATIONS_NODE_DIR', __DIR__ );
