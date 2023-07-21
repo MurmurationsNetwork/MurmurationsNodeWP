@@ -12,7 +12,7 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 			    'Murmurations Node',
 			    'Murmurations',
 			    'edit_posts', // capability
-			    'murmurations-node-admin',
+			    'murmurations-node',
 			    array( $this, 'admin_page' ),
 			    'dashicons-admin-network', // icon URL
 			    null // position
@@ -23,23 +23,23 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 		    echo '<div id="wp-admin-plugin-page-root"></div>';
 	    }
 
-	    public function enqueue_assets($hook) {
-		    if ( 'toplevel_page_murmurations-node-admin' !== $hook ) {
+	    public function enqueue_assets( $hook ) {
+		    if ( 'toplevel_page_murmurations-node' !== $hook ) {
 			    return;
 		    }
 
 		    $script      = 'admin/assets/bundle.js';
-		    $script_file = MURMURATIONS_NODE_ADMIN_DIR . '/' . $script;
+		    $script_file = MURMURATIONS_NODE_DIR . '/' . $script;
 
 		    if ( file_exists( $script_file ) ) {
-			    wp_enqueue_script( 'murmurations-node-admin', MURMURATIONS_NODE_ADMIN_URL . $script, array(), filemtime( $script_file ), true );
+			    wp_enqueue_script( 'murmurations-node', MURMURATIONS_NODE_URL . $script, array(), filemtime( $script_file ), true );
 		    }
 
 		    $style      = 'admin/assets/bundle.css';
-		    $style_file = MURMURATIONS_NODE_ADMIN_DIR . '/' . $style;
+		    $style_file = MURMURATIONS_NODE_DIR . '/' . $style;
 
 		    if ( file_exists( $style_file ) ) {
-			    wp_enqueue_style( 'murmurations-node-admin', MURMURATIONS_NODE_ADMIN_URL . $style, array(), filemtime( $style_file ) );
+			    wp_enqueue_style( 'murmurations-node', MURMURATIONS_NODE_URL . $style, array(), filemtime( $style_file ) );
 		    }
 	    }
     }
