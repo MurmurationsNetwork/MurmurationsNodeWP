@@ -7,7 +7,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				// get all profiles
 				register_rest_route(
 					'murmurations-node/v1',
-					'/get_profiles',
+					'/profile',
 					array(
 						'methods'  => 'GET',
 						'callback' => array( $this, 'get_profiles' ),
@@ -17,7 +17,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				// get a profile
 				register_rest_route(
 					'murmurations-node/v1',
-					'/get_profile/(?P<cuid>[\w]+)',
+					'/profile/(?P<cuid>[\w]+)',
 	                array(
 						'method'    => 'GET',
                         'callback'  => array( $this, 'get_profile' ),
@@ -25,6 +25,14 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				);
 
 	            // post a profile
+	            register_rest_route(
+					'murmurations-node/v1',
+					'/profile',
+                    array(
+						'methods'  => 'POST',
+						'callback' => array( $this, 'post_profile' ),
+                    )
+	            );
 
 	            // edit a profile
 
@@ -32,7 +40,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
             });
         }
 
-        public function get_profiles( $request ) {
+        public function get_profiles( ) {
 //			// todo: we might need to set the permission, it's not working now.
 //			if ( ! current_user_can( 'read') ) {
 //				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
@@ -90,6 +98,51 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			);
 
 			return rest_ensure_response($data);
+		}
+
+		public function post_profile( $request ) {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'murmurations_profiles';
+
+			$data = $request->get_json_params();
+
+			// validate the data
+			if (
+				!isset($data['cuid']) ||
+				!isset($data['linked_schemas']) ||
+				!isset($data['profile'])
+			) {
+				return new WP_Error('invalid_data', esc_html__('Invalid data. All fields are required.', 'text-domain'), array('status' => 400));
+			}
+
+			// check if the profile already exists
+			$profile = $wpdb->get_row(
+				$wpdb->prepare("SELECT * FROM $table_name WHERE cuid = %s", $data['cuid']),
+				ARRAY_A
+			);
+
+			if (!empty($profile)) {
+				return new WP_Error('profile_already_exists', esc_html__('Profile already exists.', 'text-domain'), array('status' => 400));
+			}
+
+			$insert_data = array(
+				'cuid' => sanitize_text_field($data['cuid']),
+				'node_id' => sanitize_text_field($data['node_id']),
+				'linked_schemas' => wp_json_encode($data['linked_schemas']),
+				'profile' => wp_json_encode($data['profile']),
+			);
+
+			$insert_result = $wpdb->insert($table_name, $insert_data);
+
+			if ($insert_result === false) {
+				return new WP_Error('insert_failed', esc_html__('Failed to insert the profile into the database.', 'text-domain'), array('status' => 500));
+			}
+
+			$response = array(
+				'message' => esc_html__('Profile inserted successfully.', 'text-domain'),
+			);
+
+			return rest_ensure_response($response);
 		}
     }
 }
