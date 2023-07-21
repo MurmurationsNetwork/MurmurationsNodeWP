@@ -4,7 +4,7 @@ if ( ! class_exists('Murmurations_Node_Activation') ) {
 	class Murmurations_Node_Activation {
 		public static function activate() {
 			global $wpdb;
-			$table_name = $wpdb->prefix . 'murmurations_profiles';
+			$table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
 
 			$charset_collate = $wpdb->get_charset_collate();
 

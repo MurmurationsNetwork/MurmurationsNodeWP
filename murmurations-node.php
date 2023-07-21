@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'MurmurationsNode' ) ) {
     define( 'MURMURATIONS_NODE_URL', plugin_dir_url( __FILE__ ) );
     define( 'MURMURATIONS_NODE_DIR', __DIR__ );
+	define( 'MURMURATIONS_NODE_TABLE', 'murmurations_profiles');
 
     class MurmurationsNode {
         public function __construct() {

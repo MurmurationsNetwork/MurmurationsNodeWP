@@ -2,8 +2,15 @@
 
 if ( ! class_exists( 'Murmurations_Node_API' ) ) {
     class Murmurations_Node_API {
+	    private $wpdb;
+	    private $table_name;
+
         public function __construct() {
             add_action( 'rest_api_init', function () {
+	            global $wpdb;
+	            $this->wpdb = $wpdb;
+	            $this->table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
+
 				// get all profiles
 				register_rest_route(
 					'murmurations-node/v1',
@@ -62,10 +69,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 //				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
 //			}
 
-	        global $wpdb;
-	        $table_name = $wpdb->prefix . 'murmurations_profiles';
-
-	        $profiles = $wpdb->get_results( "SELECT * FROM $table_name", ARRAY_A );
+	        $profiles = $this->wpdb->get_results( "SELECT * FROM $this->table_name", ARRAY_A );
 
 	        if ( empty( $profiles ) ) {
 		        return new WP_Error( 'no_profiles_found', esc_html__( 'No profiles found.', 'text-domain' ), array( 'status' => 404 ) );
@@ -88,13 +92,10 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
         }
 
 		public function get_profile( $request ) {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'murmurations_profiles';
-
 			$cuid = $request['cuid'];
 
-			$profile = $wpdb->get_row(
-				$wpdb->prepare("SELECT * FROM $table_name WHERE cuid = %s", $cuid),
+			$profile = $this->wpdb->get_row(
+				$this->wpdb->prepare("SELECT * FROM $this->table_name WHERE cuid = %s", $cuid),
 				ARRAY_A
 			);
 
@@ -117,9 +118,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function post_profile( $request ) {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'murmurations_profiles';
-
 			$data = $request->get_json_params();
 
 			// validate the data
@@ -132,8 +130,8 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			// check if the profile already exists
-			$profile = $wpdb->get_row(
-				$wpdb->prepare("SELECT * FROM $table_name WHERE cuid = %s", $data['cuid']),
+			$profile = $this->wpdb->get_row(
+				$this->wpdb->prepare("SELECT * FROM $this->table_name WHERE cuid = %s", $data['cuid']),
 				ARRAY_A
 			);
 
@@ -148,7 +146,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'profile' => wp_json_encode($data['profile']),
 			);
 
-			$insert_result = $wpdb->insert($table_name, $insert_data);
+			$insert_result = $this->wpdb->insert($this->table_name, $insert_data);
 
 			if ($insert_result === false) {
 				return new WP_Error('insert_failed', esc_html__('Failed to insert the profile into the database.', 'text-domain'), array('status' => 500));
@@ -162,17 +160,14 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function edit_profile( $request ) {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'murmurations_profiles';
-
 			$data = $request->get_json_params();
 
 			if (!isset($data['cuid'])) {
 				return new WP_Error('invalid_cuid', esc_html__('Invalid cuid in the request.', 'text-domain'), array('status' => 400));
 			}
 
-			$existing_profile = $wpdb->get_row(
-				$wpdb->prepare("SELECT * FROM $table_name WHERE cuid = %s", $data['cuid']),
+			$existing_profile = $this->wpdb->get_row(
+				$this->wpdb->prepare("SELECT * FROM $this->table_name WHERE cuid = %s", $data['cuid']),
 				ARRAY_A
 			);
 
@@ -185,8 +180,8 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'updated_at' => current_time('mysql'),
 			);
 
-			$update_result = $wpdb->update(
-				$table_name,
+			$update_result = $this->wpdb->update(
+				$this->table_name,
 				$update_data,
 				array('cuid' => $data['cuid'])
 			);
