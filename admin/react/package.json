@@ -33,6 +33,7 @@
     "redaxios": "^0.5.1"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.4",
     "esbuild-plugin-eslint": "^0.1.1",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.8.0",

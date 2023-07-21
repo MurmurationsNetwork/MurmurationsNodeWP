@@ -32,23 +32,23 @@ export default function App() {
   }
 
   return (
-    <div className="bg-gray-50">
-      <h1 className="text-2xl">Murmurations Profile Generator</h1>
-      <h2 className="text-xl">What do you want to create a Profile for?</h2>
-      <div className="mb-2 flex flex-row items-center px-2 py-1 md:mb-4 md:px-4 md:py-2">
+    <div className="bg-gray-50 px-4 py-2">
+      <h1 className="text-3xl">Murmurations Profile Generator</h1>
+      <h2 className="text-lg">What do you want to create a Profile for?</h2>
+      <div className="my-2 flex flex-row items-start px-2 py-1 md:my-4 md:px-4 md:py-2">
         <div>
           <form method="post">
             <select
-              className="block w-full border-2 border-gray-400 bg-white px-4 py-2 dark:bg-gray-700 md:w-96"
+              className="block w-full border-2 border-gray-400 bg-white px-4 py-2 md:w-96"
               id="schema"
               name="schema"
               multiple={false}
               required={true}
-              size={6}
+              size={4}
             >
               {schemas.map(schema => (
                 <option
-                  className="mb-1 border-gray-50 px-2 py-0 text-sm"
+                  className="mb-1 border-gray-50 px-2 py-0 text-xl"
                   value={schema.name}
                   key={schema.name}
                 >
@@ -65,20 +65,38 @@ export default function App() {
             {loading ? 'Loading ..' : 'Select'}
           </button>
         </div>
-        <div className="ml-8">
-          <p>Profiles can show up on multiple aggregators.</p>
-          <p>Example aggregators include:</p>
-          <p>
-            People are published in the Murmurations Directory.
+        <div className="md:ml-16">
+          <p className="mb-2 text-sm">
+            Profiles can show up on{' '}
+            <a href="#" target="_blank" className="text-blue-600">
+              multiple aggregators
+            </a>
+            .
+          </p>
+          <p className="mb-2 text-sm">Example aggregators include:</p>
+          <p className="mb-2 text-sm">
+            People are published in the{' '}
+            <a href="#" target="_blank" className="text-blue-600">
+              Murmurations Directory
+            </a>
+            .
             <br />
-            Organizations are published in the Murmurations Map.
+            Organizations are published in the{' '}
+            <a href="#" target="_blank" className="text-blue-600">
+              Murmurations Map
+            </a>
+            .
             <br />
-            Offers and Wants are published in the Murmurations Marketplace.
+            Offers and Wants are published in the{' '}
+            <a href="#" target="_blank" className="text-blue-600">
+              Murmurations Marketplace
+            </a>
+            .
           </p>
         </div>
       </div>
       <div className="box-border flex flex-col md:flex-row">
-        <div className="inset-0 basis-full md:sticky md:top-0 md:h-screen md:basis-1/2 md:overflow-y-auto">
+        <div className="inset-0 basis-full pr-4 py-2 md:py-4 md:sticky md:top-0 md:h-screen md:basis-3/5 md:overflow-y-auto">
           {schema && (
             <div>
               <h2 className="text-xl">
@@ -88,7 +106,7 @@ export default function App() {
             </div>
           )}
         </div>
-        <div className="mx-2 basis-full px-2 py-4 md:basis-1/2 md:px-4">
+        <div className="basis-full px-2 py-2 md:basis-2/5 md:px-4 md:py-4 text-xl">
           My Profiles
         </div>
       </div>
