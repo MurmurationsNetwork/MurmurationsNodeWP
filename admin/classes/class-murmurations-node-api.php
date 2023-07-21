@@ -33,13 +33,13 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	        $data = array();
 	        foreach ( $profiles as $profile ) {
 		        $data[] = array(
-			        'id'            => $profile['id'],
-			        'cuid'          => $profile['cuid'],
-			        'node_id'       => $profile['node_id'],
-			        'linked_schemas' => json_decode( $profile['linked_schemas'], true ),
-			        'profile'       => json_decode( $profile['profile'], true ),
-			        'created_at'    => $profile['created_at'],
-			        'updated_at'    => $profile['updated_at'],
+			        'id'                => $profile['id'],
+			        'cuid'              => $profile['cuid'],
+			        'node_id'           => $profile['node_id'],
+			        'linked_schemas'    => json_decode( $profile['linked_schemas'], true ),
+			        'profile'           => json_decode( $profile['profile'], true ),
+			        'created_at'        => $profile['created_at'],
+			        'updated_at'        => $profile['updated_at'],
 		        );
 	        }
 
