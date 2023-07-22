@@ -13,6 +13,7 @@ if ( ! class_exists('Murmurations_Node_Activation') ) {
 		        cuid VARCHAR(100) NOT NULL,
 		        node_id VARCHAR(100),
 		        linked_schemas JSON NOT NULL,
+		        title VARCHAR(100) NOT NULL,
 				profile JSON NOT NULL,
 				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

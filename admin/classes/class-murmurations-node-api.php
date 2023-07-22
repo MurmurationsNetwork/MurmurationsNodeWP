@@ -68,6 +68,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			        'cuid'              => $profile['cuid'],
 			        'node_id'           => $profile['node_id'],
 			        'linked_schemas'    => json_decode( $profile['linked_schemas'], true ),
+					'title'             => $profile['title'],
 			        'profile'           => json_decode( $profile['profile'], true ),
 			        'created_at'        => $profile['created_at'],
 			        'updated_at'        => $profile['updated_at'],
@@ -91,13 +92,14 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			// Prepare the data to be returned in the API response
 			$data = array(
-				'id' => $profile['id'],
-				'cuid' => $profile['cuid'],
-				'node_id' => $profile['node_id'],
-				'linked_schemas' => json_decode($profile['linked_schemas'], true),
-				'profile' => json_decode($profile['profile'], true),
-				'created_at' => $profile['created_at'],
-				'updated_at' => $profile['updated_at'],
+				'id'                => $profile['id'],
+				'cuid'              => $profile['cuid'],
+				'node_id'           => $profile['node_id'],
+				'linked_schemas'    => json_decode($profile['linked_schemas'], true),
+				'title'             => $profile['title'],
+				'profile'           => json_decode($profile['profile'], true),
+				'created_at'        => $profile['created_at'],
+				'updated_at'        => $profile['updated_at'],
 			);
 
 			return rest_ensure_response($data);
@@ -126,10 +128,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			$insert_data = array(
-				'cuid' => sanitize_text_field($data['cuid']),
-				'node_id' => sanitize_text_field($data['node_id']),
-				'linked_schemas' => wp_json_encode($data['linked_schemas']),
-				'profile' => wp_json_encode($data['profile']),
+				'cuid'              => sanitize_text_field($data['cuid']),
+				'node_id'           => sanitize_text_field($data['node_id']),
+				'linked_schemas'    => wp_json_encode($data['linked_schemas']),
+				'title'             => sanitize_text_field($data['title']),
+				'profile'           => wp_json_encode($data['profile']),
 			);
 
 			$insert_result = $this->wpdb->insert($this->table_name, $insert_data);
@@ -162,8 +165,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			$update_data = array(
-				'profile' => wp_json_encode($data['profile']),
-				'updated_at' => current_time('mysql'),
+				'title'         => sanitize_text_field($data['title']),
+				'profile'       => wp_json_encode($data['profile']),
+				'updated_at'    => current_time('mysql'),
 			);
 
 			$update_result = $this->wpdb->update(

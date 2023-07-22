@@ -1,10 +1,18 @@
 import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function App() {
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState('')
+  const [profiles, setProfiles] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:8000/wp-json/murmurations-node/v1/profile')
+      .then(response => setProfiles(response.data))
+      .catch(error => console.error('Error fetching profiles:', error))
+  }, [])
 
   const fetchSchema = () => {
     setLoading(true)
@@ -35,6 +43,12 @@ export default function App() {
           <GenerateForm schema={schema} />
         </div>
       )}
+      <h3>All profiles</h3>
+      <ul>
+        {profiles
+          ? profiles.map(profile => <li key={profile.id}>{profile.title}</li>)
+          : 'No profile'}
+      </ul>
     </div>
   )
 }
