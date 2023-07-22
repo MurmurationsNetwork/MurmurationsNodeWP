@@ -3,6 +3,7 @@ const fs = require('fs')
 const esbuild = require('esbuild')
 const eslint = require('esbuild-plugin-eslint')
 
+process.env.NODE_ENV = 'development'
 ;(async () => {
   const entryFile = path.join(__dirname, '..', 'src', 'index.jsx')
   const outDir = path.join(__dirname, '..', '..', 'assets')
@@ -19,6 +20,8 @@ const eslint = require('esbuild-plugin-eslint')
     format: 'cjs',
     jsx: 'automatic',
     outfile: path.join(outDir, 'bundle.js'),
+    platform: 'node',
+    external: ['node-fetch'],
 
     plugins: [eslint()]
   })

@@ -19,6 +19,8 @@ const eslint = require('esbuild-plugin-eslint')
     format: 'cjs',
     jsx: 'automatic',
     outfile: path.join(outDir, 'bundle.js'),
+    platform: 'node',
+    external: ['node-fetch'],
 
     plugins: [eslint()]
   })

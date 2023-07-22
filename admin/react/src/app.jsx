@@ -1,5 +1,6 @@
 import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
+import { generateSchemaInstance } from '@murmurations/jsig'
 import { useEffect, useState } from 'react'
 
 export default function App() {
@@ -32,6 +33,17 @@ export default function App() {
       })
   }
 
+  const handleSubmit = async event => {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+    const formValues = {}
+    formData.forEach((value, key) => {
+      formValues[key] = value
+    })
+    const result = generateSchemaInstance(schema, formValues)
+    console.log(result)
+  }
+
   return (
     <div>
       <h3>Murmurations Profile Generator</h3>
@@ -40,7 +52,10 @@ export default function App() {
       </button>
       {schema && (
         <div>
-          <GenerateForm schema={schema} />
+          <form onSubmit={handleSubmit}>
+            <GenerateForm schema={schema} />
+            <button type="submit">Submit</button>
+          </form>
         </div>
       )}
       <h3>All profiles</h3>
