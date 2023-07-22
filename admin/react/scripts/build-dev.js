@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const esbuild = require('esbuild')
 const eslint = require('esbuild-plugin-eslint')
+const { polyfillNode } = require('esbuild-plugin-polyfill-node')
 
 process.env.NODE_ENV = 'development'
 ;(async () => {
@@ -23,6 +24,6 @@ process.env.NODE_ENV = 'development'
     platform: 'node',
     external: ['node-fetch'],
 
-    plugins: [eslint()]
+    plugins: [eslint(), polyfillNode()]
   })
 })()

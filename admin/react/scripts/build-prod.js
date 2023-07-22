@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const esbuild = require('esbuild')
 const eslint = require('esbuild-plugin-eslint')
+const { polyfillNode } = require('esbuild-plugin-polyfill-node')
 
 ;(async () => {
   const entryFile = path.join(__dirname, '..', 'src', 'index.jsx')
@@ -22,6 +23,6 @@ const eslint = require('esbuild-plugin-eslint')
     platform: 'node',
     external: ['node-fetch'],
 
-    plugins: [eslint()]
+    plugins: [eslint(), polyfillNode()]
   })
 })()
