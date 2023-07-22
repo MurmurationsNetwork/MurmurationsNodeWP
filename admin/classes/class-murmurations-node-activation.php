@@ -9,15 +9,15 @@ if ( ! class_exists('Murmurations_Node_Activation') ) {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql = "CREATE TABLE $table_name (
-        id INT NOT NULL AUTO_INCREMENT,
-        cuid VARCHAR(100) NOT NULL,
-        node_id VARCHAR(100),
-        linked_schemas JSON NOT NULL,
-		profile JSON NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        PRIMARY KEY (id)
-    ) $charset_collate;";
+		        id INT NOT NULL AUTO_INCREMENT,
+		        cuid VARCHAR(100) NOT NULL,
+		        node_id VARCHAR(100),
+		        linked_schemas JSON NOT NULL,
+				profile JSON NOT NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+		        PRIMARY KEY (id)
+		    ) $charset_collate;";
 
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			dbDelta( $sql );
