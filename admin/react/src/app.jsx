@@ -87,6 +87,17 @@ export default function App() {
       })
   }
 
+  const handleDelete = async cuid => {
+    try {
+      await axios.delete(
+        `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
+      )
+      fetchProfiles()
+    } catch (error) {
+      console.error('Error deleting profile:', error)
+    }
+  }
+
   // todo: simple style to display the profile
   const profileStyle = {
     border: '1px solid #ccc',
@@ -123,7 +134,7 @@ export default function App() {
             <h3>Last Updated: {profile.updated_at}</h3>
             <button>View</button>
             <button>Modify</button>
-            <button>Delete</button>
+            <button onClick={() => handleDelete(profile.cuid)}>Delete</button>
           </div>
         ))
       ) : (
