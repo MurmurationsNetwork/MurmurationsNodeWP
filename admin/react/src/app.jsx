@@ -42,14 +42,18 @@ export default function App() {
     const formData = new FormData(event.target)
     const formValues = {}
     formData.forEach((value, key) => {
-      formValues[key] = value
+      if (key !== 'profile_title') {
+        formValues[key] = value
+      }
     })
+
     const result = generateSchemaInstance(schema, formValues)
+    const profileTitle = formData.get('profile_title')
 
     // call WordPress api to save the profile
     const newProfile = {
       cuid: createId(),
-      title: 'Test223',
+      title: profileTitle,
       linked_schemas: result.linked_schemas,
       profile: result
     }
@@ -87,6 +91,8 @@ export default function App() {
       {schema && (
         <div>
           <form onSubmit={handleSubmit}>
+            <label htmlFor="profile_title">Profile Title:</label>
+            <input type="text" name="profile_title" id="profile_title" />
             <GenerateForm schema={schema} />
             <button type="submit">Submit</button>
           </form>
