@@ -87,6 +87,13 @@ export default function App() {
       })
   }
 
+  // todo: simple style to display the profile
+  const profileStyle = {
+    border: '1px solid #ccc',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+
   return (
     <div>
       <h3>Murmurations Profile Generator</h3>
@@ -104,11 +111,24 @@ export default function App() {
         </div>
       )}
       <h3>All profiles</h3>
-      <ul>
-        {profiles
-          ? profiles.map(profile => <li key={profile.id}>{profile.title}</li>)
-          : 'No profile'}
-      </ul>
+      {profiles && profiles.length > 0 ? (
+        profiles.map(profile => (
+          <div key={profile.id} style={profileStyle}>
+            <h3>Name: {profile.title}</h3>
+            <h3>
+              {profile.linked_schemas && profile.linked_schemas.length > 0
+                ? 'Type: ' + profile.linked_schemas.join('/')
+                : 'Type: No linked schemas'}
+            </h3>
+            <h3>Last Updated: {profile.updated_at}</h3>
+            <button>View</button>
+            <button>Modify</button>
+            <button>Delete</button>
+          </div>
+        ))
+      ) : (
+        <p>No profiles</p>
+      )}
     </div>
   )
 }
