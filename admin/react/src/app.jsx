@@ -2,6 +2,7 @@ import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
 import { generateSchemaInstance } from '@murmurations/jsig'
 import { useEffect, useState } from 'react'
+import { createId } from '@paralleldrive/cuid2'
 
 export default function App() {
   const [loading, setLoading] = useState(false)
@@ -23,6 +24,9 @@ export default function App() {
         'https://test-library.murmurations.network/v2/schemas/organizations_schema-v1.0.0'
       )
       .then(({ data }) => {
+        // todo: use parseSchemas method
+        // hotfix: I replaced the schema manually to make it work
+        data.metadata.schema = ['organizations_schema-v1.0.0']
         setSchema(data)
       })
       .catch(() => {
@@ -33,7 +37,7 @@ export default function App() {
       })
   }
 
-  const handleSubmit = async event => {
+  const handleSubmit = event => {
     event.preventDefault()
     const formData = new FormData(event.target)
     const formValues = {}
@@ -41,7 +45,37 @@ export default function App() {
       formValues[key] = value
     })
     const result = generateSchemaInstance(schema, formValues)
-    console.log(result)
+
+    // call WordPress api to save the profile
+    const newProfile = {
+      cuid: createId(),
+      title: 'Test223',
+      linked_schemas: result.linked_schemas,
+      profile: result
+    }
+    const url = 'http://localhost:8000/wp-json/murmurations-node/v1/profile'
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newProfile)
+    }
+
+    fetch(url, requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return response.json()
+      })
+      .then(data => {
+        console.log('Post successful! Response data:', data)
+        setSchema('')
+      })
+      .catch(error => {
+        console.error('Error posting data:', error)
+      })
   }
 
   return (
