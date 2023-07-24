@@ -10,11 +10,15 @@ export default function App() {
   const [profiles, setProfiles] = useState('')
 
   useEffect(() => {
+    fetchProfiles()
+  }, [])
+
+  const fetchProfiles = () => {
     axios
       .get('http://localhost:8000/wp-json/murmurations-node/v1/profile')
       .then(response => setProfiles(response.data))
       .catch(error => console.error('Error fetching profiles:', error))
-  }, [])
+  }
 
   const fetchSchema = () => {
     setLoading(true)
@@ -76,6 +80,7 @@ export default function App() {
       .then(data => {
         console.log('Post successful! Response data:', data)
         setSchema('')
+        fetchProfiles()
       })
       .catch(error => {
         console.error('Error posting data:', error)
