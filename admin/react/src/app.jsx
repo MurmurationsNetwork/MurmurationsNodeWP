@@ -87,6 +87,13 @@ export default function App() {
       })
   }
 
+  const handleView = cuid => {
+    window.open(
+      `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`,
+      '_blank'
+    )
+  }
+
   const handleDelete = async cuid => {
     try {
       await axios.delete(
@@ -132,7 +139,7 @@ export default function App() {
                 : 'Type: No linked schemas'}
             </h3>
             <h3>Last Updated: {profile.updated_at}</h3>
-            <button>View</button>
+            <button onClick={() => handleView(profile.cuid)}>View</button>
             <button>Modify</button>
             <button onClick={() => handleDelete(profile.cuid)}>Delete</button>
           </div>
