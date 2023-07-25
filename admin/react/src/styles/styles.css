@@ -1,36 +1,42 @@
-#wp-admin-plugin-page-root {
-  padding: 20px 20px 20px 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, sans-serif;
+  }
 }
 
-.react-wp-admin * {
-  box-sizing: border-box;
-}
-.react-wp-admin {
-  border: 1px solid #ddd;
-}
-
-.react-wp-admin:after {
-  content: '';
-  display: block;
-  clear: both;
-}
-
-.react-wp-admin > div {
-  float: left;
-  width: 50%;
-  text-align: center;
-  padding: 30px;
-  height: 138px;
-}
-
-.react-wp-admin > div:first-child {
-  border-right: 1px solid #ddd;
-}
-
-.react-wp-admin > div > div:first-child {
-  margin-bottom: 10px;
-}
-
-.react-wp-admin > div button {
-  margin-bottom: 6px;
+@layer components {
+  .jsrfg-title {
+    @apply mt-4 block font-bold;
+  }
+  .jsrfg-required {
+    @apply text-red-500;
+  }
+  .jsrfg-description {
+    @apply mb-4 block text-xs;
+  }
+  .jsrfg-object-block {
+    @apply my-4 border-4 border-dotted border-slate-300 p-4;
+  }
+  .jsrfg-array-block {
+    @apply flex items-center justify-around;
+  }
+  .jsrfg-array-input {
+    @apply form-input mr-2 w-full focus:bg-gray-500;
+  }
+  .jsrfg-add-btn {
+    @apply my-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-yellow-400;
+  }
+  .jsrfg-remove-btn {
+    @apply my-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-400 ;
+  }
+  .jsrfg-enum-block {
+    @apply my-2 block text-sm;
+  }
+  .jsrfg-enum-select {
+    @apply form-select mt-2 w-full text-ellipsis;
+  }
 }
