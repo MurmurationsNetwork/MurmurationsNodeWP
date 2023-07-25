@@ -28,10 +28,10 @@
     @apply form-input mr-2 w-full focus:bg-gray-500;
   }
   .jsrfg-add-btn {
-    @apply my-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400;
+    @apply my-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-yellow-400;
   }
   .jsrfg-remove-btn {
-    @apply my-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400 ;
+    @apply my-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-400 ;
   }
   .jsrfg-enum-block {
     @apply my-2 block text-sm;

@@ -58,7 +58,7 @@ export default function App() {
             </select>
           </form>
           <button
-            className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400 disabled:opacity-75"
+            className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
             disabled={loading}
             onClick={() => handleSelectSchema()}
           >
@@ -108,6 +108,41 @@ export default function App() {
         </div>
         <div className="basis-full px-2 py-2 md:basis-2/5 md:px-4 md:py-4 text-xl">
           My Profiles
+          <div className="box-border flex flex-col md:flex-row mt-8">
+            <div className="basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center">
+              Test Index
+            </div>
+            <div className="basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center">
+              Live Index
+            </div>
+          </div>
+          <div className="bg-orange-300 rounded-b-md p-4">
+            <div className="box-border flex flex-col bg-orange-100 rounded-md py-4">
+              <div className="box-border flex px-2">
+                <div className="basis-1/3">Name:</div>
+                <div className="basis-2/3">Some Org</div>
+              </div>
+              <div className="box-border flex px-2">
+                <div className="basis-1/3">Type:</div>
+                <div className="basis-2/3">Organization</div>
+              </div>
+              <div className="box-border flex px-2">
+                <div className="basis-1/3">Updated:</div>
+                <div className="basis-2/3">2023-07-25</div>
+              </div>
+              <div className="box-border flex flex-col md:flex-row mt-4">
+                <button className="my-2 mx-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75">
+                  View
+                </button>
+                <button className="my-2 mx-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75">
+                  Modify
+                </button>
+                <button className="my-2 mx-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-red-400 disabled:opacity-75">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
