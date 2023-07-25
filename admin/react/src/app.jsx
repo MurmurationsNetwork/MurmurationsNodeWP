@@ -35,6 +35,16 @@ export default function App() {
     }
   }
 
+  const parseSchemaType = schema => {
+    const res = schemas.find(item => item.name === schema)
+
+    if (res) {
+      return res.title
+    } else {
+      return schema
+    }
+  }
+
   const handleSelectSchema = async (isModify, selectedSchema) => {
     if (!isModify) {
       setProfileData(null)
@@ -296,7 +306,7 @@ export default function App() {
                     <div className="basis-2/3">
                       {profile.linked_schemas &&
                       profile.linked_schemas.length > 0
-                        ? profile.linked_schemas.join('/')
+                        ? parseSchemaType(profile.linked_schemas[0])
                         : 'No linked schemas'}
                     </div>
                   </div>
