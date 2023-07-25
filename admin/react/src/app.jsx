@@ -42,6 +42,13 @@ export default function App() {
       })
   }
 
+  const handleLoadSchema = () => {
+    setSchema('')
+    setProfileData(null)
+
+    fetchSchema()
+  }
+
   const handleSubmit = event => {
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -136,7 +143,7 @@ export default function App() {
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
+        `http://localhost:8000/wp-json/murmurations-node/v1/profile-detail/${cuid}`
       )
       setProfileData(response.data)
       // todo: we need to fetchSchema according the linked_schemas
@@ -149,6 +156,8 @@ export default function App() {
   }
 
   const handleDelete = async cuid => {
+    setLoading(true)
+
     try {
       await axios.delete(
         `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
@@ -156,6 +165,8 @@ export default function App() {
       fetchProfiles()
     } catch (error) {
       console.error('Error deleting profile:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -169,7 +180,7 @@ export default function App() {
   return (
     <div>
       <h3>Murmurations Profile Generator</h3>
-      <button onClick={fetchSchema}>
+      <button onClick={handleLoadSchema}>
         {loading ? 'Loading ..' : 'Load Org Schema'}
       </button>
       {schema && (
