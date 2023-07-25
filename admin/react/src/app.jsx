@@ -35,15 +35,25 @@ export default function App() {
     }
   }
 
-  const handleSelectSchema = () => {
-    const schema = document.getElementById('schema').value
-    if (schema === '') {
-      return
+  const handleSelectSchema = async (isModify, selectedSchema) => {
+    if (!isModify) {
+      setProfileData(null)
+      selectedSchema = document.getElementById('schema').value
+      if (selectedSchema === '') {
+        return
+      }
     }
     setLoading(true)
+    setSchema('')
+
     axios
-      .get(`https://test-library.murmurations.network/v2/schemas/${schema}`)
+      .get(
+        `https://test-library.murmurations.network/v2/schemas/${selectedSchema}`
+      )
       .then(({ data }) => {
+        // todo: use parseSchemas method
+        // hotfix: I replaced the schema manually to make it work
+        data.metadata.schema = [selectedSchema]
         setSchema(data)
       })
       .catch(() => {
@@ -52,28 +62,6 @@ export default function App() {
       .finally(() => {
         setLoading(false)
       })
-  }
-
-  const handleLoadSchema = async isModify => {
-    setLoading(true)
-    setSchema('')
-    if (!isModify) {
-      setProfileData(null)
-    }
-
-    try {
-      const { data } = await axios.get(
-        'https://test-library.murmurations.network/v2/schemas/organizations_schema-v1.0.0'
-      )
-      // todo: use parseSchemas method
-      // hotfix: I replaced the schema manually to make it work
-      data.metadata.schema = ['organizations_schema-v1.0.0']
-      setSchema(data)
-    } catch (error) {
-      console.error('Error fetching schema:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const handleSubmit = async event => {
@@ -157,7 +145,7 @@ export default function App() {
       const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
       setProfileData(response.data)
       // todo: we need to fetchSchema according to the linked_schemas
-      await handleLoadSchema(true)
+      await handleSelectSchema(true, response.data.linked_schemas[0])
     } catch (error) {
       console.error('Error modifying profile:', error)
     } finally {
@@ -207,7 +195,7 @@ export default function App() {
           <button
             className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
             disabled={loading}
-            onClick={() => handleSelectSchema()}
+            onClick={() => handleSelectSchema(false)}
           >
             {loading ? 'Loading ..' : 'Select'}
           </button>
