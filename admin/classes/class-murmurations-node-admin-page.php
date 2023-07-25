@@ -41,6 +41,11 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 		    if ( file_exists( $style_file ) ) {
 			    wp_enqueue_style( 'murmurations-node', MURMURATIONS_NODE_URL . $style, array(), filemtime( $style_file ) );
 		    }
+
+			// add site url to script
+            wp_localize_script( 'murmurations-node', 'murmurations_node', array(
+				'wordpress_url' => get_site_url(),
+			) );
 	    }
     }
 }

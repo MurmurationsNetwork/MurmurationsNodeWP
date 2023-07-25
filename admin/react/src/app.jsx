@@ -5,54 +5,57 @@ import { useEffect, useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
 
 export default function App() {
+  // eslint-disable-next-line no-undef
+  const wordpressUrl = murmurations_node.wordpress_url
+  const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
+
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState('')
   const [profiles, setProfiles] = useState('')
   const [profileData, setProfileData] = useState(null)
 
   useEffect(() => {
-    fetchProfiles()
+    fetchProfiles().then(() => {
+      console.log('Profiles fetched')
+    })
   }, [])
 
-  const fetchProfiles = () => {
-    axios
-      .get('http://localhost:8000/wp-json/murmurations-node/v1/profile')
-      .then(response => setProfiles(response.data))
-      .catch(error => console.error('Error fetching profiles:', error))
+  const fetchProfiles = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/profile`)
+      setProfiles(response.data)
+    } catch (error) {
+      console.error('Error fetching profiles:', error)
+    }
   }
 
-  const fetchSchema = () => {
+  const handleLoadSchema = async isModify => {
     setLoading(true)
+    setSchema('')
+    if (!isModify) {
+      setProfileData(null)
+    }
 
-    axios
-      .get(
+    try {
+      const { data } = await axios.get(
         'https://test-library.murmurations.network/v2/schemas/organizations_schema-v1.0.0'
       )
-      .then(({ data }) => {
-        // todo: use parseSchemas method
-        // hotfix: I replaced the schema manually to make it work
-        data.metadata.schema = ['organizations_schema-v1.0.0']
-        setSchema(data)
-      })
-      .catch(() => {
-        console.error('error fetching schema')
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+      // todo: use parseSchemas method
+      // hotfix: I replaced the schema manually to make it work
+      data.metadata.schema = ['organizations_schema-v1.0.0']
+      setSchema(data)
+    } catch (error) {
+      console.error('Error fetching schema:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleLoadSchema = () => {
-    setSchema('')
-    setProfileData(null)
-
-    fetchSchema()
-  }
-
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault()
     const formData = new FormData(event.target)
     const formValues = {}
+
     formData.forEach((value, key) => {
       if (key !== 'profile_title' && key !== 'cuid') {
         formValues[key] = value
@@ -63,91 +66,74 @@ export default function App() {
     const profileTitle = formData.get('profile_title')
 
     // call WordPress api to save the profile
-    const url = `http://localhost:8000/wp-json/murmurations-node/v1/profile`
+    try {
+      if (formData.has('cuid')) {
+        const profileToUpdate = {
+          cuid: formData.get('cuid'),
+          title: profileTitle,
+          linked_schemas: result.linked_schemas,
+          profile: result
+        }
+        const requestOptions = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(profileToUpdate)
+        }
 
-    if (formData.has('cuid')) {
-      const profileToUpdate = {
-        cuid: formData.get('cuid'),
-        title: profileTitle,
-        linked_schemas: result.linked_schemas,
-        profile: result
-      }
-      const requestOptions = {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(profileToUpdate)
-      }
+        const response = await fetch(`${apiUrl}/profile`, requestOptions)
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
 
-      fetch(url, requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok')
-          }
-          return response.json()
-        })
-        .then(data => {
-          console.log('Update successful! Response data:', data)
-          setSchema('')
-          fetchProfiles()
-        })
-        .catch(error => {
-          console.error('Error updating profile:', error)
-        })
-    } else {
-      const newProfile = {
-        cuid: createId(),
-        title: profileTitle,
-        linked_schemas: result.linked_schemas,
-        profile: result
-      }
+        const data = await response.json()
+        console.log('Update successful! Response data:', data)
+      } else {
+        const newProfile = {
+          cuid: createId(),
+          title: profileTitle,
+          linked_schemas: result.linked_schemas,
+          profile: result
+        }
 
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newProfile)
-      }
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newProfile)
+        }
 
-      fetch(url, requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok')
-          }
-          return response.json()
-        })
-        .then(data => {
-          console.log('Post successful! Response data:', data)
-          setSchema('')
-          fetchProfiles()
-        })
-        .catch(error => {
-          console.error('Error posting data:', error)
-        })
+        const response = await fetch(`${apiUrl}/profile`, requestOptions)
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        console.log('Post successful! Response data:', data)
+
+        setSchema('')
+        await fetchProfiles()
+      }
+    } catch (error) {
+      console.error('Error updating/posting profile:', error)
     }
   }
 
   const handleView = cuid => {
-    window.open(
-      `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`,
-      '_blank'
-    )
+    window.open(`${apiUrl}/profile/${cuid}`, '_blank')
   }
 
   const handleModify = async cuid => {
     setLoading(true)
     setSchema('')
-    setProfileData(null)
 
     try {
-      const response = await axios.get(
-        `http://localhost:8000/wp-json/murmurations-node/v1/profile-detail/${cuid}`
-      )
+      const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
       setProfileData(response.data)
-      // todo: we need to fetchSchema according the linked_schemas
-      fetchSchema()
+      // todo: we need to fetchSchema according to the linked_schemas
+      await handleLoadSchema(true)
     } catch (error) {
       console.error('Error modifying profile:', error)
     } finally {
@@ -159,10 +145,8 @@ export default function App() {
     setLoading(true)
 
     try {
-      await axios.delete(
-        `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
-      )
-      fetchProfiles()
+      await axios.delete(`${apiUrl}/profile/${cuid}`)
+      await fetchProfiles()
     } catch (error) {
       console.error('Error deleting profile:', error)
     } finally {
@@ -180,7 +164,7 @@ export default function App() {
   return (
     <div>
       <h3>Murmurations Profile Generator</h3>
-      <button onClick={handleLoadSchema}>
+      <button onClick={() => handleLoadSchema(false)}>
         {loading ? 'Loading ..' : 'Load Org Schema'}
       </button>
       {schema && (
