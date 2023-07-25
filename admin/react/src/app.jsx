@@ -8,6 +8,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState('')
   const [profiles, setProfiles] = useState('')
+  const [profileData, setProfileData] = useState(null)
 
   useEffect(() => {
     fetchProfiles()
@@ -46,7 +47,7 @@ export default function App() {
     const formData = new FormData(event.target)
     const formValues = {}
     formData.forEach((value, key) => {
-      if (key !== 'profile_title') {
+      if (key !== 'profile_title' && key !== 'cuid') {
         formValues[key] = value
       }
     })
@@ -55,36 +56,70 @@ export default function App() {
     const profileTitle = formData.get('profile_title')
 
     // call WordPress api to save the profile
-    const newProfile = {
-      cuid: createId(),
-      title: profileTitle,
-      linked_schemas: result.linked_schemas,
-      profile: result
-    }
-    const url = 'http://localhost:8000/wp-json/murmurations-node/v1/profile'
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newProfile)
-    }
+    const url = `http://localhost:8000/wp-json/murmurations-node/v1/profile`
 
-    fetch(url, requestOptions)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        return response.json()
-      })
-      .then(data => {
-        console.log('Post successful! Response data:', data)
-        setSchema('')
-        fetchProfiles()
-      })
-      .catch(error => {
-        console.error('Error posting data:', error)
-      })
+    if (formData.has('cuid')) {
+      const profileToUpdate = {
+        cuid: formData.get('cuid'),
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result
+      }
+      const requestOptions = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileToUpdate)
+      }
+
+      fetch(url, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok')
+          }
+          return response.json()
+        })
+        .then(data => {
+          console.log('Update successful! Response data:', data)
+          setSchema('')
+          fetchProfiles()
+        })
+        .catch(error => {
+          console.error('Error updating profile:', error)
+        })
+    } else {
+      const newProfile = {
+        cuid: createId(),
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result
+      }
+
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newProfile)
+      }
+
+      fetch(url, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok')
+          }
+          return response.json()
+        })
+        .then(data => {
+          console.log('Post successful! Response data:', data)
+          setSchema('')
+          fetchProfiles()
+        })
+        .catch(error => {
+          console.error('Error posting data:', error)
+        })
+    }
   }
 
   const handleView = cuid => {
@@ -92,6 +127,19 @@ export default function App() {
       `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`,
       '_blank'
     )
+  }
+
+  const handleModify = async cuid => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
+      )
+      setProfileData(response.data)
+      // todo: we need to fetchSchema according the linked_schemas
+      fetchSchema()
+    } catch (error) {
+      console.error('Error modifying profile:', error)
+    }
   }
 
   const handleDelete = async cuid => {
@@ -122,8 +170,23 @@ export default function App() {
         <div>
           <form onSubmit={handleSubmit}>
             <label htmlFor="profile_title">Profile Title:</label>
-            <input type="text" name="profile_title" id="profile_title" />
-            <GenerateForm schema={schema} />
+            <input
+              type="text"
+              name="profile_title"
+              id="profile_title"
+              defaultValue={profileData ? profileData.title : ''}
+            />
+            {profileData ? (
+              <div>
+                <input type="hidden" name="cuid" value={profileData.cuid} />
+                <GenerateForm
+                  schema={schema}
+                  profileData={profileData.profile}
+                />
+              </div>
+            ) : (
+              <GenerateForm schema={schema} />
+            )}
             <button type="submit">Submit</button>
           </form>
         </div>
@@ -140,7 +203,7 @@ export default function App() {
             </h3>
             <h3>Last Updated: {profile.updated_at}</h3>
             <button onClick={() => handleView(profile.cuid)}>View</button>
-            <button>Modify</button>
+            <button onClick={() => handleModify(profile.cuid)}>Modify</button>
             <button onClick={() => handleDelete(profile.cuid)}>Delete</button>
           </div>
         ))
