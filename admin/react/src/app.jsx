@@ -137,10 +137,9 @@ export default function App() {
 
         const data = await response.json()
         console.log('Post successful! Response data:', data)
-
-        setSchema('')
-        await fetchProfiles()
       }
+      setSchema('')
+      await fetchProfiles()
     } catch (error) {
       console.error('Error updating/posting profile:', error)
     }
@@ -250,13 +249,19 @@ export default function App() {
               <h2 className="text-xl">
                 Fill in the fields below to create a Profile
               </h2>
-              <label htmlFor="profile_title">Profile Title:</label>
-              <input
-                type="text"
-                name="profile_title"
-                id="profile_title"
-                defaultValue={profileData ? profileData.title : ''}
-              />
+              <legend className="jsrfg-title">
+                Profile Title::<span className="jsrfg-required"> *</span>
+              </legend>
+              <div className="jsrfg-enum-block">
+                <input
+                  type="text"
+                  name="profile_title"
+                  id="profile_title"
+                  className="jsrfg-array-input"
+                  defaultValue={profileData ? profileData.title : ''}
+                  required={true}
+                />
+              </div>
               {profileData ? (
                 <div>
                   <input type="hidden" name="cuid" value={profileData.cuid} />
@@ -268,7 +273,12 @@ export default function App() {
               ) : (
                 <GenerateForm schema={schema} />
               )}
-              <button type="submit">Submit</button>
+              <button
+                className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+                type="submit"
+              >
+                Submit
+              </button>
             </form>
           )}
         </div>
