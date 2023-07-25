@@ -130,6 +130,10 @@ export default function App() {
   }
 
   const handleModify = async cuid => {
+    setLoading(true)
+    setSchema('')
+    setProfileData(null)
+
     try {
       const response = await axios.get(
         `http://localhost:8000/wp-json/murmurations-node/v1/profile/${cuid}`
@@ -139,6 +143,8 @@ export default function App() {
       fetchSchema()
     } catch (error) {
       console.error('Error modifying profile:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
