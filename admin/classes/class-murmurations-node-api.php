@@ -196,6 +196,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$update_data = array(
 				'title'      => sanitize_text_field( $data['title'] ),
 				'profile'    => wp_json_encode( $data['profile'] ),
+				'node_id'    => sanitize_text_field( $data['node_id'] ),
 				'updated_at' => current_time( 'mysql' ),
 			);
 

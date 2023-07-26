@@ -14,6 +14,8 @@ export default function App() {
   // eslint-disable-next-line no-undef
   const wordpressUrl = murmurations_node.wordpress_url
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
+  const indexUrl = 'https://test-index.murmurations.network/v2'
+  const libraryUrl = 'https://test-library.murmurations.network/v2'
 
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState('')
@@ -57,9 +59,7 @@ export default function App() {
     setSchema('')
 
     axios
-      .get(
-        `https://test-library.murmurations.network/v2/schemas/${selectedSchema}`
-      )
+      .get(`${libraryUrl}/schemas/${selectedSchema}`)
       .then(({ data }) => {
         // todo: use parseSchemas method
         // hotfix: I replaced the schema manually to make it work
@@ -91,30 +91,28 @@ export default function App() {
     // call WordPress api to save the profile
     try {
       if (formData.has('cuid')) {
-        const profileToUpdate = {
-          cuid: formData.get('cuid'),
+        const cuid = formData.get('cuid')
+        let profileToUpdate = {
+          cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
           profile: result
         }
-        const requestOptions = {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(profileToUpdate)
-        }
 
-        const response = await fetch(`${apiUrl}/profile`, requestOptions)
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
+        const response = await updateProfile(cuid, profileToUpdate)
+        console.log('Update successful! Response data:', response)
 
-        const data = await response.json()
-        console.log('Update successful! Response data:', data)
+        // if not localhost, send request to index
+        if (!checkIsLocalhost()) {
+          const secondRes = await sendRequestToIndex(cuid)
+          profileToUpdate.node_id = secondRes.node_id
+          const thirdRes = await updateProfile(cuid, profileToUpdate)
+          console.log('Post successful! Response data:', thirdRes)
+        }
       } else {
+        const cuid = createId()
         const newProfile = {
-          cuid: createId(),
+          cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
           profile: result
@@ -133,8 +131,13 @@ export default function App() {
           throw new Error('Network response was not ok')
         }
 
-        const data = await response.json()
-        console.log('Post successful! Response data:', data)
+        // if not localhost, send request to index
+        if (!checkIsLocalhost()) {
+          const secondRes = await sendRequestToIndex(cuid)
+          newProfile.node_id = secondRes.node_id
+          const thirdRes = await updateProfile(cuid, newProfile)
+          console.log('Post successful! Response data:', thirdRes)
+        }
       }
       setSchema('')
       await fetchProfiles()
@@ -173,6 +176,50 @@ export default function App() {
       console.error('Error deleting profile:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const checkIsLocalhost = () => {
+    return !!(
+      wordpressUrl.indexOf('localhost') !== -1 || wordpressUrl.endsWith('.test')
+    )
+  }
+
+  const updateProfile = async (cuid, profileToUpdate) => {
+    try {
+      const response = await fetch(`${apiUrl}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileToUpdate)
+      })
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+      return await response.json()
+    } catch (error) {
+      console.error(`Error updating profile: ${error}`)
+    }
+  }
+
+  const sendRequestToIndex = async cuid => {
+    try {
+      const response = await fetch(indexUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profile_url: `${apiUrl}/profile/${cuid}`
+        })
+      })
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+      return await response.json()
+    } catch (error) {
+      alert(`Error sending request: ${error}`)
     }
   }
 
