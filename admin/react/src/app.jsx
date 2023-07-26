@@ -80,6 +80,8 @@ export default function App() {
   }
 
   const handleSubmit = async event => {
+    setLoading(true)
+
     event.preventDefault()
     const formData = new FormData(event.target)
     const formValues = {}
@@ -108,7 +110,7 @@ export default function App() {
         console.log('Update successful! Response data:', response)
 
         // if not localhost, send request to index
-        if (!checkIsLocalhost()) {
+        if (!isLocalhost()) {
           await sendRequestToIndex(cuid)
         }
       } else {
@@ -134,7 +136,7 @@ export default function App() {
         }
 
         // if not localhost, send request to index
-        if (!checkIsLocalhost()) {
+        if (!isLocalhost()) {
           const res = await sendRequestToIndex(cuid)
           newProfile.node_id = res.data.node_id
           await updateProfile(cuid, newProfile)
@@ -144,6 +146,8 @@ export default function App() {
       await fetchProfiles()
     } catch (error) {
       console.error('Error updating/posting profile:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -169,11 +173,15 @@ export default function App() {
 
   const handleDelete = async cuid => {
     setLoading(true)
+    setSchema('')
 
     try {
       const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
       await axios.delete(`${apiUrl}/profile/${cuid}`)
-      await deleteNodeFromIndex(response.data.node_id)
+
+      if (!isLocalhost()) {
+        await deleteNodeFromIndex(response.data.node_id)
+      }
       await fetchProfiles()
     } catch (error) {
       console.error('Error deleting profile:', error)
@@ -182,8 +190,8 @@ export default function App() {
     }
   }
 
-  const checkIsLocalhost = () => {
-    return !!(
+  const isLocalhost = () => {
+    return (
       wordpressUrl.indexOf('localhost') !== -1 || wordpressUrl.endsWith('.test')
     )
   }
@@ -315,7 +323,7 @@ export default function App() {
                 Fill in the fields below to create a Profile
               </h2>
               <legend className="jsrfg-title">
-                Profile Title::<span className="jsrfg-required"> *</span>
+                Profile Title:<span className="jsrfg-required"> *</span>
               </legend>
               <div className="jsrfg-enum-block">
                 <input
@@ -341,8 +349,9 @@ export default function App() {
               <button
                 className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
                 type="submit"
+                disabled={loading}
               >
-                Submit
+                {loading ? 'Loading ..' : 'Submit'}
               </button>
             </form>
           )}
@@ -391,20 +400,22 @@ export default function App() {
                     <button
                       onClick={() => handleModify(profile.cuid)}
                       className="my-2 mx-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+                      disabled={loading}
                     >
-                      Modify
+                      {loading ? 'Loading ..' : 'Modify'}
                     </button>
                     <button
                       onClick={() => handleDelete(profile.cuid)}
                       className="my-2 mx-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-red-400 disabled:opacity-75"
+                      disabled={loading}
                     >
-                      Delete
+                      {loading ? 'Loading ..' : 'Delete'}
                     </button>
                   </div>
                 </div>
               ))
             ) : (
-              <p>No Profiles</p>
+              <p>No Profile</p>
             )}
           </div>
         </div>
