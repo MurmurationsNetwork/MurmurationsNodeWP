@@ -33,7 +33,12 @@ export default function App() {
       const response = await axios.get(`${apiUrl}/profile`)
       setProfiles(response.data)
     } catch (error) {
-      console.error('Error fetching profiles:', error)
+      console.log(error.status)
+      if (error && error.status === 404) {
+        setProfiles('')
+      } else {
+        console.error('Error fetching profiles:', error)
+      }
     }
   }
 
@@ -104,14 +109,11 @@ export default function App() {
 
         // if not localhost, send request to index
         if (!checkIsLocalhost()) {
-          const secondRes = await sendRequestToIndex(cuid)
-          profileToUpdate.node_id = secondRes.node_id
-          const thirdRes = await updateProfile(cuid, profileToUpdate)
-          console.log('Post successful! Response data:', thirdRes)
+          await sendRequestToIndex(cuid)
         }
       } else {
         const cuid = createId()
-        const newProfile = {
+        let newProfile = {
           cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
@@ -133,10 +135,9 @@ export default function App() {
 
         // if not localhost, send request to index
         if (!checkIsLocalhost()) {
-          const secondRes = await sendRequestToIndex(cuid)
-          newProfile.node_id = secondRes.node_id
-          const thirdRes = await updateProfile(cuid, newProfile)
-          console.log('Post successful! Response data:', thirdRes)
+          const res = await sendRequestToIndex(cuid)
+          newProfile.node_id = res.data.node_id
+          await updateProfile(cuid, newProfile)
         }
       }
       setSchema('')
@@ -170,7 +171,9 @@ export default function App() {
     setLoading(true)
 
     try {
+      const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
       await axios.delete(`${apiUrl}/profile/${cuid}`)
+      await deleteNodeFromIndex(response.data.node_id)
       await fetchProfiles()
     } catch (error) {
       console.error('Error deleting profile:', error)
@@ -213,6 +216,23 @@ export default function App() {
         body: JSON.stringify({
           profile_url: `${apiUrl}/profile/${cuid}`
         })
+      })
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+      return await response.json()
+    } catch (error) {
+      alert(`Error sending request: ${error}`)
+    }
+  }
+
+  const deleteNodeFromIndex = async nodeId => {
+    try {
+      const response = await fetch(`${indexUrl}/nodes/${nodeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`)
