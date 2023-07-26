@@ -205,7 +205,7 @@ export default function App() {
 
   const sendRequestToIndex = async cuid => {
     try {
-      const response = await fetch(indexUrl, {
+      const response = await fetch(`${indexUrl}/nodes-sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
