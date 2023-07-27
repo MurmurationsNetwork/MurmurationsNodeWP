@@ -26,15 +26,13 @@ export default function App() {
     fetchProfiles().then(() => {
       console.log('Profiles fetched')
     })
-    console.log(profileData)
-  }, [profileData])
+  }, [])
 
   const fetchProfiles = async () => {
     try {
       const response = await axios.get(`${apiUrl}/profile`)
       setProfiles(response.data)
     } catch (error) {
-      console.log(error.status)
       if (error && error.status === 404) {
         setProfiles('')
       } else {
@@ -349,7 +347,11 @@ export default function App() {
               </div>
               {profileData ? (
                 <div>
-                  <input type="hidden" name="cuid" value={profileData.cuid} />
+                  {profileData.cuid ? (
+                    <input type="hidden" name="cuid" value={profileData.cuid} />
+                  ) : (
+                    ''
+                  )}
                   <GenerateForm
                     schema={schema}
                     profileData={profileData.profile}
