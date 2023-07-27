@@ -26,7 +26,8 @@ export default function App() {
     fetchProfiles().then(() => {
       console.log('Profiles fetched')
     })
-  }, [])
+    console.log(profileData)
+  }, [profileData])
 
   const fetchProfiles = async () => {
     try {
@@ -54,7 +55,12 @@ export default function App() {
 
   const handleSelectSchema = async (isModify, selectedSchema) => {
     if (!isModify) {
-      setProfileData(null)
+      const defaultProfile = {
+        profile: {
+          primary_url: wordpressUrl
+        }
+      }
+      setProfileData(defaultProfile)
       selectedSchema = document.getElementById('schema').value
       if (selectedSchema === '') {
         return
@@ -160,7 +166,13 @@ export default function App() {
     setSchema('')
 
     try {
-      const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
+      let response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
+      if (
+        response.data.profile.primary_url == null ||
+        response.data.profile.primary_url === ''
+      ) {
+        response.data.profile.primary_url = wordpressUrl
+      }
       setProfileData(response.data)
       // todo: we need to fetchSchema according to the linked_schemas
       await handleSelectSchema(true, response.data.linked_schemas[0])
