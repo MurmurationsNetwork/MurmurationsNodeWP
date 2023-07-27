@@ -67,7 +67,13 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
 			}
 
-			$profiles = $this->wpdb->get_results( "SELECT * FROM $this->table_name", ARRAY_A );
+			$env = $request->get_param( 'env' );
+
+			if ( $env !== 'production' && $env !== 'test' ) {
+				return new WP_Error( 'invalid_env', esc_html__( 'Invalid environment specified.', 'text-domain' ), array( 'status' => 400 ) );
+			}
+
+			$profiles = $this->wpdb->get_results( "SELECT * FROM $this->table_name WHERE env = '$env'", ARRAY_A );
 
 			if ( empty( $profiles ) ) {
 				return new WP_Error( 'no_profiles_found', esc_html__( 'No profiles found.', 'text-domain' ), array( 'status' => 404 ) );
@@ -154,7 +160,8 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			if (
 				! isset( $data['cuid'] ) ||
 				! isset( $data['linked_schemas'] ) ||
-				! isset( $data['profile'] )
+				! isset( $data['profile'] ) ||
+				! isset( $data['env'] )
 			) {
 				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
@@ -175,6 +182,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'linked_schemas' => wp_json_encode( $data['linked_schemas'] ),
 				'title'          => sanitize_text_field( $data['title'] ),
 				'profile'        => wp_json_encode( $data['profile'] ),
+				'env'            => sanitize_text_field( $data['env'] )
 			);
 
 			$insert_result = $this->wpdb->insert( $this->table_name, $insert_data );

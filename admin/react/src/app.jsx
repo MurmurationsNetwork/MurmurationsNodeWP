@@ -16,24 +16,55 @@ export default function App() {
   // eslint-disable-next-line no-undef
   const wp_nonce = murmurations_node.wp_nonce
 
-  const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
-  const indexUrl = 'https://test-index.murmurations.network/v2'
-  const libraryUrl = 'https://test-library.murmurations.network/v2'
-
+  const [env, setEnv] = useState('test')
+  const [indexUrl, setIndexUrl] = useState(
+    'https://test-index.murmurations.network/v2'
+  )
+  const [libraryUrl, setLibraryUrl] = useState(
+    'https://test-library.murmurations.network/v2'
+  )
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState('')
   const [profiles, setProfiles] = useState('')
   const [profileData, setProfileData] = useState(null)
 
+  const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
+
   useEffect(() => {
-    fetchProfiles().then(() => {
+    fetchProfiles(env).then(() => {
       console.log('Profiles fetched')
     })
   }, [])
 
-  const fetchProfiles = async () => {
+  const clickTestIndex = async () => {
+    setEnv('test')
+    setIndexUrl('https://test-index.murmurations.network/v2')
+    setLibraryUrl('https://test-library.murmurations.network/v2')
+    await fetchProfiles('test')
+    setSchema('')
+
+    const profile_box = document.getElementById('profile_box')
+    profile_box.classList.remove('bg-orange-400')
+    profile_box.classList.add('bg-orange-300')
+  }
+
+  const clickLiveIndex = async () => {
+    setEnv('production')
+    setIndexUrl('https://index.murmurations.network/v2')
+    setLibraryUrl('https://library.murmurations.network/v2')
+    await fetchProfiles('production')
+    setSchema('')
+
+    const profile_box = document.getElementById('profile_box')
+    profile_box.classList.remove('bg-orange-300')
+    profile_box.classList.add('bg-orange-400')
+  }
+
+  const fetchProfiles = async environment => {
     try {
-      const response = await axios.get(`${apiUrl}/profile?_wpnonce=${wp_nonce}`)
+      const response = await axios.get(
+        `${apiUrl}/profile?env=${environment}&_wpnonce=${wp_nonce}`
+      )
       setProfiles(response.data)
     } catch (error) {
       if (error && error.status === 404) {
@@ -110,7 +141,8 @@ export default function App() {
           cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
-          profile: result
+          profile: result,
+          env: env
         }
 
         const response = await updateProfile(cuid, profileToUpdate)
@@ -126,7 +158,8 @@ export default function App() {
           cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
-          profile: result
+          profile: result,
+          env: env
         }
 
         const requestOptions = {
@@ -153,7 +186,7 @@ export default function App() {
         }
       }
       setSchema('')
-      await fetchProfiles()
+      await fetchProfiles(env)
     } catch (error) {
       console.error('Error updating/posting profile:', error)
     } finally {
@@ -202,7 +235,7 @@ export default function App() {
       if (!isLocalhost()) {
         await deleteNodeFromIndex(response.data.node_id)
       }
-      await fetchProfiles()
+      await fetchProfiles(env)
     } catch (error) {
       console.error('Error deleting profile:', error)
     } finally {
@@ -383,14 +416,20 @@ export default function App() {
         <div className="basis-full px-2 py-2 md:basis-2/5 md:px-4 md:py-4 text-xl">
           My Profiles
           <div className="box-border flex flex-col md:flex-row mt-8">
-            <div className="basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center">
+            <div
+              className="basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
+              onClick={() => clickTestIndex()}
+            >
               Test Index
             </div>
-            <div className="basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center">
+            <div
+              className="basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
+              onClick={() => clickLiveIndex()}
+            >
               Live Index
             </div>
           </div>
-          <div className="bg-orange-300 rounded-b-md p-4">
+          <div className="bg-orange-300 rounded-b-md p-4" id="profile_box">
             {profiles && profiles.length > 0 ? (
               profiles.map(profile => (
                 <div

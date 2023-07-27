@@ -15,6 +15,7 @@ if ( ! class_exists('Murmurations_Node_Activation') ) {
 		        linked_schemas JSON NOT NULL,
 		        title VARCHAR(100) NOT NULL,
 				profile JSON NOT NULL,
+				env VARCHAR(100) NOT NULL,
 				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 		        PRIMARY KEY (id)
