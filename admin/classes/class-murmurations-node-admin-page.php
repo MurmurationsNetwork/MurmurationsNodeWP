@@ -46,6 +46,7 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 			// add site url to script
             wp_localize_script( 'murmurations-node', 'murmurations_node', array(
 				'wordpress_url' => get_site_url(),
+	            'wp_nonce' => wp_create_nonce( 'wp_rest' ),
 			) );
 	    }
     }

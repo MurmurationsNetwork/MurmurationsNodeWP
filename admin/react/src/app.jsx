@@ -13,6 +13,9 @@ const schemas = [
 export default function App() {
   // eslint-disable-next-line no-undef
   const wordpressUrl = murmurations_node.wordpress_url
+  // eslint-disable-next-line no-undef
+  const wp_nonce = murmurations_node.wp_nonce
+
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
   const indexUrl = 'https://test-index.murmurations.network/v2'
   const libraryUrl = 'https://test-library.murmurations.network/v2'
@@ -30,7 +33,7 @@ export default function App() {
 
   const fetchProfiles = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/profile`)
+      const response = await axios.get(`${apiUrl}/profile?_wpnonce=${wp_nonce}`)
       setProfiles(response.data)
     } catch (error) {
       if (error && error.status === 404) {
@@ -134,7 +137,10 @@ export default function App() {
           body: JSON.stringify(newProfile)
         }
 
-        const response = await fetch(`${apiUrl}/profile`, requestOptions)
+        const response = await fetch(
+          `${apiUrl}/profile?_wpnonce=${wp_nonce}`,
+          requestOptions
+        )
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
@@ -164,7 +170,9 @@ export default function App() {
     setSchema('')
 
     try {
-      let response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
+      let response = await axios.get(
+        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
+      )
       if (
         response.data.profile.primary_url == null ||
         response.data.profile.primary_url === ''
@@ -186,8 +194,10 @@ export default function App() {
     setSchema('')
 
     try {
-      const response = await axios.get(`${apiUrl}/profile-detail/${cuid}`)
-      await axios.delete(`${apiUrl}/profile/${cuid}`)
+      const response = await axios.get(
+        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
+      )
+      await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
 
       if (!isLocalhost()) {
         await deleteNodeFromIndex(response.data.node_id)
@@ -208,7 +218,7 @@ export default function App() {
 
   const updateProfile = async (cuid, profileToUpdate) => {
     try {
-      const response = await fetch(`${apiUrl}/profile`, {
+      const response = await fetch(`${apiUrl}/profile?_wpnonce=${wp_nonce}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
