@@ -408,8 +408,18 @@ export default function App() {
                 type="submit"
                 disabled={loading}
               >
-                {loading ? 'Loading ..' : 'Submit'}
+                {loading
+                  ? 'Loading ..'
+                  : env === 'test'
+                  ? 'Submit to Test Index'
+                  : 'Submit to Live Index'}
               </button>
+              {env !== 'test' && (
+                <div className="mt-2 text-lg">
+                  Please only publish genuine profiles to the Live Index. For
+                  testing use the Test Index.
+                </div>
+              )}
             </form>
           )}
         </div>
@@ -417,13 +427,13 @@ export default function App() {
           My Profiles
           <div className="box-border flex flex-col md:flex-row mt-8">
             <div
-              className="basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
+              className="cursor-pointer basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
               onClick={() => clickTestIndex()}
             >
               Test Index
             </div>
             <div
-              className="basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
+              className="cursor-pointer basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
               onClick={() => clickLiveIndex()}
             >
               Live Index
@@ -478,7 +488,15 @@ export default function App() {
                 </div>
               ))
             ) : (
-              <p>No Profile</p>
+              <div>
+                <div className="my-2 text-lg text-white font-semibold">
+                  No Profiles
+                </div>
+                <div className="text-white text-base">
+                  Select the type of Profile you want to create and then submit
+                  it to the Murmurations Index.
+                </div>
+              </div>
             )}
           </div>
         </div>
