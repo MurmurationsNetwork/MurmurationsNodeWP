@@ -317,7 +317,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			$response = array(
-				'message' => esc_html__( 'Node ID updated successfully.2', 'text-domain' ),
+				'message' => esc_html__( 'Node ID updated successfully.', 'text-domain' ),
 			);
 
 			return rest_ensure_response( $response );
