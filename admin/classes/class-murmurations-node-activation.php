@@ -18,6 +18,7 @@ if ( ! class_exists('Murmurations_Node_Activation') ) {
 				env VARCHAR(100) NOT NULL,
 				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+				deleted_at TIMESTAMP NULL,
 		        PRIMARY KEY (id)
 		    ) $charset_collate;";
 

@@ -138,14 +138,16 @@ export default function App() {
       if (formData.has('cuid')) {
         const cuid = formData.get('cuid')
         let profileToUpdate = {
-          cuid: cuid,
           title: profileTitle,
           linked_schemas: result.linked_schemas,
           profile: result,
           env: env
         }
 
-        const response = await updateProfile(cuid, profileToUpdate)
+        const response = await updateRequest(
+          `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
+          profileToUpdate
+        )
         console.log('Update successful! Response data:', response)
 
         // if not localhost, send request to index
@@ -162,27 +164,23 @@ export default function App() {
           env: env
         }
 
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(newProfile)
-        }
-
-        const response = await fetch(
-          `${apiUrl}/profile?_wpnonce=${wp_nonce}`,
-          requestOptions
-        )
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
+        await postRequest(`${apiUrl}/profile?_wpnonce=${wp_nonce}`, newProfile)
 
         // if not localhost, send request to index
         if (!isLocalhost()) {
           const res = await sendRequestToIndex(cuid)
-          newProfile.node_id = res.data.node_id
-          await updateProfile(cuid, newProfile)
+
+          if (!res.data.node_id) {
+            alert('Error posting profile to index:' + res)
+            return
+          }
+
+          await updateRequest(
+            `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
+            {
+              node_id: res.data.node_id
+            }
+          )
         }
       }
       setSchema('')
@@ -233,20 +231,18 @@ export default function App() {
 
     try {
       const res = await sendRequestToIndex(cuid)
-      const data = await axios.get(
-        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
-      )
 
-      const profileToUpdate = {
-        cuid: cuid,
-        title: data.data.title,
-        linked_schemas: data.data.linked_schemas,
-        profile: data.data.profile,
-        env: data.data.env,
-        node_id: res.data.node_id
+      if (!res.data.node_id) {
+        alert('Error resending profile:' + res)
+        return
       }
 
-      const response = await updateProfile(cuid, profileToUpdate)
+      const response = await updateRequest(
+        `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
+        {
+          node_id: res.data.node_id
+        }
+      )
       console.log('Update successful! Response data:', response)
     } catch (error) {
       console.error('Error resending profile:', error)
@@ -263,11 +259,15 @@ export default function App() {
       const response = await axios.get(
         `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
       )
-      await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
+      await updateRequest(
+        `${apiUrl}/profile/update-deleted-at/${cuid}?_wpnonce=${wp_nonce}`,
+        {}
+      )
 
       if (!isLocalhost()) {
         await deleteNodeFromIndex(response.data.node_id)
       }
+      await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
       await fetchProfiles(env)
     } catch (error) {
       console.error('Error deleting profile:', error)
@@ -282,21 +282,39 @@ export default function App() {
     )
   }
 
-  const updateProfile = async (cuid, profileToUpdate) => {
+  const postRequest = async (url, data) => {
     try {
-      const response = await fetch(`${apiUrl}/profile?_wpnonce=${wp_nonce}`, {
-        method: 'PUT',
+      const response = await fetch(url, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(profileToUpdate)
+        body: JSON.stringify(data)
       })
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`)
       }
       return await response.json()
     } catch (error) {
-      console.error(`Error updating profile: ${error}`)
+      console.error(`Error posting data: ${error}`)
+    }
+  }
+
+  const updateRequest = async (url, data) => {
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+      return await response.json()
+    } catch (error) {
+      console.error(`Error updating data: ${error}`)
     }
   }
 
