@@ -176,7 +176,7 @@ export default function App() {
           }
 
           await updateRequest(
-            `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
+            `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
             {
               node_id: res.data.node_id
             }
