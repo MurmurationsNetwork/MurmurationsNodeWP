@@ -222,6 +222,39 @@ export default function App() {
     }
   }
 
+  const handleResend = async cuid => {
+    if (isLocalhost()) {
+      alert('Unable to resend profile from localhost')
+      return
+    }
+
+    setLoading(true)
+    setSchema('')
+
+    try {
+      const res = await sendRequestToIndex(cuid)
+      const data = await axios.get(
+        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
+      )
+
+      const profileToUpdate = {
+        cuid: cuid,
+        title: data.data.title,
+        linked_schemas: data.data.linked_schemas,
+        profile: data.data.profile,
+        env: data.data.env,
+        node_id: res.data.node_id
+      }
+
+      const response = await updateProfile(cuid, profileToUpdate)
+      console.log('Update successful! Response data:', response)
+    } catch (error) {
+      console.error('Error resending profile:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleDelete = async cuid => {
     setLoading(true)
     setSchema('')
@@ -469,6 +502,13 @@ export default function App() {
                       className="my-2 mx-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
                     >
                       View
+                    </button>
+                    <button
+                      onClick={() => handleResend(profile.cuid)}
+                      className="my-2 mx-4 rounded-full bg-amber-500 px-4 py-2 font-bold text-white active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
+                      disabled={loading}
+                    >
+                      {loading ? 'Loading ..' : 'Resend'}
                     </button>
                     <button
                       onClick={() => handleModify(profile.cuid)}
