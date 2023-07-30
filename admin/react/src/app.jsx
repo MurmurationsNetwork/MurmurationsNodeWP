@@ -6,8 +6,8 @@ import { createId } from '@paralleldrive/cuid2'
 
 const schemas = [
   { title: 'An Organization', name: 'organizations_schema-v1.0.0' },
-  { title: 'A Person', name: 'cta_person-v0.1.0' },
-  { title: 'An Offer or Want', name: 'offers_wants_prototype-v0.0.2' }
+  { title: 'A Person', name: 'people_schema-v0.1.0' },
+  { title: 'An Offer or Want', name: 'offers_wants_schema-v0.1.0' }
 ]
 
 export default function App() {
@@ -392,10 +392,10 @@ export default function App() {
           What do you want to create a Profile for?
         </h2>
         <div className="my-0 flex flex-col lg:flex-row items-start px-2 py-1 md:px-4 md:py-2">
-          <div>
+          <div className="basis-full lg:basis-3/5">
             <form method="post">
               <select
-                className="block w-full border-2 border-gray-400 bg-white px-4 py-2 md:w-96"
+                className="block w-full border-1 border-gray-400 bg-white px-4 py-2"
                 id="schema"
                 name="schema"
                 multiple={false}
@@ -421,35 +421,50 @@ export default function App() {
               {loading ? 'Loading ..' : 'Select'}
             </button>
           </div>
-          {/* <div className="lg:ml-16 mt-8 lg:mt-0">
-            <div className="mb-2 text-sm">
-              Profiles can show up on{' '}
-              <a href="#" target="_blank" className="text-blue-600">
-                multiple aggregators
+          <div className="mt-8 lg:mt-0 xl:px-4 basis-full lg:basis-2/5 text-base">
+            <div>
+              The Murmurations Map displays{' '}
+              <a
+                href={
+                  env === 'test'
+                    ? 'https://test-map.murmurations.network/?schema=organizations_schema-v1.0.0'
+                    : 'https://map.murmurations.network/?schema=organizations_schema-v1.0.0'
+                }
+                target="_blank"
+                className="text-blue-600"
+                rel="noreferrer"
+              >
+                Organizations
               </a>
-              .
+              ,{' '}
+              <a
+                href={
+                  env === 'test'
+                    ? 'https://test-map.murmurations.network/?schema=people_schema-v0.1.0'
+                    : 'https://map.murmurations.network/?schema=people_schema-v0.1.0'
+                }
+                target="_blank"
+                className="text-blue-600"
+                rel="noreferrer"
+              >
+                People
+              </a>{' '}
+              and{' '}
+              <a
+                href={
+                  env === 'test'
+                    ? 'https://test-map.murmurations.network/?schema=offers_wants_schema-v0.1.0'
+                    : 'https://map.murmurations.network/?schema=offers_wants_schema-v0.1.0'
+                }
+                target="_blank"
+                className="text-blue-600"
+                rel="noreferrer"
+              >
+                Offers & Wants
+              </a>{' '}
+              that have geolocation coordinates.
             </div>
-            <div className="mb-2 text-sm">Example aggregators include:</div>
-            <div className="text-sm">
-              People are published in the{' '}
-              <a href="#" target="_blank" className="text-blue-600">
-                Murmurations Directory
-              </a>
-              .
-              <br />
-              Organizations are published in the{' '}
-              <a href="#" target="_blank" className="text-blue-600">
-                Murmurations Map
-              </a>
-              .
-              <br />
-              Offers and Wants are published in the{' '}
-              <a href="#" target="_blank" className="text-blue-600">
-                Murmurations Marketplace
-              </a>
-              .
-            </div>
-          </div> */}
+          </div>
         </div>
         <div className="box-border flex flex-col xl:flex-row">
           <div className="inset-0 basis-full pr-4 py-2 md:py-4 top-0 lg:basis-3/5 md:overflow-y-auto">
@@ -467,7 +482,7 @@ export default function App() {
                     name="profile_title"
                     id="profile_title"
                     className="jsrfg-array-input"
-                    placeholder="For your reference only, to identify different Profiles in the list to the right. This will not be indexed."
+                    placeholder="For your reference only, to identify different Profiles in the list to the right. This will not be published."
                     defaultValue={profileData ? profileData.title : ''}
                     required={true}
                   />
@@ -512,7 +527,6 @@ export default function App() {
             )}
           </div>
           <div className="basis-full px-2 py-2 lg:basis-2/5 md:px-4 md:py-4 text-xl">
-            {/* <span className="font-bold">My Profiles</span> */}
             <div
               className={`${
                 env === 'test'
