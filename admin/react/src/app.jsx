@@ -467,7 +467,7 @@ export default function App() {
                     name="profile_title"
                     id="profile_title"
                     className="jsrfg-array-input"
-                    placeholder="For your reference only, to identify different Profiles in the list to the right. Will not be Indexed."
+                    placeholder="For your reference only, to identify different Profiles in the list to the right. This will not be indexed."
                     defaultValue={profileData ? profileData.title : ''}
                     required={true}
                   />
