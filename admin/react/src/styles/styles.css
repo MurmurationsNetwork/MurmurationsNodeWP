@@ -10,7 +10,7 @@
 
 @layer components {
   .jsrfg-title {
-    @apply mt-4 block font-bold;
+    @apply mt-4 block font-bold text-lg;
   }
   .jsrfg-required {
     @apply text-red-500;

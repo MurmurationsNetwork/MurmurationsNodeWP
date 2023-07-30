@@ -1,5 +1,5 @@
 === Murmurations Node ===
-Contributors: geoffturk
+Contributors: geoffturk, twang443
 Donate link: https://opencollective.com/murmurations
 Tags: murmurations, network, regenerative economy, map
 Requires at least: 5.0
