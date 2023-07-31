@@ -114,15 +114,29 @@ export default function App() {
 
     event.preventDefault()
     const formData = new FormData(event.target)
-    const formValues = {}
+    let rawData = {}
 
-    formData.forEach((value, key) => {
-      if (key !== 'profile_title' && key !== 'cuid') {
-        formValues[key] = value
+    for (let key of formData.keys()) {
+      const values = formData.getAll(key)
+
+      // Deal with multiple values submitted as an array
+      if (key.endsWith('[]')) {
+        const keyWithoutBrackets = key.slice(0, -2)
+
+        if (values.length === 1) {
+          rawData[keyWithoutBrackets] = []
+          rawData[keyWithoutBrackets].push(...values)
+        } else {
+          rawData[keyWithoutBrackets] = values
+        }
+
+        delete rawData[key]
+      } else if (key !== 'profile_title' && key !== 'cuid') {
+        rawData[key] = values.length > 1 ? values : values[0]
       }
-    })
+    }
 
-    const result = generateSchemaInstance(schema, formValues)
+    const result = generateSchemaInstance(schema, rawData)
     const profileTitle = formData.get('profile_title')
 
     // call WordPress api to save the profile
