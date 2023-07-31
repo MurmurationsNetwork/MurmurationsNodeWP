@@ -1,7 +1,7 @@
 import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
 import { generateSchemaInstance } from '@murmurations/jsig'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
 
 const schemas = [
@@ -27,6 +27,8 @@ export default function App() {
   const [schema, setSchema] = useState('')
   const [profiles, setProfiles] = useState('')
   const [profileData, setProfileData] = useState(null)
+  const [validationErrors, setValidationErrors] = useState(null)
+  const errorContainerRef = useRef(null)
 
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
 
@@ -138,6 +140,33 @@ export default function App() {
 
     const result = generateSchemaInstance(schema, rawData)
     const profileTitle = formData.get('profile_title')
+
+    setValidationErrors(null)
+    // validate the profile before submitting
+    try {
+      const response = await fetch(`${indexUrl}/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(result)
+      })
+
+      if (response.status !== 200) {
+        const data = await response.json()
+        setValidationErrors(data.errors)
+        // scroll to the error container to make it visible
+        errorContainerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+        return
+      }
+    } catch (error) {
+      console.error('Error while validating data:', error)
+    } finally {
+      setLoading(false)
+    }
 
     // call WordPress api to save the profile
     try {
@@ -479,6 +508,27 @@ export default function App() {
               that have geolocation coordinates.
             </div>
           </div>
+        </div>
+        <div ref={errorContainerRef}>
+          {validationErrors ? (
+            <div className="my-0 flex flex-col lg:flex-row items-start px-2 py-1 md:px-4 md:py-2">
+              <div className="basis-full lg:basis-3/5">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                  <strong className="font-bold text-lg">
+                    Validation Failed!
+                  </strong>
+                  <ul>
+                    {validationErrors.map((error, index) => (
+                      <li key={index} className="leading-none text-base">
+                        Title: {error.title}, Status: {error.status}, Source:{' '}
+                        {error.source.pointer}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="box-border flex flex-col xl:flex-row">
           <div className="inset-0 basis-full pr-4 py-2 md:py-4 top-0 lg:basis-3/5 md:overflow-y-auto">
