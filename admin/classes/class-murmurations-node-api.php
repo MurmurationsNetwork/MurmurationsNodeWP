@@ -243,7 +243,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$update_result = $this->wpdb->update(
 				$this->table_name,
 				$update_data,
-				array( 'cuid' => $data['cuid'] )
+				array( 'cuid' => $request['cuid'] )
 			);
 
 			if ( $update_result === false ) {
