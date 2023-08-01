@@ -73,6 +73,15 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 						'callback' => array( $this, 'update_deleted_at' ),
 					),
 				);
+
+				register_rest_route(
+					'murmurations-node/v1',
+					'/profile/update-index-errors/(?P<cuid>[\w]+)',
+					array(
+						'methods'   => 'PUT',
+						'callback' => array( $this, 'update_index_errors' ),
+					),
+				);
 			} );
 		}
 
@@ -104,6 +113,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'linked_schemas' => json_decode( $profile['linked_schemas'], true ),
 					'title'          => $profile['title'],
 					'profile'        => json_decode( $profile['profile'], true ),
+					'index_errors'   => json_decode( $profile['index_errors'], true ),
 					'created_at'     => $profile['created_at'],
 					'updated_at'     => $profile['updated_at'],
 				);
@@ -192,7 +202,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$insert_data = array(
 				'cuid'           => sanitize_text_field( $data['cuid'] ),
-				'node_id'        => sanitize_text_field( $data['node_id'] ),
 				'linked_schemas' => wp_json_encode( $data['linked_schemas'] ),
 				'title'          => sanitize_text_field( $data['title'] ),
 				'profile'        => wp_json_encode( $data['profile'] ),
@@ -346,6 +355,34 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$response = array(
 				'message' => esc_html__( 'Deleted at updated successfully.', 'text-domain' ),
+			);
+
+			return rest_ensure_response( $response );
+		}
+
+		public function update_index_errors( $request ) {
+			$nonce = $request['_wpnonce'] ?? '';
+
+			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			}
+
+			$data = $request->get_json_params();
+
+			$index_errors = ! empty( $data['index_errors'] ) ? wp_json_encode( $data['index_errors'] ) : null;
+
+			$update_result = $this->wpdb->update(
+				$this->table_name,
+				array( 'index_errors' => $index_errors ),
+				array( 'cuid' => $request['cuid'] )
+			);
+
+			if ( $update_result === false ) {
+				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the index errors.', 'text-domain' ), array( 'status' => 500 ) );
+			}
+
+			$response = array(
+				'message' => esc_html__( 'Node ID updated successfully.', 'text-domain' ),
 			);
 
 			return rest_ensure_response( $response );

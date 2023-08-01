@@ -28,6 +28,8 @@ export default function App() {
   const [profiles, setProfiles] = useState('')
   const [profileData, setProfileData] = useState(null)
   const [validationErrors, setValidationErrors] = useState(null)
+  const [showModal, setShowModal] = useState(false)
+  const [profileErrors, setProfileErrors] = useState(null)
   const errorContainerRef = useRef(null)
 
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
@@ -187,7 +189,13 @@ export default function App() {
 
         // if not localhost, send request to index
         if (!isLocalhost()) {
-          await sendRequestToIndex(cuid)
+          const res = await sendRequestToIndex(cuid)
+          if (!res.ok) {
+            const resJson = await res.json()
+            await updateIndexErrors(cuid, resJson)
+          } else {
+            await updateIndexErrors(cuid, null)
+          }
         }
       } else {
         const cuid = createId()
@@ -204,18 +212,21 @@ export default function App() {
         // if not localhost, send request to index
         if (!isLocalhost()) {
           const res = await sendRequestToIndex(cuid)
+          const resJson = await res.json()
 
-          if (!res.data.node_id) {
-            alert('Error posting profile to index:' + res)
-            return
+          if (!res.ok) {
+            console.log('needs to update index errors')
+            await updateIndexErrors(cuid, resJson)
+          } else {
+            console.log('no needs to update index errors')
+            await updateRequest(
+              `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
+              {
+                node_id: resJson.data.node_id
+              }
+            )
+            await updateIndexErrors(cuid, null)
           }
-
-          await updateRequest(
-            `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
-            {
-              node_id: res.data.node_id
-            }
-          )
         }
       }
       setSchema('')
@@ -266,9 +277,9 @@ export default function App() {
 
     try {
       const res = await sendRequestToIndex(cuid)
-
-      if (!res.data.node_id) {
-        alert('Error resending profile:' + res)
+      if (!res.ok) {
+        const resJson = await res.json()
+        await updateIndexErrors(cuid, resJson)
         return
       }
 
@@ -300,7 +311,11 @@ export default function App() {
       )
 
       if (!isLocalhost()) {
-        await deleteNodeFromIndex(response.data.node_id)
+        const res = await deleteNodeFromIndex(response.data.node_id)
+        if (!res.ok) {
+          const resJson = await res.json()
+          await updateIndexErrors(cuid, resJson)
+        }
       }
       await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
       await fetchProfiles(env)
@@ -327,7 +342,7 @@ export default function App() {
         body: JSON.stringify(data)
       })
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
+        alert(`Error: ${response.status} ${response.statusText}`)
       }
       return await response.json()
     } catch (error) {
@@ -345,7 +360,7 @@ export default function App() {
         body: JSON.stringify(data)
       })
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
+        alert(`Error: ${response.status} ${response.statusText}`)
       }
       return await response.json()
     } catch (error) {
@@ -355,7 +370,7 @@ export default function App() {
 
   const sendRequestToIndex = async cuid => {
     try {
-      const response = await fetch(`${indexUrl}/nodes-sync`, {
+      return await fetch(`${indexUrl}/nodes-sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -364,29 +379,34 @@ export default function App() {
           profile_url: `${apiUrl}/profile/${cuid}`
         })
       })
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
-      }
-      return await response.json()
     } catch (error) {
-      alert(`Error sending request: ${error}`)
+      console.log(`Error sending request: ${error}`)
     }
   }
 
   const deleteNodeFromIndex = async nodeId => {
     try {
-      const response = await fetch(`${indexUrl}/nodes/${nodeId}`, {
+      return await fetch(`${indexUrl}/nodes/${nodeId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
-      }
-      return await response.json()
     } catch (error) {
       alert(`Error sending request: ${error}`)
+    }
+  }
+
+  const updateIndexErrors = async (cuid, errors) => {
+    try {
+      await updateRequest(
+        `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
+        {
+          index_errors: errors
+        }
+      )
+    } catch (error) {
+      alert(`Error updating index errors: ${error}`)
     }
   }
 
@@ -621,6 +641,22 @@ export default function App() {
                       <div className="basis-1/3">Updated:</div>
                       <div className="basis-2/3">{profile.updated_at}</div>
                     </div>
+                    {profile.index_errors ? (
+                      <div className="box-border flex">
+                        <div className="basis-1/3 self-center">Errors:</div>
+                        <div className="basis-2/3 self-center">
+                          <button
+                            onClick={() => {
+                              setShowModal(true)
+                              setProfileErrors(profile.index_errors)
+                            }}
+                            className="my-1 mx-2 max-w-fit rounded-full bg-rose-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-rose-400 disabled:opacity-75"
+                          >
+                            View Error Details
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                     <div className="box-border flex flex-wrap xl:min-w-max flex-row mt-4 justify-between">
                       <button
                         onClick={() => handleView(profile.cuid)}
@@ -628,13 +664,15 @@ export default function App() {
                       >
                         View
                       </button>
-                      <button
-                        onClick={() => handleResend(profile.cuid)}
-                        className="my-1 mx-2 max-w-fit rounded-full bg-amber-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
-                        disabled={loading}
-                      >
-                        {loading ? 'Loading ..' : 'Resend'}
-                      </button>
+                      {profile.node_id === null || profile.node_id === '' ? (
+                        <button
+                          onClick={() => handleResend(profile.cuid)}
+                          className="my-1 mx-2 max-w-fit rounded-full bg-amber-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
+                          disabled={loading}
+                        >
+                          {loading ? 'Loading ..' : 'Resend'}
+                        </button>
+                      ) : null}
                       <button
                         onClick={() => handleModify(profile.cuid)}
                         className="my-1 mx-2 max-w-fit rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
@@ -667,6 +705,33 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {showModal ? (
+        <dialog
+          id="my_modal"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50"
+        >
+          <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
+            <form
+              onClick={() => {
+                setShowModal(false)
+                setProfileErrors(null)
+              }}
+              className="p-6"
+            >
+              <h3 className="font-bold text-xl mb-4">Error Details</h3>
+              <p className="text-gray-600 mb-4">
+                {profileErrors ? JSON.stringify(profileErrors) : 'No errors'}
+              </p>
+              <div className="modal-action flex justify-end">
+                <button className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-300">
+                  Close
+                </button>
+              </div>
+            </form>
+          </div>
+        </dialog>
+      ) : null}
     </div>
   )
 }
