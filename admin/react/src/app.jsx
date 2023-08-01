@@ -217,10 +217,8 @@ export default function App() {
           const resJson = await res.json()
 
           if (!res.ok) {
-            console.log('needs to update index errors')
             await updateIndexErrors(cuid, resJson)
           } else {
-            console.log('no needs to update index errors')
             await updateRequest(
               `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
               {
