@@ -30,6 +30,8 @@ export default function App() {
   const [validationErrors, setValidationErrors] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [profileErrors, setProfileErrors] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteProfileId, setDeleteProfileId] = useState(null)
   const errorContainerRef = useRef(null)
 
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
@@ -315,6 +317,8 @@ export default function App() {
         if (!res.ok) {
           const resJson = await res.json()
           await updateIndexErrors(cuid, resJson)
+          await fetchProfiles(env)
+          return
         }
       }
       await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
@@ -681,7 +685,11 @@ export default function App() {
                         {loading ? 'Loading ..' : 'Modify'}
                       </button>
                       <button
-                        onClick={() => handleDelete(profile.cuid)}
+                        onClick={() => {
+                          // handleDelete(profile.cuid)
+                          setDeleteProfileId(profile.cuid)
+                          setShowDeleteModal(true)
+                        }}
                         className="my-1 mx-2 max-w-fit rounded-full bg-red-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-red-400 disabled:opacity-75"
                         disabled={loading}
                       >
@@ -707,10 +715,7 @@ export default function App() {
       </div>
 
       {showModal ? (
-        <dialog
-          id="my_modal"
-          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50"
-        >
+        <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
           <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
             <form
               onClick={() => {
@@ -729,6 +734,39 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </dialog>
+      ) : null}
+      {showDeleteModal ? (
+        <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
+          <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
+            <div className="p-6">
+              <h3 className="font-bold text-xl mb-4">
+                Are you sure you want to delete this profile?
+              </h3>
+              <div className="modal-action flex justify-between">
+                <button
+                  onClick={() => {
+                    handleDelete(deleteProfileId).then(() => {
+                      setShowDeleteModal(false)
+                      setDeleteProfileId(null)
+                    })
+                  }}
+                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400 dark:bg-purple-200 dark:text-gray-800 dark:hover:bg-purple-100"
+                >
+                  Confirm Delete
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setDeleteProfileId(null)
+                  }}
+                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400 dark:bg-green-200 dark:text-gray-800 dark:hover:bg-green-100"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </dialog>
       ) : null}
