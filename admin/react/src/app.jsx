@@ -533,85 +533,90 @@ export default function App() {
             </div>
           </div>
         </div>
-        <div ref={errorContainerRef}>
-          {validationErrors ? (
-            <div className="my-0 flex flex-col lg:flex-row items-start px-2 py-1 md:px-4 md:py-2">
-              <div className="basis-full lg:basis-3/5">
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  <strong className="font-bold text-lg">
-                    Validation Failed!
-                  </strong>
-                  <ul>
-                    {validationErrors.map((error, index) => (
-                      <li key={index} className="leading-none text-base">
-                        Title: {error.title}, Status: {error.status}, Source:{' '}
-                        {error.source.pointer}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </div>
         <div className="box-border flex flex-col xl:flex-row">
           <div className="inset-0 basis-full pr-4 py-2 md:py-4 top-0 lg:basis-3/5 md:overflow-y-auto">
             {schema && (
-              <form onSubmit={handleSubmit}>
-                <h2 className="text-xl">
-                  Fill in the fields below to create a Profile
-                </h2>
-                <legend className="jsrfg-title">
-                  Profile Title:<span className="jsrfg-required"> *</span>
-                </legend>
-                <div className="jsrfg-enum-block">
-                  <input
-                    type="text"
-                    name="profile_title"
-                    id="profile_title"
-                    className="jsrfg-array-input"
-                    placeholder="For your reference only, to identify different Profiles in the list to the right. This will not be published."
-                    defaultValue={profileData ? profileData.title : ''}
-                    required={true}
-                  />
+              <div>
+                <div ref={errorContainerRef}>
+                  {validationErrors ? (
+                    <div className="mt-0 mb-4 flex flex-col lg:flex-row items-start py-1 md:py-2">
+                      <div className="basis-full">
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                          <strong className="font-bold text-lg">
+                            Validation Failed!
+                          </strong>
+                          <ul>
+                            {validationErrors.map((error, index) => (
+                              <li
+                                key={index}
+                                className="leading-none text-base"
+                              >
+                                Title: {error.title}, Status: {error.status},
+                                Source: {error.source.pointer}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-                {profileData ? (
-                  <div>
-                    {profileData.cuid ? (
-                      <input
-                        type="hidden"
-                        name="cuid"
-                        value={profileData.cuid}
-                      />
-                    ) : (
-                      ''
-                    )}
-                    <GenerateForm
-                      schema={schema}
-                      profileData={profileData.profile}
+                <form onSubmit={handleSubmit}>
+                  <h2 className="text-xl">
+                    Fill in the fields below to create a Profile
+                  </h2>
+                  <legend className="jsrfg-title">
+                    Profile Title:<span className="jsrfg-required"> *</span>
+                  </legend>
+                  <div className="jsrfg-enum-block">
+                    <input
+                      type="text"
+                      name="profile_title"
+                      id="profile_title"
+                      className="jsrfg-array-input"
+                      placeholder="For your reference only, to identify different Profiles in the list to the right. This will not be published."
+                      defaultValue={profileData ? profileData.title : ''}
+                      required={true}
                     />
                   </div>
-                ) : (
-                  <GenerateForm schema={schema} />
-                )}
-                {env !== 'test' && (
-                  <div className="mt-2 text-lg">
-                    Please only publish genuine profiles to the Live Index. For
-                    testing use the Test Index.
-                  </div>
-                )}
-                <button
-                  className="m-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading
-                    ? 'Loading ..'
-                    : env === 'test'
-                    ? 'Submit to Test Index'
-                    : 'Submit to Live Index'}
-                </button>
-              </form>
+                  {profileData ? (
+                    <div>
+                      {profileData.cuid ? (
+                        <input
+                          type="hidden"
+                          name="cuid"
+                          value={profileData.cuid}
+                        />
+                      ) : (
+                        ''
+                      )}
+                      <GenerateForm
+                        schema={schema}
+                        profileData={profileData.profile}
+                      />
+                    </div>
+                  ) : (
+                    <GenerateForm schema={schema} />
+                  )}
+                  {env !== 'test' && (
+                    <div className="mt-2 text-lg">
+                      Please only publish genuine profiles to the Live Index.
+                      For testing use the Test Index.
+                    </div>
+                  )}
+                  <button
+                    className="m-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? 'Loading ..'
+                      : env === 'test'
+                      ? 'Submit to Test Index'
+                      : 'Submit to Live Index'}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
           <div className="basis-full px-2 py-2 lg:basis-2/5 md:px-4 md:py-4 text-xl">
