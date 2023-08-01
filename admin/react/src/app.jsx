@@ -757,7 +757,7 @@ export default function App() {
                       setDeleteProfileId(null)
                     })
                   }}
-                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400 dark:bg-purple-200 dark:text-gray-800 dark:hover:bg-purple-100"
+                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400 bg-purple-200 text-gray-800 hover:bg-purple-100"
                 >
                   Confirm Delete
                 </button>
@@ -766,7 +766,7 @@ export default function App() {
                     setShowDeleteModal(false)
                     setDeleteProfileId(null)
                   }}
-                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400 dark:bg-green-200 dark:text-gray-800 dark:hover:bg-green-100"
+                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400 bg-green-200 text-gray-800 hover:bg-green-100"
                 >
                   Cancel
                 </button>
