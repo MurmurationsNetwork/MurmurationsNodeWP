@@ -28,6 +28,7 @@
   "dependencies": {
     "@murmurations/jsig": "^1.0.0",
     "@murmurations/jsrfg": "^1.0.0",
+    "@paralleldrive/cuid2": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "redaxios": "^0.5.1"
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.4",
     "esbuild-plugin-eslint": "^0.1.1",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.32.2",

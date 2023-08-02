@@ -1,11 +1,11 @@
 === Murmurations Node ===
-Contributors: geoffturk
+Contributors: geoffturk, twang443
 Donate link: https://opencollective.com/murmurations
 Tags: murmurations, network, regenerative economy, map
-Requires at least: 5.0
+Requires at least: 6.0.5
 Tested up to: 6.2.2
-Stable tag: 6.2.2
-Requires PHP: 5.6
+Stable tag: 1.0.0
+Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -48,7 +48,7 @@ The Murmurations Protocol enables individuals and organizations (Nodes) to creat
 
 = Can you explain the terms you use? =
 
-See the [common terms](https://docs.murmurations.network/about/common-terms.html) we use when working with Murmurations and our blog posts Murmurations explained, and using Murmurations.
+See the [common terms](https://docs.murmurations.network/about/common-terms.html) we use when working with Murmurations and our blog posts [Murmurations explained](https://murmurations.network/2022/07/07/murmurations-explained), and [Using Murmurations](https://murmurations.network/2022/07/12/using-murmurations).
 
 == Screenshots ==
 

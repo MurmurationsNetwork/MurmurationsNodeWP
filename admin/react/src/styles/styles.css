@@ -10,7 +10,7 @@
 
 @layer components {
   .jsrfg-title {
-    @apply mt-4 block font-bold;
+    @apply mt-4 block font-bold text-lg;
   }
   .jsrfg-required {
     @apply text-red-500;
@@ -25,7 +25,7 @@
     @apply flex items-center justify-around;
   }
   .jsrfg-array-input {
-    @apply form-input mr-2 w-full focus:bg-gray-500;
+    @apply form-input mr-2 w-full;
   }
   .jsrfg-add-btn {
     @apply my-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-yellow-400;

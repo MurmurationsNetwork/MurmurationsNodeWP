@@ -3,19 +3,23 @@
  * Plugin Name: Murmurations Node
  * Plugin URI: https://github.com/MurmurationsNetwork/MurmurationsNodeWP
  * Description: Add your profile to the Murmurations distributed data sharing network.
- * Version: 1.0.0-beta-1
+ * Version: 1.0.0-beta.1
+ * Text Domain: murmurations-node
  * Author: Murmurations Network
- * Author URI: https://murmunations.network
+ * Author URI: https://murmurations.network
  * License: GPLv3 or later
  */
 
-if ( ! class_exists( 'React_WP_Admin' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-    define( 'WP_REACT_ADMIN_URL', plugin_dir_url( __FILE__ ) );
-    define( 'WP_REACT_ADMIN_DIR', __DIR__ );
+if ( ! class_exists( 'MurmurationsNode' ) ) {
+    define( 'MURMURATIONS_NODE_URL', plugin_dir_url( __FILE__ ) );
+    define( 'MURMURATIONS_NODE_DIR', __DIR__ );
+	define( 'MURMURATIONS_NODE_TABLE', 'murmurations_profiles');
 
-    class React_WP_Admin {
-
+    class MurmurationsNode {
         public function __construct() {
             $this->register_autoloads();
             $this->register_admin_page();
@@ -36,15 +40,21 @@ if ( ! class_exists( 'React_WP_Admin' ) ) {
         }
 
         public function register_admin_page() {
-            new React_WP_Admin_Page();
+            new Murmurations_Node_Admin_Page();
         }
 
         public function register_api() {
-            new React_WP_API();
+            new Murmurations_Node_API();
         }
-
     }
 
-    new React_WP_Admin();
+    new MurmurationsNode();
+}
 
+if ( class_exists('Murmurations_Node_Activation') ) {
+	register_activation_hook( __FILE__, array('Murmurations_Node_Activation', 'activate' ) );
+}
+
+if ( class_exists('Murmurations_Node_Uninstall') ) {
+	register_uninstall_hook( __FILE__, array('Murmurations_Node_Uninstall', 'uninstall' ));
 }
