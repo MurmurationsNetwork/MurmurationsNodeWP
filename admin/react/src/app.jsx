@@ -408,6 +408,14 @@ export default function App() {
           index_errors: errors
         }
       )
+      if (errors.meta.node_id !== null) {
+        await updateRequest(
+          `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
+          {
+            node_id: errors.meta.node_id
+          }
+        )
+      }
     } catch (error) {
       alert(`Error updating index errors: ${error}`)
     }
