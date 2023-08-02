@@ -283,6 +283,7 @@ export default function App() {
         return
       }
 
+      await updateIndexErrors(cuid, null)
       const response = await updateRequest(
         `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
         {
