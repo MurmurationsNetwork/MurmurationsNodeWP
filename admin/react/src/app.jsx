@@ -408,7 +408,7 @@ export default function App() {
           index_errors: errors
         }
       )
-      if (errors.meta.node_id !== null) {
+      if (errors && errors.meta && errors.meta.node_id !== null) {
         await updateRequest(
           `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
           {
