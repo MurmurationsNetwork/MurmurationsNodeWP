@@ -168,8 +168,6 @@ export default function App() {
       }
     } catch (error) {
       console.error('Error while validating data:', error)
-    } finally {
-      setLoading(false)
     }
 
     // call WordPress api to save the profile
