@@ -291,6 +291,8 @@ export default function App() {
         }
       )
       console.log('Update successful! Response data:', response)
+      setSchema('')
+      await fetchProfiles(env)
     } catch (error) {
       console.error('Error resending profile:', error)
     } finally {
