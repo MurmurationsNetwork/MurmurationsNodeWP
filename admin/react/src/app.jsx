@@ -720,23 +720,23 @@ export default function App() {
       {showModal ? (
         <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
           <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
-            <form
-              onClick={() => {
-                setShowModal(false)
-                setProfileErrors(null)
-              }}
-              className="p-6"
-            >
+            <div className="p-6">
               <h3 className="font-bold text-xl mb-4">Error Details</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-4 break-all">
                 {profileErrors ? JSON.stringify(profileErrors) : 'No errors'}
               </p>
               <div className="modal-action flex justify-end">
-                <button className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-300">
+                <button
+                  onClick={() => {
+                    setShowModal(false)
+                    setProfileErrors(null)
+                  }}
+                  className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-300"
+                >
                   Close
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </dialog>
       ) : null}
@@ -755,7 +755,7 @@ export default function App() {
                       setDeleteProfileId(null)
                     })
                   }}
-                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400 bg-purple-200 text-gray-800 hover:bg-purple-100"
+                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400"
                 >
                   Confirm Delete
                 </button>
@@ -764,7 +764,7 @@ export default function App() {
                     setShowDeleteModal(false)
                     setDeleteProfileId(null)
                   }}
-                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400 bg-green-200 text-gray-800 hover:bg-green-100"
+                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400"
                 >
                   Cancel
                 </button>
