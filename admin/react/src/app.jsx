@@ -277,8 +277,8 @@ export default function App() {
 
     try {
       const res = await sendRequestToIndex(cuid)
+      const resJson = await res.json()
       if (!res.ok) {
-        const resJson = await res.json()
         await updateIndexErrors(cuid, resJson)
         return
       }
@@ -286,7 +286,7 @@ export default function App() {
       const response = await updateRequest(
         `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
         {
-          node_id: res.data.node_id
+          node_id: resJson.data.node_id
         }
       )
       console.log('Update successful! Response data:', response)
