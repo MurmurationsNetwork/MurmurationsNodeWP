@@ -12,7 +12,8 @@
     "lint-fix": "eslint --ignore-path .gitignore --ext .js --ext .jsx . --fix",
     "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|jsx|json)\"",
     "format": "npm run prettier -- --write",
-    "prepare": "cd ../.. && husky install admin/react/.husky"
+    "prepare": "cd ../.. && husky install admin/react/.husky",
+    "readme": "Grunt"
   },
   "eslintConfig": {
     "extends": [
@@ -40,6 +41,8 @@
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.32.2",
+    "grunt": "^1.6.1",
+    "grunt-wp-readme-to-markdown": "^2.1.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "nodemon": "^2.0.21",
