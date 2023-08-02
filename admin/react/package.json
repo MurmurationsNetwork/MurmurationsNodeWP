@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "GPLv3",
   "scripts": {
-    "build": "node ./scripts/build-prod.js",
+    "build": "rimraf ../assets/* && node ./scripts/build-prod.js && npx tailwindcss -i ./src/styles/styles.css -o ../assets/bundle.css",
     "dev": "npm-run-all --parallel watch:*",
     "watch:dev": "nodemon --watch src --ext '*' --exec 'node ./scripts/build-dev.js'",
     "watch:css": "npx tailwindcss -i ./src/styles/styles.css -o ../assets/bundle.css --watch",
@@ -45,6 +45,7 @@
     "nodemon": "^2.0.21",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.0",
+    "rimraf": "^5.0.1",
     "tailwindcss": "^3.3.3"
   },
   "engines": {
