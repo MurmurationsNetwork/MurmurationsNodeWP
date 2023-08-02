@@ -311,7 +311,7 @@ export default function App() {
         {}
       )
 
-      if (!isLocalhost()) {
+      if (!isLocalhost() && response.data.node_id !== null) {
         const res = await deleteNodeFromIndex(response.data.node_id)
         if (!res.ok) {
           const resJson = await res.json()
