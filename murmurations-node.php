@@ -24,6 +24,7 @@ if ( ! class_exists( 'MurmurationsNode' ) ) {
             $this->register_autoloads();
             $this->register_admin_page();
             $this->register_api();
+			$this->register_upgrade();
         }
 
         private function register_autoloads() {
@@ -46,6 +47,10 @@ if ( ! class_exists( 'MurmurationsNode' ) ) {
         public function register_api() {
             new Murmurations_Node_API();
         }
+
+		public function register_upgrade() {
+			new Murmurations_Node_Upgrade();
+		}
     }
 
     new MurmurationsNode();

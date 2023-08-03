@@ -3,6 +3,10 @@
 if ( ! class_exists('Murmurations_Node_Activation') ) {
 	class Murmurations_Node_Activation {
 		public static function activate() {
+			// set plugin version for future DB upgrade
+			$current_version = '1.0.0';
+			update_option( 'murmurations_node_version', $current_version );
+
 			global $wpdb;
 			$table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
 
