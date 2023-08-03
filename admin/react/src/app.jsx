@@ -240,6 +240,7 @@ export default function App() {
         }
       }
 
+      setSchema(null)
       await fetchProfiles(env)
     } catch (error) {
       if (method === 'POST') {
@@ -248,7 +249,6 @@ export default function App() {
         alert(`Error updating profile: ${error}`)
       }
     } finally {
-      setSchema(null)
       setLoading(false)
     }
   }
