@@ -68,7 +68,11 @@ export default function App() {
           return
         }
 
-        alert(`Error fetching profiles with response: ${responseData}`)
+        alert(
+          `Error fetching profiles with response: ${JSON.stringify(
+            responseData
+          )}`
+        )
         return
       }
 
@@ -113,7 +117,9 @@ export default function App() {
       let responseData = await response.json()
 
       if (!response.ok) {
-        alert(`Error fetching schema with response: ${response}`)
+        alert(
+          `Error fetching schema with response: ${JSON.stringify(response)}`
+        )
         return
       }
       responseData.metadata.schema = [selectedSchema]
@@ -208,7 +214,9 @@ export default function App() {
       const response = await postAndPutRequest(url, profileToUpdate, method)
       const responseData = await response.json()
       if (!response.ok) {
-        alert(`Error saving profile with response: ${responseData}`)
+        alert(
+          `Error saving profile with response: ${JSON.stringify(responseData)}`
+        )
         return
       }
       console.log('Update successful! Response data:', responseData)
@@ -321,7 +329,7 @@ export default function App() {
       const responseData = await response.json()
 
       if (!response.ok) {
-        alert(`Error deleting profile: ${responseData}`)
+        alert(`Error deleting profile: ${JSON.stringify(responseData)}`)
         return
       }
 
@@ -332,7 +340,7 @@ export default function App() {
       )
       const updateResponseData = await updateResponse.json()
       if (!updateResponse.ok) {
-        alert(`Error deleting profile: ${updateResponseData}`)
+        alert(`Error deleting profile: ${JSON.stringify(updateResponseData)}`)
         return
       }
 
@@ -350,7 +358,7 @@ export default function App() {
       )
       const deleteResponseData = await deleteResponse.json()
       if (!deleteResponse.ok) {
-        alert(`Error deleting profile: ${deleteResponseData}`)
+        alert(`Error deleting profile: ${JSON.stringify(deleteResponseData)}`)
         return
       }
       await fetchProfiles(env)
@@ -428,7 +436,7 @@ export default function App() {
       )
       if (!response.ok) {
         const responseData = await response.json()
-        alert(`Error updating index errors: ${responseData}`)
+        alert(`Error updating index errors: ${JSON.stringify(responseData)}`)
         return
       }
       if (errors && errors.meta && errors.meta.node_id !== null) {
@@ -442,7 +450,9 @@ export default function App() {
         if (!updateResponse.ok) {
           const updateResponseData = await updateResponse.json()
           alert(
-            `Error updating node_id with index errors: ${updateResponseData}`
+            `Error updating node_id with index errors: ${JSON.stringify(
+              updateResponseData
+            )}`
           )
         }
       }
