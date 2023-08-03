@@ -1,4 +1,3 @@
-import axios from 'redaxios'
 import { GenerateForm } from '@murmurations/jsrfg'
 import { generateSchemaInstance } from '@murmurations/jsig'
 import { useEffect, useRef, useState } from 'react'
@@ -24,52 +23,58 @@ export default function App() {
     'https://test-library.murmurations.network/v2'
   )
   const [loading, setLoading] = useState(false)
-  const [schema, setSchema] = useState('')
-  const [profiles, setProfiles] = useState('')
+  const [schema, setSchema] = useState(null)
+  const [profiles, setProfiles] = useState(null)
   const [profileData, setProfileData] = useState(null)
   const [validationErrors, setValidationErrors] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [profileErrors, setProfileErrors] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteProfileId, setDeleteProfileId] = useState(null)
+
   const errorContainerRef = useRef(null)
 
   const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
 
   useEffect(() => {
     fetchProfiles(env).then(() => {
-      console.log('Profiles fetched')
+      setSchema(null)
+      console.log(`Profiles fetched from ${env} environment`)
     })
-  }, [])
+  }, [env])
 
-  const clickTestIndex = async () => {
+  const setTestEnv = async () => {
     setEnv('test')
     setIndexUrl('https://test-index.murmurations.network/v2')
     setLibraryUrl('https://test-library.murmurations.network/v2')
-    await fetchProfiles('test')
-    setSchema('')
   }
 
-  const clickLiveIndex = async () => {
+  const setProductionEnv = async () => {
     setEnv('production')
     setIndexUrl('https://index.murmurations.network/v2')
     setLibraryUrl('https://library.murmurations.network/v2')
-    await fetchProfiles('production')
-    setSchema('')
   }
 
   const fetchProfiles = async environment => {
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `${apiUrl}/profile?env=${environment}&_wpnonce=${wp_nonce}`
       )
-      setProfiles(response.data)
-    } catch (error) {
-      if (error && error.status === 404) {
-        setProfiles('')
-      } else {
-        console.error('Error fetching profiles:', error)
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setProfiles(null)
+          return
+        }
+
+        alert(`Error fetching profiles with response: ${responseData}`)
+        return
       }
+
+      setProfiles(responseData)
+    } catch (error) {
+      alert(`Error fetching profiles: ${error}`)
     }
   }
 
@@ -83,8 +88,12 @@ export default function App() {
     }
   }
 
-  const handleSelectSchema = async (isModify, selectedSchema) => {
-    if (!isModify) {
+  const handleSelectSchema = async (isNew, selectedSchema) => {
+    setLoading(true)
+    setSchema(null)
+
+    // if the profile is new, set the default primary url and schema
+    if (isNew) {
       const defaultProfile = {
         profile: {
           primary_url: wordpressUrl
@@ -92,27 +101,28 @@ export default function App() {
       }
       setProfileData(defaultProfile)
       selectedSchema = document.getElementById('schema').value
-      if (selectedSchema === '') {
+    }
+
+    if (selectedSchema === '') {
+      alert('Please select a schema')
+      return
+    }
+
+    try {
+      const response = await fetch(`${libraryUrl}/schemas/${selectedSchema}`)
+      let responseData = await response.json()
+
+      if (!response.ok) {
+        alert(`Error fetching schema with response: ${response}`)
         return
       }
+      responseData.metadata.schema = [selectedSchema]
+      setSchema(responseData)
+    } catch (error) {
+      alert(`Error fetching schema: ${error}`)
+    } finally {
+      setLoading(false)
     }
-    setLoading(true)
-    setSchema('')
-
-    axios
-      .get(`${libraryUrl}/schemas/${selectedSchema}`)
-      .then(({ data }) => {
-        // todo: use parseSchemas method
-        // hotfix: I replaced the schema manually to make it work
-        data.metadata.schema = [selectedSchema]
-        setSchema(data)
-      })
-      .catch(() => {
-        console.error('error fetching schema')
-      })
-      .finally(() => {
-        setLoading(false)
-      })
   }
 
   const handleSubmit = async event => {
@@ -125,7 +135,7 @@ export default function App() {
     for (let key of formData.keys()) {
       const values = formData.getAll(key)
 
-      // Deal with multiple values submitted as an array
+      // todo: deal with multiple values submitted as an array (delete this part after the package is updated)
       if (key.endsWith('[]')) {
         const keyWithoutBrackets = key.slice(0, -2)
 
@@ -145,93 +155,92 @@ export default function App() {
     const result = generateSchemaInstance(schema, rawData)
     const profileTitle = formData.get('profile_title')
 
-    setValidationErrors(null)
     // validate the profile before submitting
+    setValidationErrors(null)
     try {
-      const response = await fetch(`${indexUrl}/validate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(result)
-      })
+      const response = await postAndPutRequest(
+        `${indexUrl}/validate`,
+        result,
+        'POST'
+      )
 
-      if (response.status !== 200) {
-        const data = await response.json()
-        setValidationErrors(data.errors)
+      if (!response.ok) {
+        const responseData = await response.json()
+        setValidationErrors(responseData.errors)
         // scroll to the error container to make it visible
         errorContainerRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         })
+        setLoading(false)
         return
       }
     } catch (error) {
-      console.error('Error while validating data:', error)
+      alert(`Error while validating data: ${error}`)
     }
 
-    // call WordPress api to save the profile
+    // submit has two modes: create and update
+    const method = formData.has('cuid') ? 'PUT' : 'POST'
+    let cuid, profileToUpdate, url
+    if (method === 'PUT') {
+      cuid = formData.get('cuid')
+      url = `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`
+      profileToUpdate = {
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result,
+        env: env
+      }
+    } else {
+      cuid = createId()
+      url = `${apiUrl}/profile?_wpnonce=${wp_nonce}`
+      profileToUpdate = {
+        cuid: cuid,
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result,
+        env: env
+      }
+    }
+
     try {
-      if (formData.has('cuid')) {
-        const cuid = formData.get('cuid')
-        let profileToUpdate = {
-          title: profileTitle,
-          linked_schemas: result.linked_schemas,
-          profile: result,
-          env: env
-        }
+      // call WordPress api to save the profile
+      const response = await postAndPutRequest(url, profileToUpdate, method)
+      const responseData = await response.json()
+      if (!response.ok) {
+        alert(`Error saving profile with response: ${responseData}`)
+        return
+      }
+      console.log('Update successful! Response data:', responseData)
 
-        const response = await updateRequest(
-          `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
-          profileToUpdate
-        )
-        console.log('Update successful! Response data:', response)
+      // if not localhost, send request to index
+      if (!isLocalhost()) {
+        const res = await sendRequestToIndex(cuid)
+        const resData = await res.json()
 
-        // if not localhost, send request to index
-        if (!isLocalhost()) {
-          const res = await sendRequestToIndex(cuid)
-          if (!res.ok) {
-            const resJson = await res.json()
-            await updateIndexErrors(cuid, resJson)
-          } else {
-            await updateIndexErrors(cuid, null)
-          }
-        }
-      } else {
-        const cuid = createId()
-        let newProfile = {
-          cuid: cuid,
-          title: profileTitle,
-          linked_schemas: result.linked_schemas,
-          profile: result,
-          env: env
-        }
-
-        await postRequest(`${apiUrl}/profile?_wpnonce=${wp_nonce}`, newProfile)
-
-        // if not localhost, send request to index
-        if (!isLocalhost()) {
-          const res = await sendRequestToIndex(cuid)
-          const resJson = await res.json()
-
-          if (!res.ok) {
-            await updateIndexErrors(cuid, resJson)
-          } else {
-            await updateRequest(
-              `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
-              {
-                node_id: resJson.data.node_id
-              }
-            )
-            await updateIndexErrors(cuid, null)
-          }
+        if (!res.ok) {
+          await updateIndexErrors(cuid, resData)
+        } else {
+          await postAndPutRequest(
+            `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
+            {
+              node_id: resData.data.node_id
+            },
+            'PUT'
+          )
+          await updateIndexErrors(cuid, null)
         }
       }
-      setSchema('')
+
       await fetchProfiles(env)
     } catch (error) {
-      console.error('Error updating/posting profile:', error)
+      if (method === 'POST') {
+        alert(`Error posting profile: ${error}`)
+      } else {
+        alert(`Error updating profile: ${error}`)
+      }
     } finally {
+      setSchema(null)
       setLoading(false)
     }
   }
@@ -242,23 +251,24 @@ export default function App() {
 
   const handleModify = async cuid => {
     setLoading(true)
-    setSchema('')
+    setSchema(null)
 
     try {
-      let response = await axios.get(
+      const response = await fetch(
         `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
       )
+      let responseData = await response.json()
       if (
-        response.data.profile.primary_url == null ||
-        response.data.profile.primary_url === ''
+        responseData.profile.primary_url == null ||
+        responseData.profile.primary_url === ''
       ) {
-        response.data.profile.primary_url = wordpressUrl
+        responseData.profile.primary_url = wordpressUrl
       }
-      setProfileData(response.data)
+      setProfileData(responseData)
       // todo: we need to fetchSchema according to the linked_schemas
-      await handleSelectSchema(true, response.data.linked_schemas[0])
+      await handleSelectSchema(false, responseData.linked_schemas[0])
     } catch (error) {
-      console.error('Error modifying profile:', error)
+      alert(`Error modifying profile: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -271,25 +281,27 @@ export default function App() {
     }
 
     setLoading(true)
-    setSchema('')
+    setSchema(null)
 
     try {
       const res = await sendRequestToIndex(cuid)
-      const resJson = await res.json()
+      const resData = await res.json()
       if (!res.ok) {
-        await updateIndexErrors(cuid, resJson)
+        await updateIndexErrors(cuid, resData)
         return
       }
 
       await updateIndexErrors(cuid, null)
-      const response = await updateRequest(
+      const response = await postAndPutRequest(
         `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
         {
-          node_id: resJson.data.node_id
-        }
+          node_id: resData.data.node_id
+        },
+        'PUT'
       )
-      console.log('Update successful! Response data:', response)
-      setSchema('')
+      const responseData = await response.json()
+      console.log('Update successful! Response data:', responseData)
+
       await fetchProfiles(env)
     } catch (error) {
       console.error('Error resending profile:', error)
@@ -300,30 +312,50 @@ export default function App() {
 
   const handleDelete = async cuid => {
     setLoading(true)
-    setSchema('')
+    setSchema(null)
 
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
       )
-      await updateRequest(
-        `${apiUrl}/profile/update-deleted-at/${cuid}?_wpnonce=${wp_nonce}`,
-        {}
-      )
+      const responseData = await response.json()
 
-      if (!isLocalhost() && response.data.node_id !== null) {
-        const res = await deleteNodeFromIndex(response.data.node_id)
+      if (!response.ok) {
+        alert(`Error deleting profile: ${responseData}`)
+        return
+      }
+
+      const updateResponse = await postAndPutRequest(
+        `${apiUrl}/profile/update-deleted-at/${cuid}?_wpnonce=${wp_nonce}`,
+        {},
+        'PUT'
+      )
+      const updateResponseData = await updateResponse.json()
+      if (!updateResponse.ok) {
+        alert(`Error deleting profile: ${updateResponseData}`)
+        return
+      }
+
+      if (!isLocalhost() && responseData.node_id !== null) {
+        const res = await deleteNodeFromIndex(responseData.node_id)
         if (!res.ok) {
-          const resJson = await res.json()
-          await updateIndexErrors(cuid, resJson)
+          const resData = await res.json()
+          await updateIndexErrors(cuid, resData)
           await fetchProfiles(env)
           return
         }
       }
-      await axios.delete(`${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`)
+      const deleteResponse = await deleteRequest(
+        `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`
+      )
+      const deleteResponseData = await deleteResponse.json()
+      if (!deleteResponse.ok) {
+        alert(`Error deleting profile: ${deleteResponseData}`)
+        return
+      }
       await fetchProfiles(env)
     } catch (error) {
-      console.error('Error deleting profile:', error)
+      alert(`Error deleting profile: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -335,86 +367,84 @@ export default function App() {
     )
   }
 
-  const postRequest = async (url, data) => {
+  const postAndPutRequest = async (url, data, method) => {
+    if (method !== 'POST' && method !== 'PUT') {
+      alert(`Error: ${method} is not a valid method with url: ${url}`)
+      return
+    }
+
     try {
-      const response = await fetch(url, {
-        method: 'POST',
+      return await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
-      if (!response.ok) {
-        alert(`Error: ${response.status} ${response.statusText}`)
+    } catch (error) {
+      if (method === 'POST') {
+        alert(`Error posting data: ${error}`)
+      } else {
+        alert(`Error updating data: ${error}`)
       }
-      return await response.json()
-    } catch (error) {
-      console.error(`Error posting data: ${error}`)
     }
   }
 
-  const updateRequest = async (url, data) => {
+  const deleteRequest = async url => {
     try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      if (!response.ok) {
-        alert(`Error: ${response.status} ${response.statusText}`)
-      }
-      return await response.json()
-    } catch (error) {
-      console.error(`Error updating data: ${error}`)
-    }
-  }
-
-  const sendRequestToIndex = async cuid => {
-    try {
-      return await fetch(`${indexUrl}/nodes-sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          profile_url: `${apiUrl}/profile/${cuid}`
-        })
-      })
-    } catch (error) {
-      console.log(`Error sending request: ${error}`)
-    }
-  }
-
-  const deleteNodeFromIndex = async nodeId => {
-    try {
-      return await fetch(`${indexUrl}/nodes/${nodeId}`, {
+      return await fetch(url, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         }
       })
     } catch (error) {
-      alert(`Error sending request: ${error}`)
+      alert(`Error deleting data: ${error}`)
     }
+  }
+
+  const sendRequestToIndex = async cuid => {
+    return await postAndPutRequest(
+      `${indexUrl}/nodes-sync`,
+      {
+        profile_url: `${apiUrl}/profile/${cuid}`
+      },
+      'POST'
+    )
+  }
+
+  const deleteNodeFromIndex = async nodeId => {
+    return await deleteRequest(`${indexUrl}/nodes/${nodeId}`)
   }
 
   const updateIndexErrors = async (cuid, errors) => {
     try {
-      await updateRequest(
+      const response = await postAndPutRequest(
         `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
         {
           index_errors: errors
-        }
+        },
+        'PUT'
       )
+      if (!response.ok) {
+        const responseData = await response.json()
+        alert(`Error updating index errors: ${responseData}`)
+        return
+      }
       if (errors && errors.meta && errors.meta.node_id !== null) {
-        await updateRequest(
+        const updateResponse = await postAndPutRequest(
           `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
           {
             node_id: errors.meta.node_id
-          }
+          },
+          'PUT'
         )
+        if (!updateResponse.ok) {
+          const updateResponseData = await updateResponse.json()
+          alert(
+            `Error updating node_id with index errors: ${updateResponseData}`
+          )
+        }
       }
     } catch (error) {
       alert(`Error updating index errors: ${error}`)
@@ -434,7 +464,7 @@ export default function App() {
       <div className="box-border flex flex-row mt-8 text-lg">
         <div
           className="cursor-pointer basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
-          onClick={() => clickTestIndex()}
+          onClick={() => setTestEnv()}
         >
           <span
             className={`${
@@ -446,7 +476,7 @@ export default function App() {
         </div>
         <div
           className="cursor-pointer basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
-          onClick={() => clickLiveIndex()}
+          onClick={() => setProductionEnv()}
         >
           <span
             className={`${
@@ -490,7 +520,7 @@ export default function App() {
             <button
               className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
               disabled={loading}
-              onClick={() => handleSelectSchema(false)}
+              onClick={() => handleSelectSchema(true)}
             >
               {loading ? 'Loading ..' : 'Select'}
             </button>
