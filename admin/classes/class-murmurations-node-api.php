@@ -86,10 +86,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function get_profiles( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$env = $request->get_param( 'env' );
@@ -107,7 +106,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$data = array();
 			foreach ( $profiles as $profile ) {
 				$data[] = array(
-					'id'             => $profile['id'],
 					'cuid'           => $profile['cuid'],
 					'node_id'        => $profile['node_id'],
 					'linked_schemas' => json_decode( $profile['linked_schemas'], true ),
@@ -140,10 +138,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function get_profile_detail( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$cuid = $request['cuid'];
@@ -172,10 +169,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function post_profile( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$data = $request->get_json_params();
@@ -184,6 +180,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			if (
 				! isset( $data['cuid'] ) ||
 				! isset( $data['linked_schemas'] ) ||
+				! isset( $data['title'] ) ||
 				! isset( $data['profile'] ) ||
 				! isset( $data['env'] )
 			) {
@@ -208,24 +205,17 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'env'            => sanitize_text_field( $data['env'] )
 			);
 
-			$insert_result = $this->wpdb->insert( $this->table_name, $insert_data );
+			$result = $this->wpdb->insert( $this->table_name, $insert_data );
 
-			if ( $insert_result === false ) {
-				return new WP_Error( 'insert_failed', esc_html__( 'Failed to insert the profile into the database.', 'text-domain' ), array( 'status' => 500 ) );
-			}
-
-			$response = array(
-				'message' => esc_html__( 'Profile inserted successfully.', 'text-domain' ),
-			);
+			$response = $this->handle_response( $result, 'Profile created successfully.' );
 
 			return rest_ensure_response( $response );
 		}
 
 		public function edit_profile( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$data = $request->get_json_params();
@@ -249,28 +239,21 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'updated_at' => current_time('mysql'),
 			);
 
-			$update_result = $this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table_name,
 				$update_data,
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			if ( $update_result === false ) {
-				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
-			}
-
-			$response = array(
-				'message' => esc_html__( 'Profile updated successfully.', 'text-domain' ),
-			);
+			$response = $this->handle_response( $result, 'Profile updated successfully.' );
 
 			return rest_ensure_response( $response );
 		}
 
 		public function delete_profile( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			if ( ! isset( $request['cuid'] ) ) {
@@ -286,27 +269,20 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'profile_not_found', esc_html__( 'Profile not found.', 'text-domain' ), array( 'status' => 404 ) );
 			}
 
-			$delete_result = $this->wpdb->delete(
+			$result = $this->wpdb->delete(
 				$this->table_name,
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			if ( $delete_result === false ) {
-				return new WP_Error( 'delete_failed', esc_html__( 'Failed to delete the profile.', 'text-domain' ), array( 'status' => 500 ) );
-			}
-
-			$response = array(
-				'message' => esc_html__( 'Profile deleted successfully.', 'text-domain' ),
-			);
+			$response = $this->handle_response( $result, 'Profile deleted successfully.' );
 
 			return rest_ensure_response( $response );
 		}
 
 		public function update_node_id( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$data = $request->get_json_params();
@@ -315,77 +291,77 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'invalid_data', esc_html__( $data, 'text-domain' ), array( 'status' => 400 ) );
 			}
 
-			$update_result = $this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table_name,
 				array( 'node_id' => sanitize_text_field( $data['node_id'] ) ),
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			if ( $update_result === false ) {
-				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
-			}
-
-			$response = array(
-				'message' => esc_html__( 'Node ID updated successfully.', 'text-domain' ),
-			);
+			$response = $this->handle_response( $result, 'Node ID updated successfully.' );
 
 			return rest_ensure_response( $response );
 		}
 
 		public function update_deleted_at( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			if ( ! isset( $request['cuid'] ) ) {
 				return new WP_Error( 'invalid_cuid', esc_html__( 'Invalid cuid in the request.', 'text-domain' ), array( 'status' => 400 ) );
 			}
 
-			$update_result = $this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table_name,
 				array( 'deleted_at' => current_time('mysql') ),
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			if ( $update_result === false ) {
-				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
-			}
-
-			$response = array(
-				'message' => esc_html__( 'Deleted at updated successfully.', 'text-domain' ),
-			);
+			$response = $this->handle_response( $result, 'deleted_at field updated successfully.' );
 
 			return rest_ensure_response( $response );
 		}
 
 		public function update_index_errors( $request ) {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'You cannot view the profiles.' ), array( 'status' => 401 ) );
+			$nonce_error = $this->verify_nonce( $request );
+			if ( is_wp_error( $nonce_error ) ) {
+				return $nonce_error;
 			}
 
 			$data = $request->get_json_params();
 
 			$index_errors = ! empty( $data['index_errors'] ) ? wp_json_encode( $data['index_errors'] ) : null;
 
-			$update_result = $this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table_name,
 				array( 'index_errors' => $index_errors ),
 				array( 'cuid' => $request['cuid'] )
 			);
 
+			$response = $this->handle_response( $result, 'Index errors updated successfully.' );
+
+			return rest_ensure_response( $response );
+		}
+
+		private function verify_nonce( $request ) {
+			$nonce = $request['_wpnonce'] ?? '';
+
+			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+				return new WP_Error( 'rest_forbidden', esc_html__( 'Permission denied' ), array( 'status' => 401 ) );
+			}
+
+			return true;
+		}
+
+		private function handle_response( $update_result, $message ) {
 			if ( $update_result === false ) {
 				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the index errors.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
-			$response = array(
-				'message' => esc_html__( 'Node ID updated successfully.', 'text-domain' ),
+			return array(
+				'message' => esc_html__( $message, 'text-domain' ),
 			);
-
-			return rest_ensure_response( $response );
 		}
 	}
 }

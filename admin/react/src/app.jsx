@@ -678,7 +678,7 @@ export default function App() {
                 profiles.map(profile => (
                   <div
                     className="box-border flex flex-col bg-orange-100 rounded-md px-2 md:px-8 py-2 md:py-4 my-2 md:my-4"
-                    key={profile.id}
+                    key={profile.cuid}
                   >
                     <div className="box-border flex">
                       <div className="basis-1/3">Title: </div>
