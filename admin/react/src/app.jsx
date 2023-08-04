@@ -139,10 +139,8 @@ export default function App() {
     let rawData = {}
 
     for (let key of formData.keys()) {
-      const values = formData.getAll(key)
-
       if (key !== 'profile_title' && key !== 'cuid') {
-        rawData[key] = values.length > 1 ? values : values[0]
+        rawData[key] = formData.getAll(key)
       }
     }
 
