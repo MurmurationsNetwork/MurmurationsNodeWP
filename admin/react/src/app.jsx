@@ -139,22 +139,8 @@ export default function App() {
     let rawData = {}
 
     for (let key of formData.keys()) {
-      const values = formData.getAll(key)
-
-      // todo: deal with multiple values submitted as an array (delete this part after the package is updated)
-      if (key.endsWith('[]')) {
-        const keyWithoutBrackets = key.slice(0, -2)
-
-        if (values.length === 1) {
-          rawData[keyWithoutBrackets] = []
-          rawData[keyWithoutBrackets].push(...values)
-        } else {
-          rawData[keyWithoutBrackets] = values
-        }
-
-        delete rawData[key]
-      } else if (key !== 'profile_title' && key !== 'cuid') {
-        rawData[key] = values.length > 1 ? values : values[0]
+      if (key !== 'profile_title' && key !== 'cuid') {
+        rawData[key] = formData.getAll(key)
       }
     }
 
