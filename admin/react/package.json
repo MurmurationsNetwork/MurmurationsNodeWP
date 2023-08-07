@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@murmurations/jsig": "^1.0.1",
+    "@murmurations/jsig": "^1.0.2",
     "@murmurations/jsrfg": "^1.0.0",
     "@paralleldrive/cuid2": "^2.2.1",
     "react": "^18.2.0",
