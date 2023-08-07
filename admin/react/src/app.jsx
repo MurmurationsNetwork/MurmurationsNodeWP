@@ -1,5 +1,5 @@
 import { GenerateForm } from '@murmurations/jsrfg'
-import { generateSchemaInstance } from '@murmurations/jsig'
+import { generateSchemaInstance, parseSchemas } from '@murmurations/jsig'
 import { useEffect, useRef, useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
 
@@ -113,16 +113,9 @@ export default function App() {
     }
 
     try {
-      const response = await fetch(`${libraryUrl}/schemas/${selectedSchema}`)
-      let responseData = await response.json()
-
-      if (!response.ok) {
-        alert(
-          `Error fetching schema with response: ${JSON.stringify(response)}`
-        )
-        return
-      }
-      responseData.metadata.schema = [selectedSchema]
+      const responseData = await parseSchemas(`${libraryUrl}/schemas`, [
+        selectedSchema
+      ])
       setSchema(responseData)
     } catch (error) {
       alert(`Error fetching schema: ${error}`)
