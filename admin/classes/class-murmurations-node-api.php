@@ -51,7 +51,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile-detail/(?P<cuid>[\w]+)',
 					array(
-						'methods'   => 'GET',
+						'methods'  => 'GET',
 						'callback' => array( $this, 'get_profile_detail' ),
 					),
 				);
@@ -60,7 +60,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-node-id/(?P<cuid>[\w]+)',
 					array(
-						'methods'   => 'PUT',
+						'methods'  => 'PUT',
 						'callback' => array( $this, 'update_node_id' ),
 					),
 				);
@@ -69,7 +69,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-deleted-at/(?P<cuid>[\w]+)',
 					array(
-						'methods'   => 'PUT',
+						'methods'  => 'PUT',
 						'callback' => array( $this, 'update_deleted_at' ),
 					),
 				);
@@ -78,7 +78,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-index-errors/(?P<cuid>[\w]+)',
 					array(
-						'methods'   => 'PUT',
+						'methods'  => 'PUT',
 						'callback' => array( $this, 'update_index_errors' ),
 					),
 				);
@@ -207,7 +207,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$result = $this->wpdb->insert( $this->table_name, $insert_data );
 
-			$response = $this->handle_response( $result, 'Profile created successfully.' );
+			$response = $this->handle_response( $result, 'Profile created successfully.', 'Failed to create a profile.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -236,7 +236,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$update_data = array(
 				'title'      => sanitize_text_field( $data['title'] ),
 				'profile'    => wp_json_encode( $data['profile'] ),
-				'updated_at' => current_time('mysql'),
+				'updated_at' => current_time( 'mysql' ),
 			);
 
 			$result = $this->wpdb->update(
@@ -245,7 +245,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			$response = $this->handle_response( $result, 'Profile updated successfully.' );
+			$response = $this->handle_response( $result, 'Profile updated successfully.', 'Failed to update the profile.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -274,7 +274,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			$response = $this->handle_response( $result, 'Profile deleted successfully.' );
+			$response = $this->handle_response( $result, 'Profile deleted successfully.', 'Failed to delete the profile.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -297,7 +297,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			$response = $this->handle_response( $result, 'Node ID updated successfully.' );
+			$response = $this->handle_response( $result, 'Node ID updated successfully.', 'Failed to update Node ID.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -314,11 +314,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$result = $this->wpdb->update(
 				$this->table_name,
-				array( 'deleted_at' => current_time('mysql') ),
+				array( 'deleted_at' => current_time( 'mysql' ) ),
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			$response = $this->handle_response( $result, 'deleted_at field updated successfully.' );
+			$response = $this->handle_response( $result, 'deleted_at field updated successfully.', 'Failed to update deleted_at field.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -339,7 +339,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				array( 'cuid' => $request['cuid'] )
 			);
 
-			$response = $this->handle_response( $result, 'Index errors updated successfully.' );
+			$response = $this->handle_response( $result, 'Index errors updated successfully.', 'Failed to update index errors.' );
 
 			return rest_ensure_response( $response );
 		}
@@ -354,9 +354,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return true;
 		}
 
-		private function handle_response( $update_result, $message ) {
+		private function handle_response( $update_result, $message, $error_message ) {
 			if ( $update_result === false ) {
-				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the index errors.', 'text-domain' ), array( 'status' => 500 ) );
+				return new WP_Error( 'update_failed', esc_html__( $error_message, 'text-domain' ), array( 'status' => 500 ) );
 			}
 
 			return array(

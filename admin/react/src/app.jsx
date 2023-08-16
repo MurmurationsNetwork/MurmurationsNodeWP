@@ -206,7 +206,7 @@ export default function App() {
         const resData = await res.json()
 
         if (!res.ok) {
-          await updateIndexErrors(cuid, resData)
+          await updateIndexErrors(cuid, resData, res.status)
         } else {
           await postAndPutRequest(
             `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
@@ -215,7 +215,7 @@ export default function App() {
             },
             'PUT'
           )
-          await updateIndexErrors(cuid, null)
+          await updateIndexErrors(cuid)
         }
       }
 
@@ -274,11 +274,11 @@ export default function App() {
       const res = await sendRequestToIndex(cuid)
       const resData = await res.json()
       if (!res.ok) {
-        await updateIndexErrors(cuid, resData)
+        await updateIndexErrors(cuid, resData, res.status)
         return
       }
 
-      await updateIndexErrors(cuid, null)
+      await updateIndexErrors(cuid)
       const response = await postAndPutRequest(
         `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
         {
@@ -327,7 +327,7 @@ export default function App() {
         const res = await deleteNodeFromIndex(responseData.node_id)
         if (!res.ok) {
           const resData = await res.json()
-          await updateIndexErrors(cuid, resData)
+          await updateIndexErrors(cuid, resData, res.status)
           await fetchProfiles(env)
           return
         }
@@ -404,12 +404,20 @@ export default function App() {
     return await deleteRequest(`${indexUrl}/nodes/${nodeId}`)
   }
 
-  const updateIndexErrors = async (cuid, errors) => {
+  const updateIndexErrors = async (cuid, errors = null, status = 200) => {
     try {
+      let index_errors = null
+      if (status !== 200) {
+        index_errors = {
+          status: status,
+          errors: errors
+        }
+      }
+
       const response = await postAndPutRequest(
         `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
         {
-          index_errors: errors
+          index_errors: index_errors
         },
         'PUT'
       )
