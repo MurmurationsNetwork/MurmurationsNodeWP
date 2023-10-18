@@ -9,7 +9,7 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 
 	    public function add_menus() {
 		    add_menu_page(
-			    'Murmurations Node',
+			    'Murmurations Profile Generator',
 			    'Murm-Profiles',
 			    'edit_posts', // capability
 			    'murmurations-node',

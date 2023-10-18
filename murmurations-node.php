@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Murmurations Node
+ * Plugin Name: Murmurations Profile Generator
  * Plugin URI: https://github.com/MurmurationsNetwork/MurmurationsNodeWP
  * Description: Add your profile to the Murmurations distributed data sharing network.
  * Version: 1.0.0-beta.3
