@@ -6,10 +6,10 @@
   "scripts": {
     "build": "npm-run-all --sequential build:*",
     "build:prod": "webpack --mode production",
-    "build:css": "tailwindcss -i src/styles/styles.css -o ../assets/react/bundle.css --minify",
+    "build:css": "tailwindcss -i src/styles/styles.css -o ../assets/react/index.css --minify",
     "dev": "npm-run-all --parallel watch:*",
     "watch:dev": "webpack --watch",
-    "watch:css": "tailwindcss -i ./src/styles/styles.css -o ../assets/react/bundle.css --watch --minify",
+    "watch:css": "tailwindcss -i ./src/styles/styles.css -o ../assets/react/index.css --watch --minify",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .jsx .",
     "lint-fix": "eslint --ignore-path .gitignore --ext .js --ext .jsx . --fix",
     "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|jsx|json)\"",
@@ -29,8 +29,8 @@
     ]
   },
   "dependencies": {
-    "@murmurations/jsig": "^1.0.2",
-    "@murmurations/jsrfg": "^1.0.0",
+    "@murmurations/jsig": "^1.0.4-pre.1",
+    "@murmurations/jsrfg": "^1.0.2-pre.1",
     "@paralleldrive/cuid2": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
