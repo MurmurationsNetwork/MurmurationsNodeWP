@@ -3,7 +3,7 @@
  * Plugin Name: Murmurations Profile Generator
  * Plugin URI: https://github.com/MurmurationsNetwork/MurmurationsNodeWP
  * Description: Add your profile to the Murmurations distributed data sharing network.
- * Version: 1.0.0-beta.5
+ * Version: 1.0.0-beta.6
  * Text Domain: murmurations-node
  * Author: Murmurations Network
  * Author URI: https://murmurations.network
