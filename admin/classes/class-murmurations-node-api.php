@@ -17,12 +17,18 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'/profile',
 					array(
 						array(
-							'methods'  => 'GET',
-							'callback' => array( $this, 'get_profiles' ),
+							'methods'             => 'GET',
+							'callback'            => array( $this, 'get_profiles' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 						array(
-							'methods'  => 'POST',
-							'callback' => array( $this, 'post_profile' ),
+							'methods'             => 'POST',
+							'callback'            => array( $this, 'post_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 					)
 				);
@@ -33,16 +39,23 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'/profile/(?P<cuid>[\w]+)',
 					array(
 						array(
-							'method'   => 'GET',
-							'callback' => array( $this, 'get_profile' ),
+							'method'              => 'GET',
+							'callback'            => array( $this, 'get_profile' ),
+							'permission_callback' => '__return_true'
 						),
 						array(
-							'methods'  => 'PUT',
-							'callback' => array( $this, 'edit_profile' ),
+							'methods'             => 'PUT',
+							'callback'            => array( $this, 'edit_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 						array(
-							'methods'  => 'DELETE',
-							'callback' => array( $this, 'delete_profile' ),
+							'methods'             => 'DELETE',
+							'callback'            => array( $this, 'delete_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 					)
 				);
@@ -51,8 +64,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile-detail/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'GET',
-						'callback' => array( $this, 'get_profile_detail' ),
+						'methods'             => 'GET',
+						'callback'            => array( $this, 'get_profile_detail' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -60,8 +76,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-node-id/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_node_id' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_node_id' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -69,8 +88,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-deleted-at/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_deleted_at' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_deleted_at' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -78,8 +100,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-index-errors/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_index_errors' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_index_errors' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 			} );
