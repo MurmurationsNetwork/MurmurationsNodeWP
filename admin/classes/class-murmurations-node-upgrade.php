@@ -5,7 +5,7 @@ if ( ! class_exists('Murmurations_Node_Upgrade') ) {
 		public function __construct() {
 			add_action( 'upgrader_process_complete', array( $this, 'upgrade_db_check' ) );
 		}
-		public static function upgrade_db_check() {
+		public static function upgrade_db_check(): void {
 			// uncomment the following line to upgrade the db
 //			$current_version = get_option( 'murmurations_node_version' );
 //

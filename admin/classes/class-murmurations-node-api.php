@@ -2,8 +2,8 @@
 
 if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	class Murmurations_Node_API {
-		private $wpdb;
-		private $table_name;
+		private QM_DB|wpdb $wpdb;
+		private string $table_name;
 
 		public function __construct() {
 			add_action( 'rest_api_init', function () {
@@ -85,7 +85,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			} );
 		}
 
-		public function get_profiles( $request ) {
+		public function get_profiles( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -120,7 +120,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function get_profile( $request ) {
+		public function get_profile( $request ): WP_Error|WP_REST_Response {
 			$cuid = $request['cuid'];
 
 			$profile = $this->wpdb->get_row(
@@ -137,7 +137,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function get_profile_detail( $request ) {
+		public function get_profile_detail( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -168,7 +168,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function post_profile( $request ) {
+		public function post_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -212,7 +212,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function edit_profile( $request ) {
+		public function edit_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -250,7 +250,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function delete_profile( $request ) {
+		public function delete_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -279,7 +279,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_node_id( $request ) {
+		public function update_node_id( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -302,7 +302,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_deleted_at( $request ) {
+		public function update_deleted_at( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -323,7 +323,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_index_errors( $request ) {
+		public function update_index_errors( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -344,7 +344,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		private function verify_nonce( $request ) {
+		private function verify_nonce( $request ): WP_Error|bool {
 			$nonce = $request['_wpnonce'] ?? '';
 
 			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
@@ -354,7 +354,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return true;
 		}
 
-		private function handle_response( $update_result, $message, $error_message ) {
+		private function handle_response( $update_result, $message, $error_message ): WP_Error|array {
 			if ( $update_result === false ) {
 				return new WP_Error( 'update_failed', esc_html__( $error_message, 'text-domain' ), array( 'status' => 500 ) );
 			}
