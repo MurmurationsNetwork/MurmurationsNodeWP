@@ -6,7 +6,7 @@ import { createId } from '@paralleldrive/cuid2'
 const schemas = [
   { title: 'An Organization', name: 'organizations_schema-v1.0.0' },
   { title: 'A Person', name: 'people_schema-v0.1.0' },
-  { title: 'An Offer or Want', name: 'offers_wants_schema-v0.1.0' }
+  { title: 'An Offer or Want', name: 'offers_wants_prototype-v0.0.2' }
 ]
 
 export default function App() {
@@ -554,8 +554,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? 'https://test-map.murmurations.network/?schema=offers_wants_schema-v0.1.0'
-                    : 'https://map.murmurations.network/?schema=offers_wants_schema-v0.1.0'
+                    ? 'https://test-map.murmurations.network/?schema=offers_wants_prototype-v0.0.2'
+                    : 'https://map.murmurations.network/?schema=offers_wants_prototype-v0.0.2'
                 }
                 target="_blank"
                 className="text-blue-600"
