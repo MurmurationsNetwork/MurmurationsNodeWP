@@ -2,8 +2,8 @@
 
 if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	class Murmurations_Node_API {
-		private $wpdb;
-		private $table_name;
+		private QM_DB|wpdb $wpdb;
+		private string $table_name;
 
 		public function __construct() {
 			add_action( 'rest_api_init', function () {
@@ -17,12 +17,18 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'/profile',
 					array(
 						array(
-							'methods'  => 'GET',
-							'callback' => array( $this, 'get_profiles' ),
+							'methods'             => 'GET',
+							'callback'            => array( $this, 'get_profiles' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 						array(
-							'methods'  => 'POST',
-							'callback' => array( $this, 'post_profile' ),
+							'methods'             => 'POST',
+							'callback'            => array( $this, 'post_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 					)
 				);
@@ -33,16 +39,23 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'/profile/(?P<cuid>[\w]+)',
 					array(
 						array(
-							'method'   => 'GET',
-							'callback' => array( $this, 'get_profile' ),
+							'method'              => 'GET',
+							'callback'            => array( $this, 'get_profile' ),
+							'permission_callback' => '__return_true'
 						),
 						array(
-							'methods'  => 'PUT',
-							'callback' => array( $this, 'edit_profile' ),
+							'methods'             => 'PUT',
+							'callback'            => array( $this, 'edit_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 						array(
-							'methods'  => 'DELETE',
-							'callback' => array( $this, 'delete_profile' ),
+							'methods'             => 'DELETE',
+							'callback'            => array( $this, 'delete_profile' ),
+							'permission_callback' => function () {
+								return current_user_can( 'activate_plugins' );
+							},
 						),
 					)
 				);
@@ -51,8 +64,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile-detail/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'GET',
-						'callback' => array( $this, 'get_profile_detail' ),
+						'methods'             => 'GET',
+						'callback'            => array( $this, 'get_profile_detail' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -60,8 +76,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-node-id/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_node_id' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_node_id' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -69,8 +88,11 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-deleted-at/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_deleted_at' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_deleted_at' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 
@@ -78,14 +100,17 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					'murmurations-node/v1',
 					'/profile/update-index-errors/(?P<cuid>[\w]+)',
 					array(
-						'methods'  => 'PUT',
-						'callback' => array( $this, 'update_index_errors' ),
+						'methods'             => 'PUT',
+						'callback'            => array( $this, 'update_index_errors' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
 					),
 				);
 			} );
 		}
 
-		public function get_profiles( $request ) {
+		public function get_profiles( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -120,7 +145,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function get_profile( $request ) {
+		public function get_profile( $request ): WP_Error|WP_REST_Response {
 			$cuid = $request['cuid'];
 
 			$profile = $this->wpdb->get_row(
@@ -137,7 +162,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function get_profile_detail( $request ) {
+		public function get_profile_detail( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -168,7 +193,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $data );
 		}
 
-		public function post_profile( $request ) {
+		public function post_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -212,7 +237,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function edit_profile( $request ) {
+		public function edit_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -250,7 +275,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function delete_profile( $request ) {
+		public function delete_profile( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -279,7 +304,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_node_id( $request ) {
+		public function update_node_id( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -302,7 +327,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_deleted_at( $request ) {
+		public function update_deleted_at( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -323,7 +348,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		public function update_index_errors( $request ) {
+		public function update_index_errors( $request ): WP_Error|WP_REST_Response {
 			$nonce_error = $this->verify_nonce( $request );
 			if ( is_wp_error( $nonce_error ) ) {
 				return $nonce_error;
@@ -344,7 +369,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return rest_ensure_response( $response );
 		}
 
-		private function verify_nonce( $request ) {
+		private function verify_nonce( $request ): WP_Error|bool {
 			$nonce = $request['_wpnonce'] ?? '';
 
 			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
@@ -354,7 +379,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			return true;
 		}
 
-		private function handle_response( $update_result, $message, $error_message ) {
+		private function handle_response( $update_result, $message, $error_message ): WP_Error|array {
 			if ( $update_result === false ) {
 				return new WP_Error( 'update_failed', esc_html__( $error_message, 'text-domain' ), array( 'status' => 500 ) );
 			}

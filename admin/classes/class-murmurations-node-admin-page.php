@@ -7,7 +7,7 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 		    add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	    }
 
-	    public function add_menus() {
+	    public function add_menus(): void {
 		    add_menu_page(
 			    'Murmurations Profile Generator',
 			    'Murm-Profiles',
@@ -19,12 +19,12 @@ if ( ! class_exists( 'Murmurations_Node_Admin_Page' ) ) {
 		    );
 	    }
 
-	    public function admin_page() {
+	    public function admin_page(): void {
 		    echo '<div id="wp-admin-plugin-page-root"></div>';
 		    echo '<style>#wpcontent {padding-left: 0;}</style>';
 	    }
 
-	    public function enqueue_assets( $hook ) {
+	    public function enqueue_assets( $hook ): void {
 		    if ( 'toplevel_page_murmurations-node' !== $hook ) {
 			    return;
 		    }
