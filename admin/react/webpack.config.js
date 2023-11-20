@@ -1,20 +1,13 @@
 const { resolve } = require('path')
 
-module.exports = (env, argv) => {
-  let publicPath
-  if (argv.mode === 'production') {
-    publicPath = '/wp-content/plugins/MurmurationsNodeWP/admin/assets/react/'
-  } else {
-    publicPath = '/wp-content/plugins/murmurations-node/admin/assets/react/'
-  }
-
+module.exports = () => {
   return {
     mode: 'development',
     entry: './src/index.js',
     output: {
       path: resolve(__dirname, '../assets/react'),
       filename: 'index.js',
-      publicPath: publicPath
+      publicPath: '/wp-content/plugins/MurmurationsNodeWP/admin/assets/react/'
     },
     module: {
       rules: [
