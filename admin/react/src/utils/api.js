@@ -23,10 +23,14 @@ export const updateProfile = async (cuid, profile) => {
   )
 }
 
-export const deleteProfile = async cuid => {
+export const deleteProfile = async (cuid, isLocal, indexUrl) => {
   return await fetchRequest(
     `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
-    'DELETE'
+    'DELETE',
+    {
+      is_local: isLocal,
+      index_url: indexUrl
+    }
   )
 }
 
@@ -69,10 +73,6 @@ export const postIndexProfile = async (indexUrl, cuid) => {
   return await fetchRequest(`${indexUrl}/nodes-sync`, 'POST', {
     profile_url: `${apiUrl}/profile/${cuid}`
   })
-}
-
-export const deleteIndexProfile = async (indexUrl, nodeId) => {
-  return await fetchRequest(`${indexUrl}/nodes/${nodeId}`, 'DELETE')
 }
 
 const fetchRequest = async (url, method, body) => {

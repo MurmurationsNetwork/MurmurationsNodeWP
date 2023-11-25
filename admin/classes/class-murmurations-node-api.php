@@ -281,8 +281,10 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return $nonce_error;
 			}
 
-			if ( ! isset( $request['cuid'] ) ) {
-				return new WP_Error( 'invalid_cuid', esc_html__( 'Invalid cuid in the request.', 'text-domain' ), array( 'status' => 400 ) );
+			$data = $request->get_json_params();
+
+			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
+				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
 
 			$existing_profile = $this->wpdb->get_row(
@@ -294,10 +296,63 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'profile_not_found', esc_html__( 'Profile not found.', 'text-domain' ), array( 'status' => 404 ) );
 			}
 
+			// update deleted_at field
+			$update_data = array(
+				'deleted_at' => current_time( 'mysql' ),
+			);
+
+			$result = $this->wpdb->update(
+				$this->table_name,
+				$update_data,
+				array( 'cuid' => $request['cuid'] )
+			);
+
+			if ( $result === false ) {
+				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
+			}
+
+			// delete the profile from index
+			if ( $data['is_local'] === false && ! empty( $existing_profile['node_id'] ) ) {
+				$index_url = $data['index_url'] . '/nodes/' . $existing_profile['node_id'];
+				$ch        = curl_init();
+				curl_setopt( $ch, CURLOPT_URL, $index_url );
+				curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'DELETE' );
+				curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+				$result = curl_exec( $ch );
+				curl_close( $ch );
+
+				if ( $result === false ) {
+					// update index_errors
+					$update_data = array(
+						'index_errors' => wp_json_encode( array(
+							'status' => $ch['http_code'] ?? '',
+							'error'  => curl_error( $ch ),
+						) ),
+					);
+
+					$result = $this->wpdb->update(
+						$this->table_name,
+						$update_data,
+						array( 'cuid' => $request['cuid'] )
+					);
+
+					if ( $result === false ) {
+						return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
+					}
+
+					return new WP_Error( 'index_delete_failed', esc_html__( 'Failed to delete the profile from the index.', 'text-domain' ), array( 'status' => 500 ) );
+				}
+			}
+
+			// delete the profile from the database
 			$result = $this->wpdb->delete(
 				$this->table_name,
 				array( 'cuid' => $request['cuid'] )
 			);
+
+			if ( $result === false ) {
+				return new WP_Error( 'delete_failed', esc_html__( 'Failed to delete the profile from the database.', 'text-domain' ), array( 'status' => 500 ) );
+			}
 
 			$response = $this->handle_response( $result, 'Profile deleted successfully.', 'Failed to delete the profile.' );
 

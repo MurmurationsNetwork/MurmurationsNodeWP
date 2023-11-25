@@ -263,36 +263,14 @@ export default function App() {
     setSchema(null)
 
     try {
-      const response = await api.getProfileDetails(cuid)
+      const response = await api.deleteProfile(cuid, isLocalhost(), indexUrl)
       const responseData = await response.json()
 
-      if (!response.ok) {
+      if (!response.ok && responseData.code !== 'index_delete_failed') {
         alert(`Error deleting profile: ${JSON.stringify(responseData)}`)
         return
       }
 
-      const updateResponse = await api.updateDeletedAt(cuid)
-      const updateResponseData = await updateResponse.json()
-      if (!updateResponse.ok) {
-        alert(`Error deleting profile: ${JSON.stringify(updateResponseData)}`)
-        return
-      }
-
-      if (!isLocalhost() && responseData.node_id !== null) {
-        const res = await api.deleteIndexProfile(indexUrl, responseData.node_id)
-        if (!res.ok) {
-          const resData = await res.json()
-          await updateIndexErrors(cuid, resData, res.status)
-          await fetchProfiles(env)
-          return
-        }
-      }
-      const deleteResponse = await api.deleteProfile(cuid)
-      const deleteResponseData = await deleteResponse.json()
-      if (!deleteResponse.ok) {
-        alert(`Error deleting profile: ${JSON.stringify(deleteResponseData)}`)
-        return
-      }
       await fetchProfiles(env)
     } catch (error) {
       alert(`Error deleting profile: ${error}`)
@@ -318,7 +296,7 @@ export default function App() {
         }
       }
 
-      const response = await updateIndexErrors(cuid, index_errors)
+      const response = await api.updateIndexErrors(cuid, index_errors)
       if (!response.ok) {
         const responseData = await response.json()
         alert(`Error updating index errors: ${JSON.stringify(responseData)}`)
