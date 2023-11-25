@@ -177,7 +177,7 @@ export default function App() {
 
       // if not localhost, send request to index
       if (!isLocalhost()) {
-        const res = await api.postIndexProfile(cuid)
+        const res = await api.postIndexProfile(indexUrl, cuid)
         const resData = await res.json()
 
         if (!res.ok) {
@@ -238,7 +238,7 @@ export default function App() {
     setSchema(null)
 
     try {
-      const res = await api.postIndexProfile(cuid)
+      const res = await api.postIndexProfile(indexUrl, cuid)
       const resData = await res.json()
       if (!res.ok) {
         await updateIndexErrors(cuid, resData, res.status)
