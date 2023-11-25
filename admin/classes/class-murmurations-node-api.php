@@ -326,7 +326,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					$update_data = array(
 						'index_errors' => wp_json_encode( array(
 							'status' => $ch['http_code'] ?? '',
-							'errors'  => curl_error( $ch ),
+							'errors' => curl_error( $ch ),
 						) ),
 					);
 
