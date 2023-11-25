@@ -57,7 +57,7 @@ export const updateDeletedAt = async cuid => {
 
 export const updateIndexErrors = async (cuid, indexErrors) => {
   return await fetchRequest(
-    `${apiUrl}/profile/update-index-error/${cuid}?_wpnonce=${wp_nonce}`,
+    `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
     'PUT',
     {
       index_errors: indexErrors
