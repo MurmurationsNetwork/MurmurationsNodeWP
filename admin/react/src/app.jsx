@@ -153,6 +153,7 @@ export default function App() {
         index_url: indexUrl
       }
 
+      // call WordPress api to save the profile
       if (method === 'PUT') {
         cuid = formData.get('cuid')
         response = await api.updateProfile(cuid, profile)
@@ -162,15 +163,19 @@ export default function App() {
         response = await api.saveProfile(profile)
       }
 
-      // call WordPress api to save the profile
       const responseData = await response.json()
       if (!response.ok) {
         alert(
           `Error saving profile with response: ${JSON.stringify(responseData)}`
         )
+        setSchema(null)
+        await fetchProfiles(env)
         return
       }
       console.log('Update successful! Response data:', responseData)
+
+      setSchema(null)
+      await fetchProfiles(env)
     } catch (error) {
       if (method === 'PUT') {
         alert(`Error updating profile: ${error}`)
@@ -179,8 +184,6 @@ export default function App() {
       }
     } finally {
       setLoading(false)
-      setSchema(null)
-      await fetchProfiles(env)
     }
   }
 
