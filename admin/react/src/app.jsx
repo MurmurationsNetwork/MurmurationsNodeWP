@@ -171,9 +171,6 @@ export default function App() {
         return
       }
       console.log('Update successful! Response data:', responseData)
-
-      setSchema(null)
-      await fetchProfiles(env)
     } catch (error) {
       if (method === 'PUT') {
         alert(`Error updating profile: ${error}`)
@@ -182,6 +179,8 @@ export default function App() {
       }
     } finally {
       setLoading(false)
+      setSchema(null)
+      await fetchProfiles(env)
     }
   }
 
