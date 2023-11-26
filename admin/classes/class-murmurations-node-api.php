@@ -115,11 +115,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function get_profiles( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$env = $request->get_param( 'env' );
 
 			if ( $env !== 'production' && $env !== 'test' ) {
@@ -150,11 +145,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function post_profile( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$data = $request->get_json_params();
 
 			// validate the data
@@ -225,11 +215,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function edit_profile( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$data = $request->get_json_params();
 
 			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
@@ -275,11 +260,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function delete_profile( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$data = $request->get_json_params();
 
 			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
@@ -359,11 +339,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function get_profile_detail( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$cuid = $request['cuid'];
 
 			$profile = $this->wpdb->get_row(
@@ -390,11 +365,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function resend_profile( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$data = $request->get_json_params();
 
 			if ( ! isset( $request['cuid'] ) || ! isset( $data['index_url'] ) ) {
@@ -420,11 +390,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function update_node_id( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			$data = $request->get_json_params();
 
 			if ( ! isset( $data['node_id'] ) ) {
@@ -443,11 +408,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function update_deleted_at( $request ): WP_Error|WP_REST_Response {
-			$nonce_error = $this->verify_nonce( $request );
-			if ( is_wp_error( $nonce_error ) ) {
-				return $nonce_error;
-			}
-
 			if ( ! isset( $request['cuid'] ) ) {
 				return new WP_Error( 'invalid_cuid', esc_html__( 'Invalid cuid in the request.', 'text-domain' ), array( 'status' => 400 ) );
 			}
@@ -517,16 +477,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			return null;
-		}
-
-		private function verify_nonce( $request ): WP_Error|bool {
-			$nonce = $request['_wpnonce'] ?? '';
-
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'Permission denied' ), array( 'status' => 401 ) );
-			}
-
-			return true;
 		}
 
 		private function handle_response( $update_result, $message, $error_message ): WP_Error|array {
