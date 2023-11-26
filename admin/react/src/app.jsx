@@ -143,25 +143,22 @@ export default function App() {
     const method = formData.has('cuid') ? 'PUT' : 'POST'
 
     try {
-      let cuid, profile, response
+      let cuid, response
+      let profile = {
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result,
+        env: env,
+        is_local: isLocalhost(),
+        index_url: indexUrl
+      }
+
       if (method === 'PUT') {
         cuid = formData.get('cuid')
-        profile = {
-          title: profileTitle,
-          linked_schemas: result.linked_schemas,
-          profile: result,
-          env: env
-        }
         response = await api.updateProfile(cuid, profile)
       } else {
         cuid = createId()
-        profile = {
-          cuid: cuid,
-          title: profileTitle,
-          linked_schemas: result.linked_schemas,
-          profile: result,
-          env: env
-        }
+        profile.cuid = cuid
         response = await api.saveProfile(profile)
       }
 
@@ -175,26 +172,13 @@ export default function App() {
       }
       console.log('Update successful! Response data:', responseData)
 
-      // if not localhost, send request to index
-      if (!isLocalhost()) {
-        const res = await api.postIndexProfile(indexUrl, cuid)
-        const resData = await res.json()
-
-        if (!res.ok) {
-          await updateIndexErrors(cuid, resData, res.status)
-        } else {
-          await api.updateNodeId(cuid, resData.data.node_id)
-          await updateIndexErrors(cuid)
-        }
-      }
-
       setSchema(null)
       await fetchProfiles(env)
     } catch (error) {
-      if (method === 'POST') {
-        alert(`Error posting profile: ${error}`)
-      } else {
+      if (method === 'PUT') {
         alert(`Error updating profile: ${error}`)
+      } else {
+        alert(`Error posting profile: ${error}`)
       }
     } finally {
       setLoading(false)

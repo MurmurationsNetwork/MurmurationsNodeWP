@@ -6,108 +6,112 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		private string $table_name;
 
 		public function __construct() {
-			add_action( 'rest_api_init', function () {
-				global $wpdb;
-				$this->wpdb       = $wpdb;
-				$this->table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
+			global $wpdb;
+			$this->wpdb       = $wpdb;
+			$this->table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
 
-				// routes without cuid
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile',
-					array(
-						array(
-							'methods'             => 'GET',
-							'callback'            => array( $this, 'get_profiles' ),
-							'permission_callback' => function () {
-								return current_user_can( 'activate_plugins' );
-							},
-						),
-						array(
-							'methods'             => 'POST',
-							'callback'            => array( $this, 'post_profile' ),
-							'permission_callback' => function () {
-								return current_user_can( 'activate_plugins' );
-							},
-						),
-					)
-				);
+			add_action( 'rest_api_init', array( $this, 'register_api_routes' ) );
+		}
 
-				// routes with cuid
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile/(?P<cuid>[\w]+)',
-					array(
-						array(
-							'method'              => 'GET',
-							'callback'            => array( $this, 'get_profile' ),
-							'permission_callback' => '__return_true'
-						),
-						array(
-							'methods'             => 'PUT',
-							'callback'            => array( $this, 'edit_profile' ),
-							'permission_callback' => function () {
-								return current_user_can( 'activate_plugins' );
-							},
-						),
-						array(
-							'methods'             => 'DELETE',
-							'callback'            => array( $this, 'delete_profile' ),
-							'permission_callback' => function () {
-								return current_user_can( 'activate_plugins' );
-							},
-						),
-					)
-				);
+		public function register_api_routes(): void {
+			$namespace = 'murmurations-node/v1';
 
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile-detail/(?P<cuid>[\w]+)',
+			// routes without cuid
+			register_rest_route(
+				$namespace,
+				'/profile',
+				array(
 					array(
 						'methods'             => 'GET',
-						'callback'            => array( $this, 'get_profile_detail' ),
+						'callback'            => array( $this, 'get_profiles' ),
 						'permission_callback' => function () {
 							return current_user_can( 'activate_plugins' );
 						},
 					),
-				);
+					array(
+						'methods'             => 'POST',
+						'callback'            => array( $this, 'post_profile' ),
+						'permission_callback' => function () {
+							return current_user_can( 'activate_plugins' );
+						},
+					),
+				)
+			);
 
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile/update-node-id/(?P<cuid>[\w]+)',
+			// routes with cuid
+			register_rest_route(
+				$namespace,
+				'/profile/(?P<cuid>[\w]+)',
+				array(
+					array(
+						'method'              => 'GET',
+						'callback'            => array( $this, 'get_profile' ),
+						'permission_callback' => '__return_true'
+					),
 					array(
 						'methods'             => 'PUT',
-						'callback'            => array( $this, 'update_node_id' ),
+						'callback'            => array( $this, 'edit_profile' ),
 						'permission_callback' => function () {
 							return current_user_can( 'activate_plugins' );
 						},
 					),
-				);
-
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile/update-deleted-at/(?P<cuid>[\w]+)',
 					array(
-						'methods'             => 'PUT',
-						'callback'            => array( $this, 'update_deleted_at' ),
+						'methods'             => 'DELETE',
+						'callback'            => array( $this, 'delete_profile' ),
 						'permission_callback' => function () {
 							return current_user_can( 'activate_plugins' );
 						},
 					),
-				);
+				)
+			);
 
-				register_rest_route(
-					'murmurations-node/v1',
-					'/profile/update-index-errors/(?P<cuid>[\w]+)',
-					array(
-						'methods'             => 'PUT',
-						'callback'            => array( $this, 'update_index_errors' ),
-						'permission_callback' => function () {
-							return current_user_can( 'activate_plugins' );
-						},
-					),
-				);
-			} );
+			register_rest_route(
+				$namespace,
+				'/profile-detail/(?P<cuid>[\w]+)',
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_profile_detail' ),
+					'permission_callback' => function () {
+						return current_user_can( 'activate_plugins' );
+					},
+				),
+			);
+
+			register_rest_route(
+				$namespace,
+				'/profile/update-node-id/(?P<cuid>[\w]+)',
+				array(
+					'methods'             => 'PUT',
+					'callback'            => array( $this, 'update_node_id' ),
+					'permission_callback' => function () {
+						return current_user_can( 'activate_plugins' );
+					},
+				),
+			);
+
+			register_rest_route(
+				$namespace,
+				'/profile/update-deleted-at/(?P<cuid>[\w]+)',
+				array(
+					'methods'             => 'PUT',
+					'callback'            => array( $this, 'update_deleted_at' ),
+					'permission_callback' => function () {
+						return current_user_can( 'activate_plugins' );
+					},
+				),
+			);
+
+			register_rest_route(
+				$namespace,
+				'/profile/update-index-errors/(?P<cuid>[\w]+)',
+				array(
+					'methods'             => 'PUT',
+					'callback'            => array( $this, 'update_index_errors' ),
+					'permission_callback' => function () {
+						return current_user_can( 'activate_plugins' );
+					},
+				),
+			);
 		}
 
 		public function get_profiles( $request ): WP_Error|WP_REST_Response {
@@ -207,7 +211,9 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				! isset( $data['linked_schemas'] ) ||
 				! isset( $data['title'] ) ||
 				! isset( $data['profile'] ) ||
-				! isset( $data['env'] )
+				! isset( $data['env'] ) ||
+				! isset( $data['is_local'] ) ||
+				! isset( $data['index_url'] )
 			) {
 				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
@@ -232,6 +238,18 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$result = $this->wpdb->insert( $this->table_name, $insert_data );
 
+			if ( $result === false ) {
+				return new WP_Error( 'insert_failed', esc_html__( 'Failed to create a profile.', 'text-domain' ), array( 'status' => 500 ) );
+			}
+
+			if ( $data['is_local'] === false ) {
+				$index_url        = $data['index_url'] . '/nodes-sync';
+				$indexUpdateError = $this->updateProfileIndex( $data['cuid'], $index_url );
+				if ( $indexUpdateError !== null ) {
+					return $indexUpdateError;
+				}
+			}
+
 			$response = $this->handle_response( $result, 'Profile created successfully.', 'Failed to create a profile.' );
 
 			return rest_ensure_response( $response );
@@ -245,8 +263,8 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 			$data = $request->get_json_params();
 
-			if ( ! isset( $request['cuid'] ) ) {
-				return new WP_Error( 'invalid_cuid', esc_html__( 'Invalid cuid in the request.', 'text-domain' ), array( 'status' => 400 ) );
+			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
+				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
 
 			$existing_profile = $this->wpdb->get_row(
@@ -269,6 +287,18 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				$update_data,
 				array( 'cuid' => $request['cuid'] )
 			);
+
+			if ( $result === false ) {
+				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
+			}
+
+			if ( $data['is_local'] === false ) {
+				$index_url        = $data['index_url'] . '/nodes-sync';
+				$indexUpdateError = $this->updateProfileIndex( $request['cuid'], $index_url );
+				if ( $indexUpdateError !== null ) {
+					return $indexUpdateError;
+				}
+			}
 
 			$response = $this->handle_response( $result, 'Profile updated successfully.', 'Failed to update the profile.' );
 
@@ -422,6 +452,56 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$response = $this->handle_response( $result, 'Index errors updated successfully.', 'Failed to update index errors.' );
 
 			return rest_ensure_response( $response );
+		}
+
+		private function updateProfileIndex( $cuid, $indexUrl ): WP_Error|null {
+			$profileUrl = get_site_url() . '/wp-json/murmurations-node/v1/profile/' . $cuid;
+			$ch         = curl_init();
+			curl_setopt( $ch, CURLOPT_URL, $indexUrl );
+			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, wp_json_encode( [ 'profile_url' => $profileUrl ] ) );
+			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+			$result = curl_exec( $ch );
+			curl_close( $ch );
+
+			if ( $result === false ) {
+				// update index_errors
+				$updateData = [
+					'index_errors' => wp_json_encode( [
+						'status' => $ch['http_code'] ?? '',
+						'errors' => curl_error( $ch ),
+					] ),
+				];
+
+				$updateResult = $this->wpdb->update(
+					$this->table_name,
+					$updateData,
+					[ 'cuid' => $cuid ]
+				);
+
+				if ( $updateResult === false ) {
+					return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), [ 'status' => 500 ] );
+				}
+
+				return new WP_Error( 'index_update_failed', esc_html__( 'Failed to update the profile in the index.', 'text-domain' ), [ 'status' => 500 ] );
+			}
+
+			// update node_id
+			$updateData = [
+				'node_id' => sanitize_text_field( $ch['data']['node_id'] ),
+			];
+
+			$updateResult = $this->wpdb->update(
+				$this->table_name,
+				$updateData,
+				[ 'cuid' => $cuid ]
+			);
+
+			if ( $updateResult === false ) {
+				return new WP_Error( 'node_id_update_failed', esc_html__( 'Failed to update the node id.', 'text-domain' ), [ 'status' => 500 ] );
+			}
+
+			return null;
 		}
 
 		private function verify_nonce( $request ): WP_Error|bool {
