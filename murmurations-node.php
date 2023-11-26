@@ -3,7 +3,7 @@
  * Plugin Name:       Murmurations Profile Generator
  * Plugin URI:        https://github.com/MurmurationsNetwork/MurmurationsNodeWP
  * Description:       Add your profile to the Murmurations distributed data sharing network.
- * Version:           1.0.0-beta.7
+ * Version:           1.0.0-beta.8
  * Requires at least: 6.4
  * Text Domain:       murmurations-node
  * Author:            Murmurations Network
@@ -33,6 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'MurmurationsNode' ) ) {
+	define( 'MURMURATIONS_NODE_VERSION', '1.0.0-beta.8' );
 	define( 'MURMURATIONS_NODE_URL', plugin_dir_url( __FILE__ ) );
 	define( 'MURMURATIONS_NODE_DIR', __DIR__ );
 	define( 'MURMURATIONS_NODE_TABLE', 'murmurations_profiles' );
@@ -45,7 +46,7 @@ if ( ! class_exists( 'MurmurationsNode' ) ) {
 			$this->register_upgrade();
 		}
 
-		private function register_autoloads() {
+		private function register_autoloads(): void {
 			spl_autoload_register( function ( $name ) {
 				$name = strtolower( $name );
 				$name = str_replace( '_', '-', $name );
@@ -58,15 +59,15 @@ if ( ! class_exists( 'MurmurationsNode' ) ) {
 			} );
 		}
 
-		public function register_admin_page() {
+		public function register_admin_page(): void {
 			new Murmurations_Node_Admin_Page();
 		}
 
-		public function register_api() {
+		public function register_api(): void {
 			new Murmurations_Node_API();
 		}
 
-		public function register_upgrade() {
+		public function register_upgrade(): void {
 			new Murmurations_Node_Upgrade();
 		}
 	}
@@ -76,6 +77,10 @@ if ( ! class_exists( 'MurmurationsNode' ) ) {
 
 if ( class_exists( 'Murmurations_Node_Activation' ) ) {
 	register_activation_hook( __FILE__, array( 'Murmurations_Node_Activation', 'activate' ) );
+}
+
+if ( class_exists( 'Murmurations_Node_Deactivation' ) ) {
+	register_deactivation_hook( __FILE__, array( 'Murmurations_Node_Deactivation', 'deactivate' ) );
 }
 
 if ( class_exists( 'Murmurations_Node_Uninstall' ) ) {

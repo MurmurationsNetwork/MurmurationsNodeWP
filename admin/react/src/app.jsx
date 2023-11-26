@@ -2,26 +2,15 @@ import { GenerateForm } from '@murmurations/jsrfg'
 import { generateSchemaInstance, parseSchemas } from '@murmurations/jsig'
 import { useEffect, useRef, useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
-
-const schemas = [
-  { title: 'An Organization', name: 'organizations_schema-v1.0.0' },
-  { title: 'A Person', name: 'people_schema-v0.1.0' },
-  { title: 'An Offer or Want', name: 'offers_wants_prototype-v0.0.2' }
-]
+import * as api from './utils/api'
+import { defaultProfile } from './data/defaultProfile'
+import * as config from './data/config'
+import { schemas } from './data/schemas'
 
 export default function App() {
-  // eslint-disable-next-line no-undef
-  const wordpressUrl = murmurations_node.wordpress_url
-  // eslint-disable-next-line no-undef
-  const wp_nonce = murmurations_node.wp_nonce
-
   const [env, setEnv] = useState('test')
-  const [indexUrl, setIndexUrl] = useState(
-    'https://test-index.murmurations.network/v2'
-  )
-  const [libraryUrl, setLibraryUrl] = useState(
-    'https://test-library.murmurations.network/v2'
-  )
+  const [indexUrl, setIndexUrl] = useState(config.testIndexUrl)
+  const [libraryUrl, setLibraryUrl] = useState(config.testLibraryUrl)
   const [loading, setLoading] = useState(false)
   const [schema, setSchema] = useState(null)
   const [profiles, setProfiles] = useState(null)
@@ -34,8 +23,6 @@ export default function App() {
 
   const errorContainerRef = useRef(null)
 
-  const apiUrl = `${wordpressUrl}/wp-json/murmurations-node/v1`
-
   useEffect(() => {
     fetchProfiles(env).then(() => {
       setSchema(null)
@@ -45,21 +32,19 @@ export default function App() {
 
   const setTestEnv = async () => {
     setEnv('test')
-    setIndexUrl('https://test-index.murmurations.network/v2')
-    setLibraryUrl('https://test-library.murmurations.network/v2')
+    setIndexUrl(config.testIndexUrl)
+    setLibraryUrl(config.testLibraryUrl)
   }
 
   const setProductionEnv = async () => {
     setEnv('production')
-    setIndexUrl('https://index.murmurations.network/v2')
-    setLibraryUrl('https://library.murmurations.network/v2')
+    setIndexUrl(config.productionIndexUrl)
+    setLibraryUrl(config.productionLibraryUrl)
   }
 
   const fetchProfiles = async environment => {
     try {
-      const response = await fetch(
-        `${apiUrl}/profile?env=${environment}&_wpnonce=${wp_nonce}`
-      )
+      const response = await api.getProfiles(environment)
       const responseData = await response.json()
 
       if (!response.ok) {
@@ -98,11 +83,6 @@ export default function App() {
 
     // if the profile is new, set the default primary url and schema
     if (isNew) {
-      const defaultProfile = {
-        profile: {
-          primary_url: wordpressUrl
-        }
-      }
       setProfileData(defaultProfile)
       selectedSchema = document.getElementById('schema').value
     }
@@ -143,12 +123,7 @@ export default function App() {
     // validate the profile before submitting
     setValidationErrors(null)
     try {
-      const response = await postAndPutRequest(
-        `${indexUrl}/validate`,
-        result,
-        'POST'
-      )
-
+      const response = await api.validateProfile(indexUrl, result)
       if (!response.ok) {
         const responseData = await response.json()
         setValidationErrors(responseData.errors)
@@ -166,66 +141,46 @@ export default function App() {
 
     // submit has two modes: create and update
     const method = formData.has('cuid') ? 'PUT' : 'POST'
-    let cuid, profileToUpdate, url
-    if (method === 'PUT') {
-      cuid = formData.get('cuid')
-      url = `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`
-      profileToUpdate = {
-        title: profileTitle,
-        linked_schemas: result.linked_schemas,
-        profile: result,
-        env: env
-      }
-    } else {
-      cuid = createId()
-      url = `${apiUrl}/profile?_wpnonce=${wp_nonce}`
-      profileToUpdate = {
-        cuid: cuid,
-        title: profileTitle,
-        linked_schemas: result.linked_schemas,
-        profile: result,
-        env: env
-      }
-    }
 
     try {
+      let cuid, response
+      let profile = {
+        title: profileTitle,
+        linked_schemas: result.linked_schemas,
+        profile: result,
+        env: env,
+        is_local: isLocalhost(),
+        index_url: indexUrl
+      }
+
       // call WordPress api to save the profile
-      const response = await postAndPutRequest(url, profileToUpdate, method)
+      if (method === 'PUT') {
+        cuid = formData.get('cuid')
+        response = await api.updateProfile(cuid, profile)
+      } else {
+        cuid = createId()
+        profile.cuid = cuid
+        response = await api.saveProfile(profile)
+      }
+
       const responseData = await response.json()
       if (!response.ok) {
         alert(
           `Error saving profile with response: ${JSON.stringify(responseData)}`
         )
+        setSchema(null)
+        await fetchProfiles(env)
         return
       }
       console.log('Update successful! Response data:', responseData)
 
-      // if not localhost, send request to index
-      if (!isLocalhost()) {
-        const res = await sendRequestToIndex(cuid)
-        const resData = await res.json()
-
-        if (!res.ok) {
-          await updateIndexErrors(cuid, resData, res.status)
-        } else {
-          await postAndPutRequest(
-            `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
-            {
-              node_id: resData.data.node_id
-            },
-            'PUT'
-          )
-          await updateIndexErrors(cuid)
-        }
-      }
-
       setSchema(null)
       await fetchProfiles(env)
     } catch (error) {
-      if (method === 'POST') {
-        alert(`Error posting profile: ${error}`)
-      } else {
+      if (method === 'PUT') {
         alert(`Error updating profile: ${error}`)
+      } else {
+        alert(`Error posting profile: ${error}`)
       }
     } finally {
       setLoading(false)
@@ -233,7 +188,7 @@ export default function App() {
   }
 
   const handleView = cuid => {
-    window.open(`${apiUrl}/profile/${cuid}`, '_blank')
+    window.open(`${config.apiUrl}/profile/${cuid}`, '_blank')
   }
 
   const handleModify = async cuid => {
@@ -241,15 +196,13 @@ export default function App() {
     setSchema(null)
 
     try {
-      const response = await fetch(
-        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
-      )
+      const response = await api.getProfileDetails(cuid)
       let responseData = await response.json()
       if (
         responseData.profile.primary_url == null ||
         responseData.profile.primary_url === ''
       ) {
-        responseData.profile.primary_url = wordpressUrl
+        responseData.profile.primary_url = config.wordpressUrl
       }
       setProfileData(responseData)
       // todo: we need to fetchSchema according to the linked_schemas
@@ -271,23 +224,17 @@ export default function App() {
     setSchema(null)
 
     try {
-      const res = await sendRequestToIndex(cuid)
-      const resData = await res.json()
-      if (!res.ok) {
-        await updateIndexErrors(cuid, resData, res.status)
+      const response = await api.resendProfile(indexUrl, cuid)
+      const responseData = await response.json()
+      if (!response.ok) {
+        alert(
+          `Error resending profile with response: ${JSON.stringify(
+            responseData
+          )}`
+        )
         return
       }
-
-      await updateIndexErrors(cuid)
-      const response = await postAndPutRequest(
-        `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
-        {
-          node_id: resData.data.node_id
-        },
-        'PUT'
-      )
-      const responseData = await response.json()
-      console.log('Update successful! Response data:', responseData)
+      console.log('Resend successful! Response data:', responseData)
 
       await fetchProfiles(env)
     } catch (error) {
@@ -302,44 +249,14 @@ export default function App() {
     setSchema(null)
 
     try {
-      const response = await fetch(
-        `${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`
-      )
+      const response = await api.deleteProfile(cuid, isLocalhost(), indexUrl)
       const responseData = await response.json()
 
-      if (!response.ok) {
+      if (!response.ok && responseData.code !== 'index_delete_failed') {
         alert(`Error deleting profile: ${JSON.stringify(responseData)}`)
         return
       }
 
-      const updateResponse = await postAndPutRequest(
-        `${apiUrl}/profile/update-deleted-at/${cuid}?_wpnonce=${wp_nonce}`,
-        {},
-        'PUT'
-      )
-      const updateResponseData = await updateResponse.json()
-      if (!updateResponse.ok) {
-        alert(`Error deleting profile: ${JSON.stringify(updateResponseData)}`)
-        return
-      }
-
-      if (!isLocalhost() && responseData.node_id !== null) {
-        const res = await deleteNodeFromIndex(responseData.node_id)
-        if (!res.ok) {
-          const resData = await res.json()
-          await updateIndexErrors(cuid, resData, res.status)
-          await fetchProfiles(env)
-          return
-        }
-      }
-      const deleteResponse = await deleteRequest(
-        `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`
-      )
-      const deleteResponseData = await deleteResponse.json()
-      if (!deleteResponse.ok) {
-        alert(`Error deleting profile: ${JSON.stringify(deleteResponseData)}`)
-        return
-      }
       await fetchProfiles(env)
     } catch (error) {
       alert(`Error deleting profile: ${error}`)
@@ -350,102 +267,9 @@ export default function App() {
 
   const isLocalhost = () => {
     return (
-      wordpressUrl.indexOf('localhost') !== -1 || wordpressUrl.endsWith('.test')
+      config.wordpressUrl.indexOf('localhost') !== -1 ||
+      config.wordpressUrl.endsWith('.test')
     )
-  }
-
-  const postAndPutRequest = async (url, data, method) => {
-    if (method !== 'POST' && method !== 'PUT') {
-      alert(`Error: ${method} is not a valid method with url: ${url}`)
-      return
-    }
-
-    try {
-      return await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-    } catch (error) {
-      if (method === 'POST') {
-        alert(`Error posting data: ${error}`)
-      } else {
-        alert(`Error updating data: ${error}`)
-      }
-    }
-  }
-
-  const deleteRequest = async url => {
-    try {
-      return await fetch(url, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    } catch (error) {
-      alert(`Error deleting data: ${error}`)
-    }
-  }
-
-  const sendRequestToIndex = async cuid => {
-    return await postAndPutRequest(
-      `${indexUrl}/nodes-sync`,
-      {
-        profile_url: `${apiUrl}/profile/${cuid}`
-      },
-      'POST'
-    )
-  }
-
-  const deleteNodeFromIndex = async nodeId => {
-    return await deleteRequest(`${indexUrl}/nodes/${nodeId}`)
-  }
-
-  const updateIndexErrors = async (cuid, errors = null, status = 200) => {
-    try {
-      let index_errors = null
-      if (status !== 200) {
-        index_errors = {
-          status: status,
-          errors: errors
-        }
-      }
-
-      const response = await postAndPutRequest(
-        `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
-        {
-          index_errors: index_errors
-        },
-        'PUT'
-      )
-      if (!response.ok) {
-        const responseData = await response.json()
-        alert(`Error updating index errors: ${JSON.stringify(responseData)}`)
-        return
-      }
-      if (errors && errors.meta && errors.meta.node_id !== null) {
-        const updateResponse = await postAndPutRequest(
-          `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
-          {
-            node_id: errors.meta.node_id
-          },
-          'PUT'
-        )
-        if (!updateResponse.ok) {
-          const updateResponseData = await updateResponse.json()
-          alert(
-            `Error updating node_id with index errors: ${JSON.stringify(
-              updateResponseData
-            )}`
-          )
-        }
-      }
-    } catch (error) {
-      alert(`Error updating index errors: ${error}`)
-    }
   }
 
   return (
@@ -528,8 +352,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? 'https://test-map.murmurations.network/?schema=organizations_schema-v1.0.0'
-                    : 'https://map.murmurations.network/?schema=organizations_schema-v1.0.0'
+                    ? config.testMapUrl + schemas[0].name
+                    : config.productionMapUrl + schemas[0].name
                 }
                 target="_blank"
                 className="text-blue-600"
@@ -541,8 +365,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? 'https://test-map.murmurations.network/?schema=people_schema-v0.1.0'
-                    : 'https://map.murmurations.network/?schema=people_schema-v0.1.0'
+                    ? config.testMapUrl + schemas[1].name
+                    : config.productionMapUrl + schemas[1].name
                 }
                 target="_blank"
                 className="text-blue-600"
@@ -554,8 +378,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? 'https://test-map.murmurations.network/?schema=offers_wants_prototype-v0.0.2'
-                    : 'https://map.murmurations.network/?schema=offers_wants_prototype-v0.0.2'
+                    ? config.testMapUrl + schemas[2].name
+                    : config.productionMapUrl + schemas[2].name
                 }
                 target="_blank"
                 className="text-blue-600"

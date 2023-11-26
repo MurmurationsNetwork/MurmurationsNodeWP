@@ -1,11 +1,13 @@
 <?php
 
-if ( ! class_exists('Murmurations_Node_Activation') ) {
+if ( ! class_exists( 'Murmurations_Node_Activation' ) ) {
 	class Murmurations_Node_Activation {
 		public static function activate(): void {
+			// Clear the permalinks after the post type has been registered.
+			flush_rewrite_rules();
+
 			// set plugin version for future DB upgrade
-			$current_version = '1.0.0';
-			update_option( 'murmurations_node_version', $current_version );
+			update_option( 'murmurations_node_version', MURMURATIONS_NODE_VERSION );
 
 			global $wpdb;
 			$table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
