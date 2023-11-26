@@ -352,8 +352,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? config.testMapUrl + config.organizationSchema
-                    : config.productionMapUrl + config.organizationSchema
+                    ? config.testMapUrl + schemas[0].name
+                    : config.productionMapUrl + schemas[0].name
                 }
                 target="_blank"
                 className="text-blue-600"
@@ -365,8 +365,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? config.testMapUrl + config.peopleSchema
-                    : config.productionMapUrl + config.peopleSchema
+                    ? config.testMapUrl + schemas[1].name
+                    : config.productionMapUrl + schemas[1].name
                 }
                 target="_blank"
                 className="text-blue-600"
@@ -378,8 +378,8 @@ export default function App() {
               <a
                 href={
                   env === 'test'
-                    ? config.testMapUrl + config.offersSchema
-                    : config.productionMapUrl + config.offersSchema
+                    ? config.testMapUrl + schemas[2].name
+                    : config.productionMapUrl + schemas[2].name
                 }
                 target="_blank"
                 className="text-blue-600"
