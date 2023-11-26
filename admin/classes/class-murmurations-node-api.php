@@ -216,19 +216,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 		public function edit_profile( $request ): WP_Error|WP_REST_Response {
 			$data = $request->get_json_params();
-
-			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
-				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
-			}
-
-			$existing_profile = $this->wpdb->get_row(
-				$this->wpdb->prepare( "SELECT * FROM $this->table_name WHERE cuid = %s", $request['cuid'] ),
-				ARRAY_A
-			);
-
-			if ( empty( $existing_profile ) ) {
-				return new WP_Error( 'profile_not_found', esc_html__( 'Profile not found.', 'text-domain' ), array( 'status' => 404 ) );
-			}
+			$this->checkProfile( $request, $data );
 
 			$update_data = array(
 				'title'      => sanitize_text_field( $data['title'] ),
@@ -261,19 +249,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 
 		public function delete_profile( $request ): WP_Error|WP_REST_Response {
 			$data = $request->get_json_params();
-
-			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
-				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
-			}
-
-			$existing_profile = $this->wpdb->get_row(
-				$this->wpdb->prepare( "SELECT * FROM $this->table_name WHERE cuid = %s", $request['cuid'] ),
-				ARRAY_A
-			);
-
-			if ( empty( $existing_profile ) ) {
-				return new WP_Error( 'profile_not_found', esc_html__( 'Profile not found.', 'text-domain' ), array( 'status' => 404 ) );
-			}
+			$existing_profile = $this->checkProfile( $request, $data );
 
 			// update deleted_at field
 			$update_data = array(
@@ -421,6 +397,23 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$response = $this->handle_response( $result, 'deleted_at field updated successfully.', 'Failed to update deleted_at field.' );
 
 			return rest_ensure_response( $response );
+		}
+
+		private function checkProfile( $request, $data ): WP_Error|array {
+			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
+				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
+			}
+
+			$existing_profile = $this->wpdb->get_row(
+				$this->wpdb->prepare( "SELECT * FROM $this->table_name WHERE cuid = %s", $request['cuid'] ),
+				ARRAY_A
+			);
+
+			if ( empty( $existing_profile ) ) {
+				return new WP_Error( 'profile_not_found', esc_html__( 'Profile not found.', 'text-domain' ), array( 'status' => 404 ) );
+			}
+
+			return $existing_profile;
 		}
 
 		private function updateProfileIndex( $cuid, $indexUrl ): WP_Error|null {
