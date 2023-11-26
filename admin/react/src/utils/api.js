@@ -38,6 +38,16 @@ export const getProfileDetails = async cuid => {
   return fetch(`${apiUrl}/profile-detail/${cuid}?_wpnonce=${wp_nonce}`)
 }
 
+export const resendProfile = async (indexUrl, cuid) => {
+  return await fetchRequest(
+    `${apiUrl}/profile/resend/${cuid}?_wpnonce=${wp_nonce}`,
+    'POST',
+    {
+      index_url: indexUrl
+    }
+  )
+}
+
 export const updateNodeId = async (cuid, nodeId) => {
   return await fetchRequest(
     `${apiUrl}/profile/update-node-id/${cuid}?_wpnonce=${wp_nonce}`,
@@ -55,24 +65,8 @@ export const updateDeletedAt = async cuid => {
   )
 }
 
-export const updateIndexErrors = async (cuid, indexErrors) => {
-  return await fetchRequest(
-    `${apiUrl}/profile/update-index-errors/${cuid}?_wpnonce=${wp_nonce}`,
-    'PUT',
-    {
-      index_errors: indexErrors
-    }
-  )
-}
-
 export const validateProfile = async (indexUrl, profile) => {
   return await fetchRequest(`${indexUrl}/validate`, 'POST', profile)
-}
-
-export const postIndexProfile = async (indexUrl, cuid) => {
-  return await fetchRequest(`${indexUrl}/nodes-sync`, 'POST', {
-    profile_url: `${apiUrl}/profile/${cuid}`
-  })
 }
 
 const fetchRequest = async (url, method, body) => {

@@ -6,6 +6,7 @@ import * as api from './utils/api'
 import { defaultProfile } from './data/defaultProfile'
 import * as config from './data/config'
 import { schemas } from './data/schemas'
+import { resendProfile } from './utils/api'
 
 export default function App() {
   const [env, setEnv] = useState('test')
@@ -222,17 +223,17 @@ export default function App() {
     setSchema(null)
 
     try {
-      const res = await api.postIndexProfile(indexUrl, cuid)
-      const resData = await res.json()
-      if (!res.ok) {
-        await updateIndexErrors(cuid, resData, res.status)
+      const response = await api.resendProfile(indexUrl, cuid)
+      const responseData = await response.json()
+      if (!response.ok) {
+        alert(
+          `Error resending profile with response: ${JSON.stringify(
+            responseData
+          )}`
+        )
         return
       }
-
-      await updateIndexErrors(cuid)
-      const response = await api.updateNodeId(cuid, resData.data.node_id)
-      const responseData = await response.json()
-      console.log('Update successful! Response data:', responseData)
+      console.log('Resend successful! Response data:', responseData)
 
       await fetchProfiles(env)
     } catch (error) {
@@ -268,38 +269,6 @@ export default function App() {
       config.wordpressUrl.indexOf('localhost') !== -1 ||
       config.wordpressUrl.endsWith('.test')
     )
-  }
-
-  const updateIndexErrors = async (cuid, errors = null, status = 200) => {
-    try {
-      let index_errors = null
-      if (status !== 200) {
-        index_errors = {
-          status: status,
-          errors: errors
-        }
-      }
-
-      const response = await api.updateIndexErrors(cuid, index_errors)
-      if (!response.ok) {
-        const responseData = await response.json()
-        alert(`Error updating index errors: ${JSON.stringify(responseData)}`)
-        return
-      }
-      if (errors && errors.meta && errors.meta.node_id !== null) {
-        const updateResponse = await api.updateNodeId(cuid, errors.meta.node_id)
-        if (!updateResponse.ok) {
-          const updateResponseData = await updateResponse.json()
-          alert(
-            `Error updating node_id with index errors: ${JSON.stringify(
-              updateResponseData
-            )}`
-          )
-        }
-      }
-    } catch (error) {
-      alert(`Error updating index errors: ${error}`)
-    }
   }
 
   return (
