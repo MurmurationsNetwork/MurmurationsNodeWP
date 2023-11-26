@@ -6,7 +6,6 @@ import * as api from './utils/api'
 import { defaultProfile } from './data/defaultProfile'
 import * as config from './data/config'
 import { schemas } from './data/schemas'
-import { resendProfile } from './utils/api'
 
 export default function App() {
   const [env, setEnv] = useState('test')
