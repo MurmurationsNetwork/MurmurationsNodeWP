@@ -137,10 +137,10 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				$data[] = array(
 					'cuid'           => $profile['cuid'],
 					'node_id'        => $profile['node_id'],
-					'linked_schemas' => $profile['linked_schemas'] ? json_decode($profile['linked_schemas'], true) : null,
+					'linked_schemas' => $profile['linked_schemas'] ? json_decode( $profile['linked_schemas'], true ) : null,
 					'title'          => $profile['title'],
-					'profile'        => $profile['profile'] ? json_decode($profile['profile'], true) : null,
-					'index_errors'   => $profile['index_errors'] ? json_decode($profile['index_errors'], true) : null,
+					'profile'        => $profile['profile'] ? json_decode( $profile['profile'], true ) : null,
+					'index_errors'   => $profile['index_errors'] ? json_decode( $profile['index_errors'], true ) : null,
 					'created_at'     => $profile['created_at'],
 					'updated_at'     => $profile['updated_at'],
 				);
@@ -496,8 +496,14 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			// update node_id
+			$responseData = json_decode( $result, true );
+
+			if ( ! $responseData || ! isset( $responseData['data'] ) || ! isset( $responseData['data']['node_id'] ) ) {
+				return new WP_Error( 'node_id_not_found', esc_html__( 'Node ID not found in the response.', 'text-domain' ), [ 'status' => 500 ] );
+			}
+
 			$updateData = [
-				'node_id' => sanitize_text_field( $ch['data']['node_id'] ),
+				'node_id' => sanitize_text_field( $responseData['data']['node_id'] ),
 			];
 
 			$updateResult = $this->wpdb->update(
