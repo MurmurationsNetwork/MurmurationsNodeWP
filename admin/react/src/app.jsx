@@ -272,6 +272,12 @@ export default function App() {
     )
   }
 
+  const handleKeyDown = (e, callback) => {
+    if (e.key === 'Enter' || e.key === 'Space') {
+      callback()
+    }
+  }
+
   return (
     <div className="bg-gray-50 px-4 py-2">
       <h1 className="text-3xl">Murmurations Profile Generator</h1>
@@ -283,9 +289,11 @@ export default function App() {
         For testing use the <strong>Test Index.</strong>
       </div>
       <div className="box-border flex flex-row mt-8 text-lg">
-        <div
+        <button
           className="cursor-pointer basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
           onClick={() => setTestEnv()}
+          tabIndex={0}
+          onKeyDown={e => handleKeyDown(e, setTestEnv)}
         >
           <span
             className={`${
@@ -294,10 +302,12 @@ export default function App() {
           >
             Test Index
           </span>
-        </div>
-        <div
+        </button>
+        <button
           className="cursor-pointer basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
           onClick={() => setProductionEnv()}
+          tabIndex={0}
+          onKeyDown={e => handleKeyDown(e, setProductionEnv)}
         >
           <span
             className={`${
@@ -306,7 +316,7 @@ export default function App() {
           >
             Live Index
           </span>
-        </div>
+        </button>
       </div>
       <div
         className={`border-8 ${
