@@ -47,6 +47,7 @@
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.32.2",
     "grunt": "^1.6.1",
     "grunt-wp-readme-to-markdown": "^2.1.0",

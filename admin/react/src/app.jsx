@@ -89,6 +89,7 @@ export default function App() {
 
     if (selectedSchema === '') {
       alert('Please select a schema')
+      setLoading(false)
       return
     }
 
@@ -137,6 +138,7 @@ export default function App() {
       }
     } catch (error) {
       alert(`Error while validating data: ${error}`)
+      setLoading(false)
     }
 
     // submit has two modes: create and update
@@ -168,6 +170,7 @@ export default function App() {
         alert(
           `Error saving profile with response: ${JSON.stringify(responseData)}`
         )
+        setLoading(false)
         setSchema(null)
         await fetchProfiles(env)
         return
@@ -232,6 +235,7 @@ export default function App() {
             responseData
           )}`
         )
+        setLoading(false)
         return
       }
       console.log('Resend successful! Response data:', responseData)
@@ -254,6 +258,7 @@ export default function App() {
 
       if (!response.ok && responseData.code !== 'index_delete_failed') {
         alert(`Error deleting profile: ${JSON.stringify(responseData)}`)
+        setLoading(false)
         return
       }
 
@@ -272,6 +277,12 @@ export default function App() {
     )
   }
 
+  const handleKeyDown = (e, callback) => {
+    if (e.key === 'Enter' || e.key === 'Space') {
+      callback()
+    }
+  }
+
   return (
     <div className="bg-gray-50 px-4 py-2">
       <h1 className="text-3xl">Murmurations Profile Generator</h1>
@@ -283,9 +294,11 @@ export default function App() {
         For testing use the <strong>Test Index.</strong>
       </div>
       <div className="box-border flex flex-row mt-8 text-lg">
-        <div
+        <button
           className="cursor-pointer basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
           onClick={() => setTestEnv()}
+          tabIndex={0}
+          onKeyDown={e => handleKeyDown(e, setTestEnv)}
         >
           <span
             className={`${
@@ -294,10 +307,12 @@ export default function App() {
           >
             Test Index
           </span>
-        </div>
-        <div
+        </button>
+        <button
           className="cursor-pointer basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
           onClick={() => setProductionEnv()}
+          tabIndex={0}
+          onKeyDown={e => handleKeyDown(e, setProductionEnv)}
         >
           <span
             className={`${
@@ -306,7 +321,7 @@ export default function App() {
           >
             Live Index
           </span>
-        </div>
+        </button>
       </div>
       <div
         className={`border-8 ${
@@ -343,7 +358,7 @@ export default function App() {
               disabled={loading}
               onClick={() => handleSelectSchema(true)}
             >
-              {loading ? 'Loading ..' : 'Select'}
+              Select
             </button>
           </div>
           <div className="mt-8 lg:mt-0 xl:px-4 basis-full lg:basis-2/5 text-base">
@@ -467,9 +482,7 @@ export default function App() {
                     type="submit"
                     disabled={loading}
                   >
-                    {loading
-                      ? 'Loading ..'
-                      : env === 'test'
+                    {env === 'test'
                       ? 'Submit to Test Index'
                       : 'Submit to Live Index'}
                   </button>
@@ -537,7 +550,7 @@ export default function App() {
                           className="my-1 mx-2 max-w-fit rounded-full bg-amber-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
                           disabled={loading}
                         >
-                          {loading ? 'Loading ..' : 'Resend'}
+                          Resend
                         </button>
                       ) : null}
                       <button
@@ -545,7 +558,7 @@ export default function App() {
                         className="my-1 mx-2 max-w-fit rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
                         disabled={loading}
                       >
-                        {loading ? 'Loading ..' : 'Modify'}
+                        Modify
                       </button>
                       <button
                         onClick={() => {
@@ -556,7 +569,7 @@ export default function App() {
                         className="my-1 mx-2 max-w-fit rounded-full bg-red-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-red-400 disabled:opacity-75"
                         disabled={loading}
                       >
-                        {loading ? 'Loading ..' : 'Delete'}
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -577,7 +590,28 @@ export default function App() {
         </div>
       </div>
 
-      {showModal ? (
+      {loading ? (
+        <dialog className="inset-0 z-40 flex items-center justify-center">
+          <div className="bg-yellow-100 p-8 rounded shadow-xl">
+            <p className="text-2xl text-center mb-4">Processing...</p>
+            <p className="text-xl text-center mt-4">
+              Murmurations is an unfunded volunteer-led project.
+              <br />
+              Please consider{' '}
+              <a
+                href="https://opencollective.com/murmurations"
+                target="_blank"
+                className="text-blue-500 underline"
+                rel="noreferrer"
+              >
+                making a donation
+              </a>{' '}
+              to support development.
+            </p>
+          </div>
+        </dialog>
+      ) : null}
+      {showModal && !loading ? (
         <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
           <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
             <div className="p-6">
@@ -600,7 +634,7 @@ export default function App() {
           </div>
         </dialog>
       ) : null}
-      {showDeleteModal ? (
+      {showDeleteModal && !loading ? (
         <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
           <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
             <div className="p-6">
@@ -615,7 +649,7 @@ export default function App() {
                       setDeleteProfileId(null)
                     })
                   }}
-                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:scale-110 hover:bg-red-400"
+                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-lg text-white hover:scale-110 hover:bg-red-400"
                 >
                   Confirm Delete
                 </button>
@@ -624,7 +658,7 @@ export default function App() {
                     setShowDeleteModal(false)
                     setDeleteProfileId(null)
                   }}
-                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-400"
+                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-lg text-white hover:bg-yellow-400"
                 >
                   Cancel
                 </button>
