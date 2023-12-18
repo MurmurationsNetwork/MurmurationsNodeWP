@@ -235,7 +235,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
-			if ( !$this->is_local ) {
+			if ( ! $this->is_local ) {
 				$index_url        = $data['index_url'] . '/nodes-sync';
 				$indexUpdateError = $this->updateProfileIndex( $request['cuid'], $index_url );
 				if ( $indexUpdateError !== null ) {
