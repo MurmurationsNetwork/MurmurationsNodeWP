@@ -23,12 +23,11 @@ export const updateProfile = async (cuid, profile) => {
   )
 }
 
-export const deleteProfile = async (cuid, isLocal, indexUrl) => {
+export const deleteProfile = async (cuid, indexUrl) => {
   return await fetchRequest(
     `${apiUrl}/profile/${cuid}?_wpnonce=${wp_nonce}`,
     'DELETE',
     {
-      is_local: isLocal,
       index_url: indexUrl
     }
   )
