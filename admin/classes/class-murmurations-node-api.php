@@ -4,11 +4,13 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 	class Murmurations_Node_API {
 		private QM_DB|wpdb $wpdb;
 		private string $table_name;
+		private bool $is_local;
 
 		public function __construct() {
 			global $wpdb;
 			$this->wpdb       = $wpdb;
 			$this->table_name = $wpdb->prefix . MURMURATIONS_NODE_TABLE;
+			$this->is_local   = str_contains( get_site_url(), 'localhost' ) || str_contains( get_site_url(), '127.0.0.1' ) || str_contains( get_site_url(), '.test' );
 
 			add_action( 'rest_api_init', array( $this, 'register_api_routes' ) );
 		}
@@ -154,7 +156,6 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				! isset( $data['title'] ) ||
 				! isset( $data['profile'] ) ||
 				! isset( $data['env'] ) ||
-				! isset( $data['is_local'] ) ||
 				! isset( $data['index_url'] )
 			) {
 				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
@@ -184,7 +185,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'insert_failed', esc_html__( 'Failed to create a profile.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
-			if ( $data['is_local'] === false ) {
+			if ( ! $this->is_local ) {
 				$index_url        = $data['index_url'] . '/nodes-sync';
 				$indexUpdateError = $this->updateProfileIndex( $data['cuid'], $index_url );
 				if ( $indexUpdateError !== null ) {
@@ -234,7 +235,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
-			if ( $data['is_local'] === false ) {
+			if ( ! $this->is_local ) {
 				$index_url        = $data['index_url'] . '/nodes-sync';
 				$indexUpdateError = $this->updateProfileIndex( $request['cuid'], $index_url );
 				if ( $indexUpdateError !== null ) {
@@ -248,7 +249,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		public function delete_profile( $request ): WP_Error|WP_REST_Response {
-			$data = $request->get_json_params();
+			$data             = $request->get_json_params();
 			$existing_profile = $this->checkProfile( $request, $data );
 
 			// update deleted_at field
@@ -267,7 +268,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			}
 
 			// delete the profile from index
-			if ( $data['is_local'] === false && ! empty( $existing_profile['node_id'] ) ) {
+			if ( ! $this->is_local && ! empty( $existing_profile['node_id'] ) ) {
 				$index_url = $data['index_url'] . '/nodes/' . $existing_profile['node_id'];
 				$ch        = curl_init();
 				curl_setopt( $ch, CURLOPT_URL, $index_url );
@@ -347,6 +348,10 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
 
+			if ( $this->is_local ) {
+				return new WP_Error( 'invalid_env', esc_html__( 'Unable to resend profile from localhost', 'text-domain' ), array( 'status' => 400 ) );
+			}
+
 			$existing_profile = $this->wpdb->get_row(
 				$this->wpdb->prepare( "SELECT * FROM $this->table_name WHERE cuid = %s", $request['cuid'] ),
 				ARRAY_A
@@ -400,7 +405,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 		}
 
 		private function checkProfile( $request, $data ): WP_Error|array {
-			if ( ! isset( $request['cuid'] ) || ! isset( $data['is_local'] ) || ! isset( $data['index_url'] ) ) {
+			if ( ! isset( $request['cuid'] ) || ! isset( $data['index_url'] ) ) {
 				return new WP_Error( 'invalid_data', esc_html__( 'Invalid data. All fields are required.', 'text-domain' ), array( 'status' => 400 ) );
 			}
 

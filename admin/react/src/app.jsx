@@ -151,7 +151,6 @@ export default function App() {
         linked_schemas: result.linked_schemas,
         profile: result,
         env: env,
-        is_local: isLocalhost(),
         index_url: indexUrl
       }
 
@@ -218,11 +217,6 @@ export default function App() {
   }
 
   const handleResend = async cuid => {
-    if (isLocalhost()) {
-      alert('Unable to resend profile from localhost')
-      return
-    }
-
     setLoading(true)
     setSchema(null)
 
@@ -253,7 +247,7 @@ export default function App() {
     setSchema(null)
 
     try {
-      const response = await api.deleteProfile(cuid, isLocalhost(), indexUrl)
+      const response = await api.deleteProfile(cuid, indexUrl)
       const responseData = await response.json()
 
       if (!response.ok && responseData.code !== 'index_delete_failed') {
@@ -268,13 +262,6 @@ export default function App() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const isLocalhost = () => {
-    return (
-      config.wordpressUrl.indexOf('localhost') !== -1 ||
-      config.wordpressUrl.endsWith('.test')
-    )
   }
 
   const handleKeyDown = (e, callback) => {
