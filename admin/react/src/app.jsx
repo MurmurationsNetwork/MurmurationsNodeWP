@@ -280,30 +280,30 @@ export default function App() {
         Please only publish genuine profiles to the <strong>Live Index</strong>.
         For testing use the <strong>Test Index.</strong>
       </div>
-      <div className="box-border flex flex-row mt-8 text-lg">
+      <div className="mt-8 box-border flex flex-row text-lg">
         <button
-          className="cursor-pointer basis-1/2 bg-orange-300 rounded-t-md mr-1 p-2 text-white text-center"
+          className="mr-1 basis-1/2 cursor-pointer rounded-t-md bg-orange-300 p-2 text-center text-white"
           onClick={() => setTestEnv()}
           tabIndex={0}
           onKeyDown={e => handleKeyDown(e, setTestEnv)}
         >
           <span
             className={`${
-              env === 'test' ? 'font-bold text-2xl' : 'font-light align-middle'
+              env === 'test' ? 'text-2xl font-bold' : 'align-middle font-light'
             }`}
           >
             Test Index
           </span>
         </button>
         <button
-          className="cursor-pointer basis-1/2 bg-orange-400 rounded-t-md ml-1 p-2 text-white text-center"
+          className="ml-1 basis-1/2 cursor-pointer rounded-t-md bg-orange-400 p-2 text-center text-white"
           onClick={() => setProductionEnv()}
           tabIndex={0}
           onKeyDown={e => handleKeyDown(e, setProductionEnv)}
         >
           <span
             className={`${
-              env !== 'test' ? 'font-bold text-2xl' : 'font-light align-middle'
+              env !== 'test' ? 'text-2xl font-bold' : 'align-middle font-light'
             }`}
           >
             Live Index
@@ -315,14 +315,14 @@ export default function App() {
           env === 'test' ? 'border-orange-300' : 'border-orange-400'
         } px-4 pt-4`}
       >
-        <h2 className="text-lg ml-4">
+        <h2 className="ml-4 text-lg">
           What do you want to create a Profile for?
         </h2>
-        <div className="my-0 flex flex-col lg:flex-row items-start px-2 py-1 md:px-4 md:py-2">
+        <div className="my-0 flex flex-col items-start px-2 py-1 md:px-4 md:py-2 lg:flex-row">
           <div className="basis-full lg:basis-3/5">
             <form method="post">
               <select
-                className="block w-full border-1 border-gray-400 bg-white px-4 py-2"
+                className="border-1 block w-full border-gray-400 bg-white px-4 py-2"
                 id="schema"
                 name="schema"
                 multiple={false}
@@ -341,14 +341,14 @@ export default function App() {
               </select>
             </form>
             <button
-              className="mt-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+              className="mt-4 rounded-full bg-orange-500 px-4 py-2 text-lg font-bold text-white hover:scale-110 hover:bg-orange-400 active:scale-90 disabled:opacity-75"
               disabled={loading}
               onClick={() => handleSelectSchema(true)}
             >
               Select
             </button>
           </div>
-          <div className="mt-8 lg:mt-0 xl:px-4 basis-full lg:basis-2/5 text-base">
+          <div className="mt-8 basis-full text-base lg:mt-0 lg:basis-2/5 xl:px-4">
             <div>
               The Murmurations Map displays{' '}
               <a
@@ -394,22 +394,22 @@ export default function App() {
           </div>
         </div>
         <div className="box-border flex flex-col xl:flex-row">
-          <div className="inset-0 basis-full pr-4 py-2 md:py-4 top-0 lg:basis-3/5 md:overflow-y-auto">
+          <div className="inset-0 top-0 basis-full py-2 pr-4 md:overflow-y-auto md:py-4 lg:basis-3/5">
             {schema && (
               <div>
                 <div ref={errorContainerRef}>
                   {validationErrors ? (
-                    <div className="mt-0 mb-4 flex flex-col lg:flex-row items-start py-1 md:py-2">
+                    <div className="mb-4 mt-0 flex flex-col items-start py-1 md:py-2 lg:flex-row">
                       <div className="basis-full">
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                          <strong className="font-bold text-lg">
+                        <div className="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+                          <strong className="text-lg font-bold">
                             Validation Failed!
                           </strong>
                           <ul>
                             {validationErrors.map((error, index) => (
                               <li
                                 key={index}
-                                className="leading-none text-base"
+                                className="text-base leading-none"
                               >
                                 Title: {error.title}, Status: {error.status},
                                 Source: {error.source.pointer}
@@ -465,7 +465,7 @@ export default function App() {
                     </div>
                   )}
                   <button
-                    className="m-4 rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-lg active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+                    className="m-4 rounded-full bg-orange-500 px-4 py-2 text-lg font-bold text-white hover:scale-110 hover:bg-orange-400 active:scale-90 disabled:opacity-75"
                     type="submit"
                     disabled={loading}
                   >
@@ -477,18 +477,18 @@ export default function App() {
               </div>
             )}
           </div>
-          <div className="basis-full px-2 py-2 lg:basis-2/5 md:px-4 md:py-4 text-xl">
+          <div className="basis-full px-2 py-2 text-xl md:px-4 md:py-4 lg:basis-2/5">
             <div
               className={`${
                 env === 'test'
-                  ? 'bg-orange-300 rounded-md px-4 py-1 max-w-lg xl:max-w-full'
-                  : 'bg-orange-400 rounded-md px-4 py-1 max-w-lg xl:max-w-full'
+                  ? 'max-w-lg rounded-md bg-orange-300 px-4 py-1 xl:max-w-full'
+                  : 'max-w-lg rounded-md bg-orange-400 px-4 py-1 xl:max-w-full'
               }`}
             >
               {profiles && profiles.length > 0 ? (
                 profiles.map(profile => (
                   <div
-                    className="box-border flex flex-col bg-orange-100 rounded-md px-2 md:px-8 py-2 md:py-4 my-2 md:my-4"
+                    className="my-2 box-border flex flex-col rounded-md bg-orange-100 px-2 py-2 md:my-4 md:px-8 md:py-4"
                     key={profile.cuid}
                   >
                     <div className="box-border flex">
@@ -517,24 +517,24 @@ export default function App() {
                               setShowModal(true)
                               setProfileErrors(profile.index_errors)
                             }}
-                            className="my-1 mx-2 max-w-fit rounded-full bg-rose-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-rose-400 disabled:opacity-75"
+                            className="mx-2 my-1 max-w-fit rounded-full bg-rose-500 px-4 py-2 text-base font-bold text-white hover:scale-110 hover:bg-rose-400 active:scale-90 disabled:opacity-75"
                           >
                             View Error Details
                           </button>
                         </div>
                       </div>
                     ) : null}
-                    <div className="box-border flex flex-wrap xl:min-w-max flex-row mt-4 justify-between">
+                    <div className="mt-4 box-border flex flex-row flex-wrap justify-between xl:min-w-max">
                       <button
                         onClick={() => handleView(profile.cuid)}
-                        className="my-1 mx-2 max-w-fit rounded-full bg-yellow-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
+                        className="mx-2 my-1 max-w-fit rounded-full bg-yellow-500 px-4 py-2 text-base font-bold text-white hover:scale-110 hover:bg-yellow-400 active:scale-90 disabled:opacity-75"
                       >
                         View
                       </button>
                       {profile.node_id === null || profile.node_id === '' ? (
                         <button
                           onClick={() => handleResend(profile.cuid)}
-                          className="my-1 mx-2 max-w-fit rounded-full bg-amber-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-yellow-400 disabled:opacity-75"
+                          className="mx-2 my-1 max-w-fit rounded-full bg-amber-500 px-4 py-2 text-base font-bold text-white hover:scale-110 hover:bg-yellow-400 active:scale-90 disabled:opacity-75"
                           disabled={loading}
                         >
                           Resend
@@ -542,7 +542,7 @@ export default function App() {
                       ) : null}
                       <button
                         onClick={() => handleModify(profile.cuid)}
-                        className="my-1 mx-2 max-w-fit rounded-full bg-orange-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-orange-400 disabled:opacity-75"
+                        className="mx-2 my-1 max-w-fit rounded-full bg-orange-500 px-4 py-2 text-base font-bold text-white hover:scale-110 hover:bg-orange-400 active:scale-90 disabled:opacity-75"
                         disabled={loading}
                       >
                         Modify
@@ -553,7 +553,7 @@ export default function App() {
                           setDeleteProfileId(profile.cuid)
                           setShowDeleteModal(true)
                         }}
-                        className="my-1 mx-2 max-w-fit rounded-full bg-red-500 px-4 py-2 font-bold text-white text-base active:scale-90 hover:scale-110 hover:bg-red-400 disabled:opacity-75"
+                        className="mx-2 my-1 max-w-fit rounded-full bg-red-500 px-4 py-2 text-base font-bold text-white hover:scale-110 hover:bg-red-400 active:scale-90 disabled:opacity-75"
                         disabled={loading}
                       >
                         Delete
@@ -563,10 +563,10 @@ export default function App() {
                 ))
               ) : (
                 <div>
-                  <div className="my-2 text-lg text-white font-semibold">
+                  <div className="my-2 text-lg font-semibold text-white">
                     No Profiles
                   </div>
-                  <div className="text-white text-base mb-4">
+                  <div className="mb-4 text-base text-white">
                     Select the type of Profile you want to create and then
                     submit it to the Murmurations Index.
                   </div>
@@ -579,9 +579,9 @@ export default function App() {
 
       {loading ? (
         <dialog className="inset-0 z-40 flex items-center justify-center">
-          <div className="bg-yellow-100 p-8 rounded shadow-xl">
-            <p className="text-2xl text-center mb-4">Processing...</p>
-            <p className="text-xl text-center mt-4">
+          <div className="rounded bg-yellow-100 p-8 shadow-xl">
+            <p className="mb-4 text-center text-2xl">Processing...</p>
+            <p className="mt-4 text-center text-xl">
               Murmurations is an unfunded volunteer-led project.
               <br />
               Please consider{' '}
@@ -599,11 +599,11 @@ export default function App() {
         </dialog>
       ) : null}
       {showModal && !loading ? (
-        <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
-          <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
+        <dialog className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 backdrop-blur backdrop-filter">
+          <div className="h-auto w-96 rounded-lg bg-white shadow-lg">
             <div className="p-6">
-              <h3 className="font-bold text-xl mb-4">Error Details</h3>
-              <p className="text-gray-600 mb-4 break-all">
+              <h3 className="mb-4 text-xl font-bold">Error Details</h3>
+              <p className="mb-4 break-all text-gray-600">
                 {profileErrors ? JSON.stringify(profileErrors) : 'No errors'}
               </p>
               <div className="modal-action flex justify-end">
@@ -612,7 +612,7 @@ export default function App() {
                     setShowModal(false)
                     setProfileErrors(null)
                   }}
-                  className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-300"
+                  className="rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600"
                 >
                   Close
                 </button>
@@ -622,10 +622,10 @@ export default function App() {
         </dialog>
       ) : null}
       {showDeleteModal && !loading ? (
-        <dialog className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur backdrop-filter bg-opacity-50">
-          <div className="w-96 h-auto bg-white rounded-lg shadow-lg">
+        <dialog className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 backdrop-blur backdrop-filter">
+          <div className="h-auto w-96 rounded-lg bg-white shadow-lg">
             <div className="p-6">
-              <h3 className="font-bold text-xl mb-4">
+              <h3 className="mb-4 text-xl font-bold">
                 Are you sure you want to delete this profile?
               </h3>
               <div className="modal-action flex justify-between">
@@ -636,7 +636,7 @@ export default function App() {
                       setDeleteProfileId(null)
                     })
                   }}
-                  className="mt-4 rounded-full bg-red-500 px-4 py-2 font-bold text-lg text-white hover:scale-110 hover:bg-red-400"
+                  className="mt-4 rounded-full bg-red-500 px-4 py-2 text-lg font-bold text-white hover:scale-110 hover:bg-red-400"
                 >
                   Confirm Delete
                 </button>
@@ -645,7 +645,7 @@ export default function App() {
                     setShowDeleteModal(false)
                     setDeleteProfileId(null)
                   }}
-                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 font-bold text-lg text-white hover:bg-yellow-400"
+                  className="mt-4 rounded-full bg-yellow-500 px-4 py-2 text-lg font-bold text-white hover:bg-yellow-400"
                 >
                   Cancel
                 </button>
