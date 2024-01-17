@@ -2,16 +2,18 @@
 Contributors: geoffturk, twang443
 Donate link: https://opencollective.com/murmurations
 Tags: murmurations, network, regenerative economy, map
-Requires at least: 6.0.5
-Tested up to: 6.2.2
+Requires at least: 6.4.2
+Tested up to: 6.4.2
 Stable tag: 1.0.0
-Requires PHP: 7.4
+Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Generate a profile for your organization and share it in the Murmurations network
+Generate a profile for your organization, yourself or an offer/want and share it in the Murmurations network
 
 == Description ==
+
+This plugin enables you to publish information about yourself or your organization to the Murmurations network, modify that data as it changes, and ultimately remove it when it is no longer relevant. Data aggregators can discover your information through the Murmurations index and add it to their maps and directories if it is relevant to the type of information they aggregate.
 
 Murmurations is a distributed data sharing network built to help connect regenerative economy projects and organizations and make them visible to the world and each other.
 
@@ -28,7 +30,7 @@ To enable these entities to work together, Murmurations provides:
 - An [Index](https://index.murmurations.network/v2/nodes), a [Library](https://library.murmurations.network/v2/schemas) and a user-friendly data host (our [Profile Generator](https://tools.murmurations.network/profile-generator))) which enables organizations to quickly add themselves to the network.
 - [Open source plug-ins and other code](https://github.com/MurmurationsNetwork) to make it as easy as possible to use, share and contribute data to the network in a decentralized way.
 
-The initial use case for Murmurations was to facilitate decentralized mapping of purpose-driven and solidarity economy organizations and projects.
+The initial use case for Murmurations is to facilitate decentralized mapping of purpose-driven and solidarity economy organizations and projects.
 
 Further historical background is in the 2019 [Murmurations Whitepaper](https://murmurations.network/wp-content/uploads/2019/09/murmurations-white-paper-v0.1.0.pdf).
 
@@ -38,7 +40,7 @@ This section describes how to install the plugin and get it working.
 
 1. Upload the plugin files to the `/wp-content/plugins` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Select the Murmurations option in the Admin menu and then start submitting profiles to the Murmurations Network.
+3. Select the Murm-Profiles option in the Admin menu and then start submitting profiles to the Murmurations Index, where they can be discovered by map makers and other data aggregators.
 
 == Frequently Asked Questions ==
 
