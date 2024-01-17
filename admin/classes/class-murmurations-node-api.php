@@ -48,7 +48,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 					array(
 						'method'              => 'GET',
 						'callback'            => array( $this, 'get_profile' ),
-						'permission_callback' => '__return_true'
+						'permission_callback' => '__return_true',
 					),
 					array(
 						'methods'             => 'PUT',
@@ -176,7 +176,7 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				'linked_schemas' => wp_json_encode( $data['linked_schemas'] ),
 				'title'          => sanitize_text_field( $data['title'] ),
 				'profile'        => wp_json_encode( $data['profile'] ),
-				'env'            => sanitize_text_field( $data['env'] )
+				'env'            => sanitize_text_field( $data['env'] ),
 			);
 
 			$result = $this->wpdb->insert( $this->table_name, $insert_data );
@@ -280,10 +280,12 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 				if ( $result === false ) {
 					// update index_errors
 					$update_data = array(
-						'index_errors' => wp_json_encode( array(
-							'status' => $ch['http_code'] ?? '',
-							'errors' => curl_error( $ch ),
-						) ),
+						'index_errors' => wp_json_encode(
+							array(
+								'status' => $ch['http_code'] ?? '',
+								'errors' => curl_error( $ch ),
+							)
+						),
 					);
 
 					$result = $this->wpdb->update(
@@ -426,52 +428,54 @@ if ( ! class_exists( 'Murmurations_Node_API' ) ) {
 			$ch         = curl_init();
 			curl_setopt( $ch, CURLOPT_URL, $indexUrl );
 			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, wp_json_encode( [ 'profile_url' => $profileUrl ] ) );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, wp_json_encode( array( 'profile_url' => $profileUrl ) ) );
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = curl_exec( $ch );
 			curl_close( $ch );
 
 			if ( $result === false ) {
 				// update index_errors
-				$updateData = [
-					'index_errors' => wp_json_encode( [
-						'status' => $ch['http_code'] ?? '',
-						'errors' => curl_error( $ch ),
-					] ),
-				];
+				$updateData = array(
+					'index_errors' => wp_json_encode(
+						array(
+							'status' => $ch['http_code'] ?? '',
+							'errors' => curl_error( $ch ),
+						)
+					),
+				);
 
 				$updateResult = $this->wpdb->update(
 					$this->table_name,
 					$updateData,
-					[ 'cuid' => $cuid ]
+					array( 'cuid' => $cuid )
 				);
 
 				if ( $updateResult === false ) {
-					return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), [ 'status' => 500 ] );
+					return new WP_Error( 'update_failed', esc_html__( 'Failed to update the profile.', 'text-domain' ), array( 'status' => 500 ) );
 				}
 
-				return new WP_Error( 'index_update_failed', esc_html__( 'Failed to update the profile in the index.', 'text-domain' ), [ 'status' => 500 ] );
+				return new WP_Error( 'index_update_failed', esc_html__( 'Failed to update the profile in the index.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
 			// update node_id
 			$responseData = json_decode( $result, true );
 
 			if ( ! $responseData || ! isset( $responseData['data'] ) || ! isset( $responseData['data']['node_id'] ) ) {
-				return new WP_Error( 'node_id_not_found', esc_html__( 'Node ID not found in the response.', 'text-domain' ), [ 'status' => 500 ] );
+				return new WP_Error( 'node_id_not_found', esc_html__( 'Node ID not found in the response.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
-			$updateData = [
+			$updateData = array(
 				'node_id' => sanitize_text_field( $responseData['data']['node_id'] ),
-			];
+			);
 
 			$updateResult = $this->wpdb->update(
 				$this->table_name,
 				$updateData,
-				[ 'cuid' => $cuid ]
+				array( 'cuid' => $cuid )
 			);
 
 			if ( $updateResult === false ) {
-				return new WP_Error( 'node_id_update_failed', esc_html__( 'Failed to update the node id.', 'text-domain' ), [ 'status' => 500 ] );
+				return new WP_Error( 'node_id_update_failed', esc_html__( 'Failed to update the node id.', 'text-domain' ), array( 'status' => 500 ) );
 			}
 
 			return null;
