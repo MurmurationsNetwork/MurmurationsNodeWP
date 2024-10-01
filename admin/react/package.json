@@ -14,7 +14,7 @@
     "lint-fix": "eslint --ignore-path .gitignore --ext .js --ext .jsx . --fix",
     "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|jsx|json)\"",
     "format": "npm run prettier -- --write",
-    "prepare": "cd ../.. && husky admin/react/.husky",
+    "prepare": "cd ../.. && npx husky admin/react/.husky",
     "readme": "Grunt"
   },
   "eslintConfig": {
