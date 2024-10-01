@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  css: {
+    postcss: './postcss.config.js'
+  },
   build: {
     target: 'esnext',
     cssCodeSplit: false,
@@ -13,7 +16,8 @@ export default defineConfig({
       output: {
         entryFileNames: 'index.js',
         assetFileNames: 'index.css',
-        inlineDynamicImports: true
+        inlineDynamicImports: true,
+        format: 'iife'
       }
     }
   }
