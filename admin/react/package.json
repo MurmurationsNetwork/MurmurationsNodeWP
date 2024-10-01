@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "GPLv3",
+  "type": "module",
   "scripts": {
-    "build": "npm-run-all --sequential build:*",
-    "build:prod": "webpack --mode production",
+    "build": "npm-run-all --sequential build:css build:vite",
+    "build:vite": "vite build",
     "build:css": "tailwindcss -i src/styles/styles.css -o ../assets/react/index.css --minify",
-    "dev": "npm-run-all --parallel watch:*",
-    "watch:dev": "webpack --watch",
+    "dev": "npm-run-all --parallel watch:css vite",
     "watch:css": "tailwindcss -i ./src/styles/styles.css -o ../assets/react/index.css --watch --minify",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .jsx .",
     "lint-fix": "eslint --ignore-path .gitignore --ext .js --ext .jsx . --fix",
@@ -32,8 +32,10 @@
     "@murmurations/jsig": "^1.0.9",
     "@murmurations/jsrfg": "^1.0.7",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@vitejs/plugin-react": "^4.3.2",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -58,6 +60,7 @@
     "prettier-plugin-tailwindcss": "^0.6.8",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.13",
+    "vite-plugin-singlefile": "^2.0.2",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4"
   },
