@@ -1,3 +1,5 @@
+> This project has been archived. Please see [MurmurMaps](https://github.com/MurmurationsNetwork/MurmurMaps) for the latest implementation of Murmurations node profile generation.
+
 # Murmurations Node #
 **Contributors:** [geoffturk](https://profiles.wordpress.org/geoffturk/), [twang443](https://profiles.wordpress.org/twang443/)  
 **Donate link:** https://opencollective.com/murmurations  
